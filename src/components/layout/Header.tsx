@@ -1,0 +1,220 @@
+import { useEffect, useState, type FormEvent } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  Search, ShoppingCart, User, Phone, MapPin, Menu, X,
+  Truck, Headphones, ShieldCheck, LogOut
+} from "lucide-react";
+import { useCart } from "@/hooks/use-cart";
+import { getCurrentUser, logoutUser, subscribeAuthChange, type AuthSession } from "@/lib/auth";
+import { useSiteSettings } from "@/hooks/queries/settings.queries";
+import { cn } from "@/lib/utils";
+import logoLocan from "@/assets/logo/logo_locan.png";
+
+const menuItems = [
+  { name: "🏠 Trang chủ", path: "/" },
+  { name: "⚡Flash Sale", path: "/flash-sale" },
+  { name: "⚙️ Build PC", path: "/build-pc" },
+  { name: "🔧 Sửa chữa vệ sinh máy tính", path: "/dich-vu/" },
+  // { name: "🚚 Giao hàng nhanh", path: "/giao-hang-nhanh" },
+  { name: "💎 Ưu đãi thành viên", path: "/uu-dai-thanh-vien" },
+];
+
+const commitments = [
+  { icon: Truck, text: "Giao hàng nhanh" },
+  { icon: Headphones, text: "Hỗ trợ kỹ thuật" },
+  { icon: ShieldCheck, text: "Bảo hành rõ ràng" },
+];
+
+const defaultSiteSettings = {
+  siteName: "Lộc An",
+  hotline: "0989386219",
+  address: "7 La Dương, Dương Nội, Hà Đông",
+};
+
+export default function Header() {
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentUser, setCurrentUser] = useState<AuthSession | null>(null);
+  const { totalItems } = useCart();
+  const { data: siteSettings } = useSiteSettings();
+  const navigate = useNavigate();
+  const [isScrolled, setIsScrolled] = useState(false);
+  const settings = { ...defaultSiteSettings, ...siteSettings };
+
+  useEffect(() => {
+    const syncUser = () => setCurrentUser(getCurrentUser());
+    syncUser();
+    return subscribeAuthChange(syncUser);
+  }, []);
+
+  useEffect(() => {
+    const onScroll = () => setIsScrolled(window.scrollY > 10);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const handleLogout = () => {
+    logoutUser();
+    setMobileOpen(false);
+  };
+
+  const handleSearchSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    const q = searchQuery.trim();
+    if (!q) return;
+    navigate(`/tim-kiem?q=${encodeURIComponent(q)}`);
+  };
+
+  return (
+    <header className={cn("sticky top-0 z-50 transition-shadow duration-300", isScrolled ? "shadow-header" : "shadow-none")}>
+      <div className="bg-white text-foreground">
+        <div className="section-container flex items-center justify-between py-1.5 text-xs">
+          <div className="flex items-center gap-4">
+            {commitments.map((c, i) => (
+              <span key={i} className="hidden sm:flex items-center gap-1">
+                <c.icon className="h-3.5 w-3.5" />
+                {c.text}
+              </span>
+            ))}
+          </div>
+          <div className="flex items-center gap-3">
+            <Link to="/lien-he" className="flex items-center gap-1 hover:underline">
+              <MapPin className="h-3.5 w-3.5" />
+              <span className="hidden md:inline">{settings.address}</span>
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      <div className="header-bg text-primary-foreground">
+        <div className="section-container flex items-center gap-4 py-0 h-20">
+          <button
+            className="lg:hidden p-2 rounded-md hover:bg-primary-light/20"
+            onClick={() => setMobileOpen(!mobileOpen)}
+          >
+            {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
+
+          <Link to="/" className="flex-shrink-0">
+            <img
+              src={logoLocan}
+              alt={settings.siteName}
+              className="max-h-[120px] w-auto max-w-[200px] object-contain"
+            />
+          </Link>
+
+          <div className="flex-1 max-w-2xl mx-2 md:mx-6">
+            <form className="relative" onSubmit={handleSearchSubmit}>
+              <input
+                type="text"
+                name="q"
+                placeholder="Tìm sản phẩm, linh kiện, dịch vụ..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full py-1 pl-3 pr-10 rounded-lg text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-accent"
+              />
+              <button
+                type="submit"
+                className="absolute right-0 top-0 h-full px-4 rounded-r-lg bg-accent text-accent-foreground hover:bg-accent-hover transition-colors"
+                aria-label="Tìm kiếm"
+              >
+                <Search className="h-4 w-4" />
+              </button>
+            </form>
+          </div>
+
+          <a href={`tel:${settings.hotline}`} className="hidden md:flex items-center gap-2 hover:opacity-90 flex-shrink-0">
+            <Phone className="h-4 w-4" />
+            <div>
+              <div className="text-xs opacity-80">Hotline</div>
+              <div className="font-bold text-sm">{settings.hotline}</div>
+            </div>
+          </a>
+
+          <div className="flex items-center gap-1 md:gap-3">
+            {currentUser ? (
+              <Link
+                to="/tai-khoan"
+                className="p-1.5 rounded-md hover:bg-primary-light/20 flex flex-col items-center"
+                title={currentUser.fullName}
+              >
+                <User className="h-4 w-4" />
+                <span className="text-[10px] hidden md:block max-w-[84px] truncate">{currentUser.fullName}</span>
+              </Link>
+            ) : (
+              <Link to="/dang-nhap" className="p-1.5 rounded-md hover:bg-primary-light/20 flex flex-col items-center">
+                <User className="h-4 w-4" />
+                <span className="text-[10px] hidden md:block">Tài khoản</span>
+              </Link>
+            )}
+
+            <Link to="/gio-hang" className="p-1.5 rounded-md hover:bg-primary-light/20 flex flex-col items-center relative">
+              <ShoppingCart className="h-4 w-4" />
+              <span className="text-[10px] hidden md:block">Giỏ hàng</span>
+              <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-accent text-accent-foreground text-[10px] flex items-center justify-center font-bold">{totalItems}</span>
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      <nav className="bg-white hidden lg:block border-b border-border/50">
+        <div className="section-container">
+          <ul className="flex w-full items-center justify-between">
+            {menuItems.map((item) => (
+              <li key={item.path}>
+                <Link
+                  to={item.path}
+                  className="block whitespace-nowrap px-3 py-2.5 text-foreground text-sm font-medium hover:bg-muted transition-colors"
+                >
+                  {item.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </nav>
+
+      {mobileOpen && (
+        <nav className="lg:hidden bg-card border-b shadow-lg absolute w-full z-50 max-h-[80vh] overflow-y-auto">
+          <div className="py-2">
+            <a href={`tel:${settings.hotline}`} className="flex items-center gap-3 px-4 py-3 text-sale font-bold border-b">
+              <Phone className="h-5 w-5" />
+              Gọi ngay: {settings.hotline}
+            </a>
+
+            {menuItems.map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                className="block px-4 py-3 text-sm font-medium text-foreground hover:bg-muted border-b border-border/50"
+                onClick={() => setMobileOpen(false)}
+              >
+                {item.name}
+              </Link>
+            ))}
+
+            {currentUser ? (
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-foreground hover:bg-muted border-b border-border/50"
+              >
+                <LogOut className="h-4 w-4" />
+                Đăng xuất ({currentUser.fullName})
+              </button>
+            ) : (
+              <Link
+                to="/dang-nhap"
+                className="block px-4 py-3 text-sm font-medium text-foreground hover:bg-muted border-b border-border/50"
+                onClick={() => setMobileOpen(false)}
+              >
+                Tài khoản
+              </Link>
+            )}
+          </div>
+        </nav>
+      )}
+    </header>
+  );
+}

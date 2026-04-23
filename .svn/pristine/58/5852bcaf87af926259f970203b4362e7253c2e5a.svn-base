@@ -1,0 +1,117 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.userService = void 0;
+const database_1 = require("@/config/database");
+const bcrypt_util_1 = require("@/utils/bcrypt.util");
+const client_1 = require("@prisma/client");
+exports.userService = {
+    async getAllAdmin() {
+        return database_1.prisma.user.findMany({
+            where: { role: { in: [client_1.Role.ADMIN, client_1.Role.SUPERADMIN] } },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                phone: true,
+                role: true,
+                status: true,
+                avatar: true,
+                createdAt: true,
+            },
+            orderBy: { createdAt: 'desc' },
+        });
+    },
+    async getAllCustomers() {
+        return database_1.prisma.user.findMany({
+            where: {
+                role: client_1.Role.CUSTOMER,
+                status: { not: 'DELETED' },
+            },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                phone: true,
+                role: true,
+                status: true,
+                avatar: true,
+                createdAt: true,
+            },
+            orderBy: { createdAt: 'desc' },
+        });
+    },
+    async getAllCustomers() {
+        return database_1.prisma.user.findMany({
+            where: {
+                role: client_1.Role.CUSTOMER,
+                status: { not: 'DELETED' },
+            },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                phone: true,
+                role: true,
+                status: true,
+                avatar: true,
+                createdAt: true,
+            },
+            orderBy: { createdAt: 'desc' },
+        });
+    },
+    async getById(id) {
+        return database_1.prisma.user.findUnique({
+            where: { id },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                phone: true,
+                role: true,
+                status: true,
+                avatar: true,
+                createdAt: true,
+            },
+        });
+    },
+    async create(data) {
+        const passwordHash = await (0, bcrypt_util_1.hashPassword)(data.password);
+        return database_1.prisma.user.create({
+            data: { ...data, passwordHash },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                phone: true,
+                role: true,
+                status: true,
+                avatar: true,
+                createdAt: true,
+            },
+        });
+    },
+    async update(id, data) {
+        return database_1.prisma.user.update({
+            where: { id },
+            data,
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                phone: true,
+                role: true,
+                status: true,
+                avatar: true,
+                createdAt: true,
+            },
+        });
+    },
+    async delete(id) {
+        // Soft-delete by suspending
+        return database_1.prisma.user.update({
+            where: { id },
+            data: { status: 'DELETED' },
+            select: { id: true },
+        });
+    },
+};

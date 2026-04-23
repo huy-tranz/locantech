@@ -1,0 +1,52 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const admin_middleware_1 = require("@/middleware/admin.middleware");
+const user_service_1 = require("@/services/user.service");
+const client_1 = require("@prisma/client");
+const router = (0, express_1.Router)();
+// GET /admin/users
+router.get('/admin/users', ...admin_middleware_1.requireAdmin, async (_req, res) => {
+    const users = await user_service_1.userService.getAllAdmin();
+    res.json(users);
+});
+// GET /admin/customers
+router.get('/admin/customers', ...admin_middleware_1.requireAdmin, async (_req, res) => {
+    const customers = await user_service_1.userService.getAllCustomers();
+    res.json(customers);
+});
+// GET /admin/customers
+router.get('/admin/customers', ...admin_middleware_1.requireAdmin, async (_req, res) => {
+    const customers = await user_service_1.userService.getAllCustomers();
+    res.json(customers);
+});
+// GET /admin/users/:id
+router.get('/admin/users/:id', ...admin_middleware_1.requireAdmin, async (req, res) => {
+    const user = await user_service_1.userService.getById(req.params.id);
+    if (!user) {
+        res.status(404).json({ error: 'Không tìm thấy người dùng' });
+        return;
+    }
+    res.json(user);
+});
+// POST /admin/users
+router.post('/admin/users', ...admin_middleware_1.requireAdmin, async (req, res) => {
+    const { name, email, phone, role, password } = req.body;
+    if (!name || !email || !password) {
+        res.status(400).json({ error: 'Thiếu thông tin bắt buộc' });
+        return;
+    }
+    const user = await user_service_1.userService.create({ name, email, phone, role: role || client_1.Role.ADMIN, password });
+    res.status(201).json(user);
+});
+// PATCH /admin/users/:id
+router.patch('/admin/users/:id', ...admin_middleware_1.requireAdmin, async (req, res) => {
+    const user = await user_service_1.userService.update(req.params.id, req.body);
+    res.json(user);
+});
+// DELETE /admin/users/:id
+router.delete('/admin/users/:id', ...admin_middleware_1.requireAdmin, async (req, res) => {
+    await user_service_1.userService.delete(req.params.id);
+    res.json({ success: true });
+});
+exports.default = router;

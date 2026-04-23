@@ -1,0 +1,158 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.productService = void 0;
+const database_1 = require("@/config/database");
+const error_middleware_1 = require("@/middleware/error.middleware");
+exports.productService = {
+    async getAll(filters) {
+        const page = Math.max(1, filters.page || 1);
+        const limit = Math.min(100, Math.max(1, filters.limit || 20));
+        const skip = (page - 1) * limit;
+        const where = {
+            status: filters.status === 'all' ? undefined : 'PUBLISHED',
+        };
+        if (filters.category) {
+            where.category = { slug: filters.category };
+        }
+        if (filters.search) {
+            where.OR = [
+                { name: { contains: filters.search, mode: 'insensitive' } },
+                { sku: { contains: filters.search, mode: 'insensitive' } },
+                { brand: { contains: filters.search, mode: 'insensitive' } },
+            ];
+        }
+        if (filters.minPrice !== undefined) {
+            where.price = { ...where.price, gte: filters.minPrice };
+        }
+        if (filters.maxPrice !== undefined) {
+            where.price = { ...where.price, lte: filters.maxPrice };
+        }
+        if (filters.featured !== undefined) {
+            where.isFeatured = filters.featured;
+        }
+        if (filters.bestSeller !== undefined) {
+            where.isBestSeller = filters.bestSeller;
+        }
+        if (filters.brand) {
+            where.brand = { equals: filters.brand, mode: 'insensitive' };
+        }
+        // Sorting
+        let orderBy = { createdAt: 'desc' };
+        switch (filters.sort) {
+            case 'price_asc':
+                orderBy = { price: 'asc' };
+                break;
+            case 'price_desc':
+                orderBy = { price: 'desc' };
+                break;
+            case 'name':
+                orderBy = { name: 'asc' };
+                break;
+            case 'sold':
+                orderBy = { soldCount: 'desc' };
+                break;
+            case 'newest':
+                orderBy = { createdAt: 'desc' };
+                break;
+        }
+        const [products, total] = await Promise.all([
+            database_1.prisma.product.findMany({
+                where,
+                include: { category: { select: { id: true, name: true, slug: true } } },
+                orderBy,
+                skip,
+                take: limit,
+            }),
+            database_1.prisma.product.count({ where }),
+        ]);
+        return {
+            products,
+            pagination: {
+                page,
+                limit,
+                total,
+                totalPages: Math.ceil(total / limit),
+            },
+        };
+    },
+    async getById(id) {
+        const product = await database_1.prisma.product.findUnique({
+            where: { id },
+            include: { category: true },
+        });
+        if (!product)
+            throw new error_middleware_1.AppError(404, 'Product not found');
+        return product;
+    },
+    async getBySlug(slug) {
+        const product = await database_1.prisma.product.findUnique({
+            where: { slug },
+            include: { category: true },
+        });
+        if (!product)
+            throw new error_middleware_1.AppError(404, 'Product not found');
+        return product;
+    },
+    async getFeatured(limit = 8) {
+        return database_1.prisma.product.findMany({
+            where: { status: 'PUBLISHED', isFeatured: true },
+            take: limit,
+            orderBy: { createdAt: 'desc' },
+        });
+    },
+    async getBestSellers(limit = 8) {
+        return database_1.prisma.product.findMany({
+            where: { status: 'PUBLISHED', isBestSeller: true },
+            take: limit,
+            orderBy: { soldCount: 'desc' },
+        });
+    },
+    async getRelated(productId, limit = 4) {
+        const product = await database_1.prisma.product.findUnique({ where: { id: productId } });
+        if (!product)
+            throw new error_middleware_1.AppError(404, 'Product not found');
+        return database_1.prisma.product.findMany({
+            where: {
+                status: 'PUBLISHED',
+                id: { not: productId },
+                OR: [
+                    { categoryId: product.categoryId },
+                    { brand: product.brand },
+                ],
+            },
+            take: limit,
+            orderBy: { soldCount: 'desc' },
+        });
+    },
+    async getBrands() {
+        const products = await database_1.prisma.product.findMany({
+            where: { status: 'PUBLISHED', brand: { not: null } },
+            select: { brand: true },
+            distinct: ['brand'],
+            orderBy: { brand: 'asc' },
+        });
+        return products.map((p) => p.brand).filter(Boolean);
+    },
+    // Admin CRUD
+    async create(data) {
+        const existing = await database_1.prisma.product.findFirst({
+            where: { OR: [{ sku: data.sku }, { slug: data.slug }] },
+        });
+        if (existing)
+            throw new error_middleware_1.AppError(409, 'Product with this SKU or slug already exists');
+        return database_1.prisma.product.create({ data });
+    },
+    async update(id, data) {
+        const product = await database_1.prisma.product.findUnique({ where: { id } });
+        if (!product)
+            throw new error_middleware_1.AppError(404, 'Product not found');
+        return database_1.prisma.product.update({ where: { id }, data });
+    },
+    async delete(id) {
+        const product = await database_1.prisma.product.findUnique({ where: { id } });
+        if (!product)
+            throw new error_middleware_1.AppError(404, 'Product not found');
+        await database_1.prisma.product.delete({ where: { id } });
+        return { message: 'Product deleted' };
+    },
+};

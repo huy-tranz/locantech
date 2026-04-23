@@ -1,0 +1,90 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.repairService = void 0;
+const database_1 = require("@/config/database");
+const orderNumber_util_1 = require("@/utils/orderNumber.util");
+const error_middleware_1 = require("@/middleware/error.middleware");
+exports.repairService = {
+    async getAll(userId) {
+        return database_1.prisma.repairRequest.findMany({
+            where: { userId },
+            include: {
+                product: { select: { id: true, name: true, slug: true } },
+            },
+            orderBy: { createdAt: 'desc' },
+        });
+    },
+    async getById(requestId, userId) {
+        const request = await database_1.prisma.repairRequest.findUnique({
+            where: { id: requestId },
+            include: {
+                product: true,
+                timeline: { orderBy: { createdAt: 'asc' } },
+            },
+        });
+        if (!request)
+            throw new error_middleware_1.AppError(404, 'Repair request not found');
+        if (request.userId !== userId)
+            throw new error_middleware_1.AppError(403, 'Access denied');
+        return request;
+    },
+    async create(userId, data) {
+        return database_1.prisma.repairRequest.create({
+            data: {
+                ticketNumber: await (0, orderNumber_util_1.generateTicketNumber)(),
+                userId,
+                productId: data.productId,
+                deviceBrand: data.deviceBrand,
+                deviceModel: data.deviceModel,
+                deviceImei: data.deviceImei,
+                faultDescription: data.faultDescription,
+                faultImages: data.faultImages ?? [],
+                timeline: {
+                    create: { status: 'RECEIVED', note: 'Yêu cầu sửa chữa đã được tiếp nhận' },
+                },
+            },
+            include: { timeline: true },
+        });
+    },
+    async updateStatus(requestId, status, note, adminId) {
+        const request = await database_1.prisma.repairRequest.findUnique({ where: { id: requestId } });
+        if (!request)
+            throw new error_middleware_1.AppError(404, 'Repair request not found');
+        const updateData = { status };
+        if (status === 'APPROVED' && request.estimatedCost) {
+            // Nothing special
+        }
+        return database_1.prisma.repairRequest.update({
+            where: { id: requestId },
+            data: {
+                ...updateData,
+                timeline: {
+                    create: { status, note, updatedBy: adminId },
+                },
+            },
+            include: { timeline: true },
+        });
+    },
+    async getAllAdmin(filters) {
+        const page = Math.max(1, filters.page || 1);
+        const limit = Math.min(100, Math.max(1, filters.limit || 20));
+        const skip = (page - 1) * limit;
+        const where = {};
+        if (filters.status)
+            where.status = filters.status;
+        const [requests, total] = await Promise.all([
+            database_1.prisma.repairRequest.findMany({
+                where,
+                include: {
+                    user: { select: { id: true, name: true, email: true, phone: true } },
+                    product: { select: { id: true, name: true } },
+                },
+                orderBy: { createdAt: 'desc' },
+                skip,
+                take: limit,
+            }),
+            database_1.prisma.repairRequest.count({ where }),
+        ]);
+        return { requests, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } };
+    },
+};

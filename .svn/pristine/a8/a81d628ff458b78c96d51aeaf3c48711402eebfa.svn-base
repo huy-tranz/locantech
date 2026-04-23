@@ -1,0 +1,82 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.categoryService = void 0;
+const database_1 = require("@/config/database");
+const slug_util_1 = require("@/utils/slug.util");
+const error_middleware_1 = require("@/middleware/error.middleware");
+exports.categoryService = {
+    async getAll() {
+        // Return nested tree structure
+        const categories = await database_1.prisma.category.findMany({
+            where: { isActive: true },
+            include: { children: { where: { isActive: true }, orderBy: { sortOrder: 'asc' } } },
+            orderBy: { sortOrder: 'asc' },
+        });
+        return categories.filter((c) => !c.parentId); // Only root categories
+    },
+    async getAllFlat() {
+        return database_1.prisma.category.findMany({
+            where: { isActive: true },
+            orderBy: { sortOrder: 'asc' },
+        });
+    },
+    async getById(id) {
+        const category = await database_1.prisma.category.findUnique({
+            where: { id },
+            include: { parent: true, children: { where: { isActive: true } } },
+        });
+        if (!category)
+            throw new error_middleware_1.AppError(404, 'Category not found');
+        return category;
+    },
+    async getBySlug(slug) {
+        const category = await database_1.prisma.category.findUnique({
+            where: { slug },
+            include: { children: { where: { isActive: true } } },
+        });
+        if (!category)
+            throw new error_middleware_1.AppError(404, 'Category not found');
+        return category;
+    },
+    async create(data) {
+        const slug = (0, slug_util_1.generateSlug)(data.name);
+        if (data.parentId) {
+            const parent = await database_1.prisma.category.findUnique({ where: { id: data.parentId } });
+            if (!parent)
+                throw new error_middleware_1.AppError(404, 'Parent category not found');
+        }
+        return database_1.prisma.category.create({
+            data: { ...data, slug },
+        });
+    },
+    async update(id, data) {
+        const category = await database_1.prisma.category.findUnique({ where: { id } });
+        if (!category)
+            throw new error_middleware_1.AppError(404, 'Category not found');
+        const slug = data.name ? (0, slug_util_1.generateSlug)(data.name) : category.slug;
+        return database_1.prisma.category.update({
+            where: { id },
+            data: { ...data, slug },
+        });
+    },
+    async delete(id) {
+        const category = await database_1.prisma.category.findUnique({
+            where: { id },
+            include: { children: true, products: true },
+        });
+        if (!category)
+            throw new error_middleware_1.AppError(404, 'Category not found');
+        if (category.children.length > 0) {
+            throw new error_middleware_1.AppError(400, 'Cannot delete category with subcategories');
+        }
+        if (category.products.length > 0) {
+            // Just unlink products instead of blocking delete
+            await database_1.prisma.product.updateMany({
+                where: { categoryId: id },
+                data: { categoryId: null },
+            });
+        }
+        await database_1.prisma.category.delete({ where: { id } });
+        return { message: 'Category deleted' };
+    },
+};

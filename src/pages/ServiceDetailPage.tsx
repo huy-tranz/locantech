@@ -1,0 +1,197 @@
+import { useParams, Link } from "react-router-dom";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
+import FloatingActions from "@/components/layout/FloatingActions";
+import { getAllServices, getServiceIcon } from "@/data/services";
+import { ChevronRight, Phone, CheckCircle, ArrowRight } from "lucide-react";
+
+const serviceDetails: Record<string, {
+  issues: string[];
+  causes: string[];
+  process: string[];
+  pricing: { item: string; price: string }[];
+  faq: { q: string; a: string }[];
+}> = {
+  "sua-laptop": {
+    issues: ["Máy chạy chậm, treo, giật lag", "Không lên nguồn", "Màn hình bị sọc, nhòe, chết điểm ảnh", "Bản lề gãy, vỏ nứt", "Pin chai, hết pin nhanh", "Bàn phím hỏng, gõ lỗi phím"],
+    causes: ["Lỗi ổ cứng hoặc RAM", "IC nguồn hỏng, sạc bị lỗi", "Cáp màn hình lỏng, panel hỏng", "Va đập, sử dụng lâu ngày"],
+    process: ["Nhận máy, kiểm tra miễn phí", "Báo giá chi tiết cho khách", "Khách đồng ý → Tiến hành sửa", "Test máy kỹ trước khi bàn giao", "Bảo hành sau sửa chữa"],
+    pricing: [{ item: "Thay màn hình laptop", price: "800.000 - 2.500.000đ" }, { item: "Thay bản lề", price: "300.000 - 600.000đ" }, { item: "Sửa nguồn laptop", price: "400.000 - 1.200.000đ" }, { item: "Thay bàn phím", price: "300.000 - 800.000đ" }],
+    faq: [{ q: "Sửa mất bao lâu?", a: "Thông thường 1-3 ngày tùy lỗi, lỗi đơn giản có thể sửa trong ngày." }, { q: "Có bảo hành sau sửa không?", a: "Có, Lộc An bảo hành 1-3 tháng tùy loại linh kiện thay thế." }],
+  },
+  "sua-pc": {
+    issues: ["Máy không lên nguồn", "Kêu bíp liên tục", "Treo xanh màn hình (BSOD)", "Quạt kêu to, máy quá nóng", "Không nhận RAM/SSD mới"],
+    causes: ["Lỗi nguồn (PSU), mainboard hỏng", "RAM lỏng hoặc hỏng", "Lỗi driver, HDD/SSD bad sector", "Bụi bẩn, keo tản nhiệt khô"],
+    process: ["Nhận máy, kiểm tra miễn phí", "Báo giá rõ ràng", "Khách đồng ý → Tiến hành sửa", "Test stress máy kỹ", "Bàn giao + bảo hành"],
+    pricing: [{ item: "Sửa mainboard", price: "300.000 - 1.500.000đ" }, { item: "Thay nguồn PSU", price: "Linh kiện + 100.000đ công" }, { item: "Sửa lỗi phần mềm", price: "150.000 - 300.000đ" }],
+    faq: [{ q: "Có sửa tại nhà không?", a: "Có, Lộc An hỗ trợ sửa tại nhà trong khu vực Hà Đông và lân cận." }],
+  },
+};
+
+// Default detail for services without specific content
+const defaultDetail = {
+  issues: ["Thiết bị hoạt động không ổn định", "Không đạt hiệu năng mong muốn", "Cần nâng cấp hoặc bảo trì"],
+  causes: ["Sử dụng lâu ngày", "Cấu hình chưa phù hợp", "Thiếu bảo trì định kỳ"],
+  process: ["Tiếp nhận yêu cầu", "Khảo sát / kiểm tra", "Báo giá chi tiết", "Thực hiện", "Bàn giao + bảo hành"],
+  pricing: [{ item: "Liên hệ tư vấn", price: "Theo khảo sát thực tế" }],
+  faq: [{ q: "Thời gian xử lý?", a: "Tùy yêu cầu, thường từ 30 phút đến 1-3 ngày." }],
+};
+
+export default function ServiceDetailPage() {
+  const { slug } = useParams<{ slug: string }>();
+  const services = getAllServices();
+  const service = services.find((s) => s.slug === slug);
+
+  if (!service) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main className="section-container py-20 text-center">
+          <h1 className="text-2xl font-bold mb-4">Không tìm thấy dịch vụ</h1>
+          <Link to="/dich-vu" className="btn-primary">Xem tất cả dịch vụ</Link>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  const detail = serviceDetails[service.slug] || defaultDetail;
+  const Icon = getServiceIcon(service.iconKey);
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Header />
+      <main className="section-container py-4 md:py-6">
+        {/* Breadcrumb */}
+        <nav className="flex items-center text-sm text-muted-foreground mb-4 gap-1.5 flex-wrap">
+          <Link to="/" className="hover:text-primary">Trang chủ</Link>
+          <ChevronRight className="h-3.5 w-3.5" />
+          <Link to="/dich-vu" className="hover:text-primary">Dịch vụ</Link>
+          <ChevronRight className="h-3.5 w-3.5" />
+          <span className="text-foreground font-medium">{service.name}</span>
+        </nav>
+
+        {/* Hero */}
+        <div className="bg-primary rounded-xl p-6 md:p-8 mb-8 flex flex-col md:flex-row items-center gap-4">
+          <div className="h-16 w-16 rounded-xl bg-primary-foreground/10 flex items-center justify-center flex-shrink-0">
+            <Icon className="h-8 w-8 text-primary-foreground" />
+          </div>
+          <div className="flex-1 text-center md:text-left">
+            <h1 className="text-xl md:text-2xl font-bold text-primary-foreground">{service.name}</h1>
+            <p className="text-sm text-primary-foreground/80 mt-1">{service.shortDesc}</p>
+            <div className="flex flex-wrap gap-4 mt-2 text-sm text-primary-foreground/70 justify-center md:justify-start">
+              <span>💰 {service.priceRange}</span>
+              <span>⏱ {service.duration}</span>
+            </div>
+          </div>
+          <a href="tel:0989386219" className="btn-cta text-base flex items-center gap-2 whitespace-nowrap">
+            <Phone className="h-5 w-5" /> Gọi ngay
+          </a>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          <div className="lg:col-span-2 space-y-6">
+            {/* Common issues */}
+            <section className="bg-card rounded-lg border p-5">
+              <h2 className="text-lg font-bold text-foreground mb-3">🔧 Lỗi thường gặp</h2>
+              <ul className="space-y-2">
+                {detail.issues.map((issue, i) => (
+                  <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
+                    <CheckCircle className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                    {issue}
+                  </li>
+                ))}
+              </ul>
+            </section>
+
+            {/* Causes */}
+            <section className="bg-card rounded-lg border p-5">
+              <h2 className="text-lg font-bold text-foreground mb-3">🔍 Nguyên nhân phổ biến</h2>
+              <ul className="space-y-2">
+                {detail.causes.map((c, i) => (
+                  <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
+                    <ArrowRight className="h-4 w-4 text-accent flex-shrink-0 mt-0.5" />
+                    {c}
+                  </li>
+                ))}
+              </ul>
+            </section>
+
+            {/* Process */}
+            <section className="bg-card rounded-lg border p-5">
+              <h2 className="text-lg font-bold text-foreground mb-3">📋 Quy trình xử lý</h2>
+              <div className="space-y-3">
+                {detail.process.map((step, i) => (
+                  <div key={i} className="flex items-start gap-3">
+                    <span className="h-7 w-7 rounded-full bg-primary text-primary-foreground text-sm flex items-center justify-center flex-shrink-0 font-bold">
+                      {i + 1}
+                    </span>
+                    <span className="text-sm text-foreground pt-1">{step}</span>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* Pricing */}
+            <section className="bg-card rounded-lg border p-5">
+              <h2 className="text-lg font-bold text-foreground mb-3">💰 Bảng giá tham khảo</h2>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="bg-muted">
+                      <th className="text-left px-4 py-2.5 font-semibold text-foreground">Hạng mục</th>
+                      <th className="text-right px-4 py-2.5 font-semibold text-foreground">Chi phí</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {detail.pricing.map((p, i) => (
+                      <tr key={i} className="border-b last:border-0">
+                        <td className="px-4 py-2.5 text-muted-foreground">{p.item}</td>
+                        <td className="px-4 py-2.5 text-right font-medium" style={{ color: "hsl(var(--sale))" }}>{p.price}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <p className="text-xs text-muted-foreground mt-3">* Giá tham khảo, có thể thay đổi tùy tình trạng thực tế.</p>
+            </section>
+
+            {/* FAQ */}
+            <section className="bg-card rounded-lg border p-5">
+              <h2 className="text-lg font-bold text-foreground mb-3">❓ Câu hỏi thường gặp</h2>
+              <div className="space-y-4">
+                {detail.faq.map((f, i) => (
+                  <div key={i}>
+                    <p className="text-sm font-semibold text-foreground mb-1">{f.q}</p>
+                    <p className="text-sm text-muted-foreground pl-4 border-l-2 border-primary/30">{f.a}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </div>
+
+          {/* Sidebar: form */}
+          <div className="lg:col-span-1">
+            <div className="bg-card rounded-lg border p-5 sticky top-28">
+              <h3 className="text-base font-bold text-foreground mb-4 text-center">Gửi yêu cầu sửa chữa</h3>
+              <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); alert("Cảm ơn bạn! Lộc An sẽ liên hệ trong thời gian sớm nhất."); }}>
+                <input type="text" placeholder="Họ và tên *" required className="w-full px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-primary bg-background text-foreground" />
+                <input type="tel" placeholder="Số điện thoại *" required className="w-full px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-primary bg-background text-foreground" />
+                <textarea placeholder="Mô tả tình trạng máy..." rows={3} className="w-full px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-primary bg-background text-foreground" />
+                <button type="submit" className="btn-cta w-full py-3 text-base">Đặt lịch sửa</button>
+              </form>
+              <div className="mt-4 pt-4 border-t text-center">
+                <p className="text-xs text-muted-foreground mb-2">Hoặc gọi trực tiếp</p>
+                <a href="tel:0989386219" className="flex items-center justify-center gap-2 text-primary font-bold text-lg">
+                  <Phone className="h-5 w-5" /> 0989.386.219
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+      <Footer />
+      <FloatingActions />
+    </div>
+  );
+}

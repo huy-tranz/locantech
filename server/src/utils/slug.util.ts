@@ -1,0 +1,14 @@
+/**
+ * Generate a URL-safe slug from a string
+ * e.g., "Laptop ASUS ROG Strix G16" -> "laptop-asus-rog-strix-g16"
+ */
+export const generateSlug = (text: string): string => {
+  return text
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') // Remove diacritics (Vietnamese accents)
+    .replace(/[^a-z0-9\s-]/g, '')     // Remove special characters
+    .replace(/\s+/g, '-')              // Spaces to hyphens
+    .replace(/-+/g, '-')              // Multiple hyphens to one
+    .replace(/^-+|-+$/g, '')          // Trim leading/trailing hyphens
+}

@@ -1,0 +1,17 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const admin_middleware_1 = require("@/middleware/admin.middleware");
+const settings_service_1 = require("@/services/settings.service");
+const router = (0, express_1.Router)();
+// GET /admin/settings
+router.get('/admin/settings', ...admin_middleware_1.requireAdmin, async (_req, res) => {
+    const config = await settings_service_1.settingsService.get();
+    res.json(config);
+});
+// PATCH /admin/settings
+router.patch('/admin/settings', ...admin_middleware_1.requireAdmin, async (req, res) => {
+    const config = await settings_service_1.settingsService.update(req.body);
+    res.json(config);
+});
+exports.default = router;

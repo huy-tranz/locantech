@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lộc An – Máy tính, laptop, sửa chữa và giải pháp công nghệ</title>
+    <meta name="description" content="Lộc An – Cửa hàng máy tính, laptop, linh kiện, thiết bị mạng, camera giám sát và dịch vụ sửa chữa tại Hà Đông, Hà Nội. Hotline: 0973131302">
+    <meta name="robots" content="index, follow" />
+    
+    
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Lộc An – Máy tính, laptop, sửa chữa và giải pháp công nghệ">
+  <meta name="twitter:title" content="Lộc An – Máy tính, laptop, sửa chữa và giải pháp công nghệ">
+  <meta property="og:description" content="Lộc An – Cửa hàng máy tính, laptop, linh kiện, thiết bị mạng, camera giám sát và dịch vụ sửa chữa tại Hà Đông, Hà Nội. Hotline: 0973131302">
+  <meta name="twitter:description" content="Lộc An – Cửa hàng máy tính, laptop, linh kiện, thiết bị mạng, camera giám sát và dịch vụ sửa chữa tại Hà Đông, Hà Nội. Hotline: 0973131302">
+  <meta property="og:image" content="https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/9ca2d624-8d35-44cb-bbf1-6c4669d5a808/id-preview-03b1d92e--45fb80c6-2b26-457e-b7e2-a00c626c7f8f.lovable.app-1773903577882.png">
+  <meta name="twitter:image" content="https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/9ca2d624-8d35-44cb-bbf1-6c4669d5a808/id-preview-03b1d92e--45fb80c6-2b26-457e-b7e2-a00c626c7f8f.lovable.app-1773903577882.png">
+  <meta name="twitter:card" content="summary_large_image">
+</head>
+
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

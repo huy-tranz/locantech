@@ -1,0 +1,74 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.remove = exports.update = exports.create = exports.getBySlug = exports.getById = exports.getAllFlat = exports.getAll = void 0;
+const category_service_1 = require("@/services/category.service");
+const getAll = async (_req, res, next) => {
+    try {
+        const categories = await category_service_1.categoryService.getAll();
+        res.json(categories);
+    }
+    catch (err) {
+        next(err);
+    }
+};
+exports.getAll = getAll;
+const getAllFlat = async (_req, res, next) => {
+    try {
+        const categories = await category_service_1.categoryService.getAllFlat();
+        res.json(categories);
+    }
+    catch (err) {
+        next(err);
+    }
+};
+exports.getAllFlat = getAllFlat;
+const getById = async (req, res, next) => {
+    try {
+        const category = await category_service_1.categoryService.getById(req.params.id);
+        res.json(category);
+    }
+    catch (err) {
+        next(err);
+    }
+};
+exports.getById = getById;
+const getBySlug = async (req, res, next) => {
+    try {
+        const category = await category_service_1.categoryService.getBySlug(req.params.slug);
+        res.json(category);
+    }
+    catch (err) {
+        next(err);
+    }
+};
+exports.getBySlug = getBySlug;
+const create = async (req, res, next) => {
+    try {
+        const category = await category_service_1.categoryService.create(req.body);
+        res.status(201).json(category);
+    }
+    catch (err) {
+        next(err);
+    }
+};
+exports.create = create;
+const update = async (req, res, next) => {
+    try {
+        const category = await category_service_1.categoryService.update(req.params.id, req.body);
+        res.json(category);
+    }
+    catch (err) {
+        next(err);
+    }
+};
+exports.update = update;
+const remove = async (req, res, next) => {
+    try {
+        const result = await category_service_1.categoryService.delete(req.params.id);
+        res.json(result);
+    }
+    catch (err) {
+        next(err);
+    }
+};
+exports.remove = remove;

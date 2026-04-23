@@ -1,0 +1,98 @@
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
+import FloatingActions from "@/components/layout/FloatingActions";
+import BannerSection from "@/components/home/BannerSection";
+import CategorySidebar from "@/components/home/CategorySidebar";
+import ServiceSection from "@/components/home/ServiceSection";
+import ProductBlock from "@/components/home/ProductBlock";
+import FlashSaleSection from "@/components/home/FlashSaleSection";
+import WhyChooseUs from "@/components/home/WhyChooseUs";
+import NewsSection from "@/components/home/NewsSection";
+import { getProductsByCategory } from "@/data/products";
+import ScrollReveal from "@/components/ScrollReveal";
+
+const Index = () => {
+  const laptops = getProductsByCategory("laptop");
+  const pcs = getProductsByCategory("pc");
+  const pcGaming = getProductsByCategory("pc-gaming");
+  const linhKien = getProductsByCategory("linh-kien");
+  const manHinh = getProductsByCategory("man-hinh");
+  const ngoaiVi = getProductsByCategory("ngoai-vi");
+  const tbMang = getProductsByCategory("thiet-bi-mang");
+  const cameras = getProductsByCategory("camera");
+  
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Header />
+
+      <main className="section-container py-4 md:py-6">
+        {/* Hero: Category sidebar + Banner */}
+        <ScrollReveal>
+          <div className="flex gap-4 mb-6">
+            {/* Category sidebar - desktop only */}
+            <div className="hidden lg:block w-[240px] flex-shrink-0">
+              <CategorySidebar />
+            </div>
+            {/* Banner */}
+            <div className="flex-1 min-w-0">
+              <BannerSection />
+            </div>
+          </div>
+        </ScrollReveal>
+
+        {/* Flash Sale */}
+        <ScrollReveal delayMs={100}>
+          <FlashSaleSection />
+        </ScrollReveal>
+
+        {/* Product blocks */}
+        <ProductBlock title="Laptop bán chạy" products={laptops} link="/laptop" />
+        <ProductBlock title="PC văn phòng" products={pcs} link="/pc" />
+        <ProductBlock title="PC Gaming" products={pcGaming} link="/pc-gaming" />
+        <ProductBlock title="Linh kiện máy tính" products={linhKien} link="/linh-kien" />
+        <ProductBlock title="Màn hình máy tính" products={manHinh} link="/man-hinh" />
+        <ProductBlock title="Gaming Gear" products={ngoaiVi} link="/ngoai-vi" />
+        <ProductBlock title="Thiết bị mạng" products={tbMang} link="/thiet-bi-mang" />
+        <ProductBlock title="Camera giám sát" products={cameras} link="/camera" />
+
+        {/* Dịch vụ sửa chữa & CNTT */}
+        <ScrollReveal delayMs={200}>
+          <ServiceSection />
+        </ScrollReveal>
+
+        {/* Why choose us */}
+        <ScrollReveal delayMs={300}>
+          <WhyChooseUs />
+        </ScrollReveal>
+
+        {/* News */}
+        <ScrollReveal delayMs={400}>
+          <NewsSection />
+        </ScrollReveal>
+
+        {/* Brand intro */}
+        <ScrollReveal delayMs={500}>
+          <section className="py-8 text-center max-w-3xl mx-auto">
+            <h2 className="text-xl md:text-2xl font-bold text-foreground mb-3">
+              Lộc An – Đồng hành cùng bạn trong mọi giải pháp công nghệ
+            </h2>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Lộc An là cửa hàng chuyên bán và sửa chữa máy tính, laptop, linh kiện, thiết bị mạng và camera giám sát
+              tại Hà Đông, Hà Nội. Chúng tôi cam kết tư vấn đúng nhu cầu, báo giá rõ ràng và hỗ trợ kỹ thuật tận tâm.
+              Dù bạn là sinh viên, dân văn phòng, game thủ hay doanh nghiệp nhỏ – Lộc An luôn có giải pháp phù hợp cho bạn.
+            </p>
+            <a href="tel:0973131302" className="btn-cta mt-4 inline-flex">
+              Gọi ngay: 0973.131.302
+            </a>
+          </section>
+        </ScrollReveal>
+      </main>
+
+      <Footer />
+      <FloatingActions />
+    </div>
+  );
+};
+
+export default Index;

@@ -1,0 +1,368 @@
+// LocAn Tech Store - PostgreSQL Schema via Prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ──────────────────────────────────────────────
+// USERS & AUTH
+// ──────────────────────────────────────────────
+
+enum Role {
+  CUSTOMER
+  ADMIN
+  SUPERADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  DELETED
+}
+
+model User {
+  id              String          @id @default(cuid())
+  email           String          @unique
+  passwordHash    String
+  name            String
+  phone           String?
+  role            Role            @default(CUSTOMER)
+  status          UserStatus      @default(ACTIVE)
+  avatar          String?
+  orders          Order[]
+  repairRequests  RepairRequest[]
+  cartItems       CartItem[]
+  wishlistItems   WishlistItem[]
+  refreshTokens   RefreshToken[]
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@index([email])
+  @@index([role])
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([token])
+}
+
+// ──────────────────────────────────────────────
+// CATEGORIES (recursive / nested tree)
+// ──────────────────────────────────────────────
+
+model Category {
+  id        String     @id @default(cuid())
+  name      String
+  slug      String     @unique
+  image     String?
+  parentId  String?
+  parent    Category?  @relation("CategoryTree", fields: [parentId], references: [id])
+  children  Category[] @relation("CategoryTree")
+  products  Product[]
+  sortOrder Int        @default(0)
+  isActive  Boolean    @default(true)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@index([parentId])
+  @@index([slug])
+}
+
+// ──────────────────────────────────────────────
+// PRODUCTS
+// ──────────────────────────────────────────────
+
+enum ProductStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model Product {
+  id              String         @id @default(cuid())
+  sku             String         @unique
+  name            String
+  slug            String         @unique
+  description     String?
+  shortDesc       String?
+  price           Decimal        @db.Decimal(12, 2)
+  comparePrice    Decimal?       @db.Decimal(12, 2)
+  quantity        Int            @default(0)
+  soldCount       Int            @default(0)
+  images          String[]
+  thumbnail       String?
+  brand           String?
+  warranty        String?
+  tags            String[]
+  specifications  Json?
+  status          ProductStatus  @default(DRAFT)
+  isFeatured      Boolean        @default(false)
+  isBestSeller    Boolean        @default(false)
+  categoryId      String?
+  category        Category?      @relation(fields: [categoryId], references: [id])
+  orderItems      OrderItem[]
+  cartItems       CartItem[]
+  wishlistItems   WishlistItem[]
+  repairRequests  RepairRequest[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([sku])
+  @@index([slug])
+  @@index([categoryId])
+  @@index([status])
+  @@index([isFeatured])
+  @@index([price])
+}
+
+// ──────────────────────────────────────────────
+// CART & WISHLIST
+// ──────────────────────────────────────────────
+
+model CartItem {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, productId])
+  @@index([userId])
+}
+
+model WishlistItem {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId])
+  @@index([userId])
+}
+
+// ──────────────────────────────────────────────
+// ORDERS
+// ──────────────────────────────────────────────
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  COD
+  BANK_TRANSFER
+  MOMO
+  ZALOPAY
+  VNPAY
+}
+
+enum PaymentStatus {
+  UNPAID
+  PAID
+  REFUNDED
+  FAILED
+}
+
+model Order {
+  id              String          @id @default(cuid())
+  orderNumber     String          @unique
+  userId          String?
+  user            User?           @relation(fields: [userId], references: [id])
+  status          OrderStatus     @default(PENDING)
+  paymentMethod   PaymentMethod
+  paymentStatus   PaymentStatus   @default(UNPAID)
+  paymentId       String?
+  subtotal        Decimal         @db.Decimal(12, 2)
+  shippingFee     Decimal         @db.Decimal(12, 2) @default(0)
+  discountAmount  Decimal         @db.Decimal(12, 2) @default(0)
+  discountCode    String?
+  total           Decimal         @db.Decimal(12, 2)
+  recipientName   String
+  recipientPhone  String
+  shippingAddress String
+  shippingCity    String?
+  note            String?
+  confirmedAt     DateTime?
+  shippedAt       DateTime?
+  deliveredAt     DateTime?
+  cancelledAt     DateTime?
+  items           OrderItem[]
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@index([orderNumber])
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model OrderItem {
+  id           String  @id @default(cuid())
+  orderId      String
+  order        Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId    String
+  product      Product @relation(fields: [productId], references: [id])
+  productName  String
+  productSku   String
+  productImage String?
+  price        Decimal @db.Decimal(12, 2)
+  quantity     Int
+  total        Decimal @db.Decimal(12, 2)
+
+  @@index([orderId])
+}
+
+// ──────────────────────────────────────────────
+// REPAIR REQUESTS
+// ──────────────────────────────────────────────
+
+enum RepairStatus {
+  RECEIVED
+  DIAGNOSING
+  QUOTING
+  APPROVED
+  REPAIRING
+  TESTING
+  READY
+  DELIVERED
+  CANCELLED
+  REJECTED
+}
+
+model RepairRequest {
+  id               String          @id @default(cuid())
+  ticketNumber     String          @unique
+  userId           String
+  user             User            @relation(fields: [userId], references: [id])
+  productId        String?
+  product          Product?        @relation(fields: [productId], references: [id])
+  deviceBrand      String
+  deviceModel      String
+  deviceImei       String?
+  faultDescription String
+  faultImages      String[]
+  estimatedCost    Decimal?        @db.Decimal(12, 2)
+  actualCost       Decimal?        @db.Decimal(12, 2)
+  status           RepairStatus    @default(RECEIVED)
+  timeline         RepairTimeline[]
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  @@index([ticketNumber])
+  @@index([userId])
+  @@index([status])
+}
+
+model RepairTimeline {
+  id               String         @id @default(cuid())
+  repairRequestId  String
+  repairRequest    RepairRequest  @relation(fields: [repairRequestId], references: [id], onDelete: Cascade)
+  status           RepairStatus
+  note             String?
+  updatedBy        String?
+  createdAt        DateTime       @default(now())
+
+  @@index([repairRequestId])
+}
+
+// ──────────────────────────────────────────────
+// SITE CONFIGURATION
+// ──────────────────────────────────────────────
+
+model SiteConfig {
+  id             String   @id @default("default")
+  siteName       String
+  hotline        String
+  email          String
+  address        String
+  workingHours   String
+  facebook       String?
+  zalo           String?
+  footerText     String?
+  seoTitle       String?
+  seoDescription String?
+  metaImage      String?
+  updatedAt      DateTime @updatedAt
+}
+
+// ──────────────────────────────────────────────
+// CMS: BANNERS, NEWS, SERVICES
+// ──────────────────────────────────────────────
+
+model Banner {
+  id        String    @id @default(cuid())
+  title     String
+  subtitle  String?
+  image     String
+  link      String?
+  linkType  String?
+  position  String    @default("HERO")
+  sortOrder Int       @default(0)
+  isActive  Boolean   @default(true)
+  startDate DateTime?
+  endDate   DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([position, isActive])
+}
+
+model News {
+  id          String    @id @default(cuid())
+  title       String
+  slug        String    @unique
+  excerpt     String?
+  content     String
+  image       String?
+  author      String?
+  tags        String[]
+  isPublished Boolean   @default(true)
+  viewCount   Int       @default(0)
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([slug])
+  @@index([isPublished])
+}
+
+model Service {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  icon        String?
+  image       String?
+  features    String[]
+  priceFrom   Decimal? @db.Decimal(12, 2)
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([slug])
+  @@index([isActive])
+}
