@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { getAllProducts, type Product, formatPrice } from "@/data/products";
+import { type Product, formatPrice } from "@/data/products";
 import {
   BUILD_PC_STORAGE_KEY,
   type BuildSelections,
@@ -19,6 +19,8 @@ import {
 } from "@/data/buildPC";
 import { useCart } from "@/hooks/use-cart";
 import { toast } from "@/hooks/use-toast";
+import { useProducts } from "@/hooks/queries/product.queries";
+import { getProductsFromResponse } from "@/lib/productAdapter";
 
 function BuildPCPage() {
   const { addItem } = useCart();
@@ -28,7 +30,8 @@ function BuildPCPage() {
   const [activeStepKey, setActiveStepKey] = useState<BuildStepKey | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const allProducts = useMemo(() => getAllProducts(), []);
+  const { data: productsData } = useProducts({ status: "all", limit: 500 });
+  const allProducts = useMemo(() => getProductsFromResponse(productsData), [productsData]);
   const productMap = useMemo(() => new Map(allProducts.map((product) => [product.id, product])), [allProducts]);
 
   useEffect(() => {
@@ -451,7 +454,7 @@ function BuildPCPage() {
               <Input
                 value={searchTerm}
                 onChange={(event) => setSearchTerm(event.target.value)}
-                placeholder="Tìm theo tên, thương hiệu hoặc SKU..."
+                placeholder="Tìm theo tên, thương hiệu hoặc mã SP..."
                 className="pl-10"
               />
             </div>

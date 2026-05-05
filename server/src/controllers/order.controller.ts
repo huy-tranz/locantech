@@ -20,7 +20,7 @@ export const getAll = async (req: Request, res: Response, next: NextFunction) =>
 export const getById = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const isAdmin = ['ADMIN', 'SUPERADMIN'].includes(req.user!.role)
-    const order = await orderService.getById(req.params.id, isAdmin ? undefined : req.user!.id)
+    const order = await orderService.getById(String(req.params.id), isAdmin ? undefined : req.user!.id)
     res.json(order)
   } catch (err) { next(err) }
 }
@@ -42,7 +42,7 @@ export const createGuest = async (req: Request, res: Response, next: NextFunctio
 export const updateStatus = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { status } = req.body
-    const order = await orderService.updateStatus(req.params.id, status, req.user!.id)
+    const order = await orderService.updateStatus(String(req.params.id), status, req.user!.id)
     res.json(order)
   } catch (err) { next(err) }
 }

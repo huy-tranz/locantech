@@ -6,8 +6,10 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "@/hooks/use-toast";
-import { formatPrice, getAllProducts, type Product } from "@/data/products";
+import { formatPrice, type Product } from "@/data/products";
 import { getFlashSaleConfig, saveFlashSaleConfig } from "@/data/flashSale";
+import { useProducts } from "@/hooks/queries/product.queries";
+import { getProductsFromResponse } from "@/lib/productAdapter";
 import { Plus, Save, Trash2 } from "lucide-react";
 
 function toDatetimeLocal(value: string) {
@@ -29,7 +31,8 @@ function fromDatetimeLocal(value: string) {
 }
 
 export default function AdminFlashSalePage() {
-  const allProducts = useMemo(() => getAllProducts(), []);
+  const { data: productRes } = useProducts({ status: "all", limit: 100 });
+  const allProducts = useMemo(() => getProductsFromResponse(productRes), [productRes]);
   const [config, setConfig] = useState(() => getFlashSaleConfig());
   const [search, setSearch] = useState("");
 

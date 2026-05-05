@@ -10,6 +10,7 @@ import newsRoutes from './news.routes'
 import serviceRoutes from './service.routes'
 import settingsRoutes from './settings.routes'
 import userRoutes from './user.routes'
+import uploadRoutes from './upload.routes'
 
 const router = Router()
 
@@ -24,5 +25,6 @@ router.use(newsRoutes)
 router.use(serviceRoutes)
 router.use(settingsRoutes)
 router.use(userRoutes)
+router.use(uploadRoutes)
 
 export default router

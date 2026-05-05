@@ -4,9 +4,11 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import FloatingActions from "@/components/layout/FloatingActions";
 import ProductCard from "@/components/ProductCard";
-import { formatPrice, products } from "@/data/products";
+import { formatPrice } from "@/data/products";
 import { useCart } from "@/hooks/use-cart";
 import { toast } from "@/hooks/use-toast";
+import { useProducts } from "@/hooks/queries/product.queries";
+import { getProductsFromResponse } from "@/lib/productAdapter";
 import { changeCurrentUserPassword, getCurrentUser, isAuthenticated, logoutUser, updateCurrentUserProfile, type AuthSession } from "@/lib/auth";
 import { getAccountData, saveAccountData, type AccountAddress, type AccountData, type AccountOrder, type RepairRequest } from "@/lib/account";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -69,6 +71,8 @@ export default function AccountPage() {
   const [repairDetail, setRepairDetail] = useState<RepairRequest | null>(null);
   const [addressOpen, setAddressOpen] = useState(false);
   const [editingAddress, setEditingAddress] = useState<AccountAddress | null>(null);
+  const { data: productsData } = useProducts({ status: "all", limit: 500 });
+  const allProducts = useMemo(() => getProductsFromResponse(productsData), [productsData]);
 
   useEffect(() => {
     if (!isAuthenticated()) {
@@ -82,8 +86,8 @@ export default function AccountPage() {
     setData(getAccountData(current.id));
   }, [navigate]);
 
-  const wishlist = useMemo(() => (data?.wishlist ?? []).map((id) => products.find((p) => p.id === id)).filter(Boolean), [data]);
-  const recent = useMemo(() => (data?.recentlyViewed ?? []).map((id) => products.find((p) => p.id === id)).filter(Boolean), [data]);
+  const wishlist = useMemo(() => (data?.wishlist ?? []).map((id) => allProducts.find((p) => p.id === id)).filter(Boolean), [allProducts, data]);
+  const recent = useMemo(() => (data?.recentlyViewed ?? []).map((id) => allProducts.find((p) => p.id === id)).filter(Boolean), [allProducts, data]);
 
   if (!user || !data) return null;
 
@@ -440,7 +444,7 @@ export default function AccountPage() {
               </DialogHeader>
               <div className="space-y-4">
                 {orderDetail.items.map((item) => {
-                  const product = products.find((p) => p.id === item.productId);
+                  const product = allProducts.find((p) => p.id === item.productId);
                   return product ? (
                     <div key={`${orderDetail.id}-${item.productId}`} className="flex items-center gap-4 rounded-2xl border border-slate-200 p-3">
                       <img src={product.image} alt={product.name} className="h-20 w-20 rounded-2xl bg-slate-50 object-contain p-2" />

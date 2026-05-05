@@ -4,6 +4,13 @@ import { settingsService } from '@/services/settings.service'
 
 const router = Router()
 
+// GET /settings
+// Public site metadata used by storefront pages. Keep admin writes protected below.
+router.get('/settings', async (_req, res) => {
+  const config = await settingsService.get()
+  res.json(config)
+})
+
 // GET /admin/settings
 router.get('/admin/settings', ...requireAdmin, async (_req, res) => {
   const config = await settingsService.get()

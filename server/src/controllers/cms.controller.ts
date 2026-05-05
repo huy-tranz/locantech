@@ -18,14 +18,14 @@ export const createBanner = async (req: Request, res: Response, next: NextFuncti
 
 export const updateBanner = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const banner = await bannerService.update(req.params.id, req.body)
+    const banner = await bannerService.update(String(req.params.id), req.body)
     res.json(banner)
   } catch (err) { next(err) }
 }
 
 export const deleteBanner = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const result = await bannerService.delete(req.params.id)
+    const result = await bannerService.delete(String(req.params.id))
     res.json(result)
   } catch (err) { next(err) }
 }
@@ -51,7 +51,7 @@ export const getNews = async (req: Request, res: Response, next: NextFunction) =
 
 export const getNewsBySlug = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const article = await newsService.getBySlug(req.params.slug)
+    const article = await newsService.getBySlug(String(req.params.slug))
     res.json(article)
   } catch (err) { next(err) }
 }
@@ -65,14 +65,14 @@ export const createNews = async (req: Request, res: Response, next: NextFunction
 
 export const updateNews = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const article = await newsService.update(req.params.id, req.body)
+    const article = await newsService.update(String(req.params.id), req.body)
     res.json(article)
   } catch (err) { next(err) }
 }
 
 export const deleteNews = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const result = await newsService.delete(req.params.id)
+    const result = await newsService.delete(String(req.params.id))
     res.json(result)
   } catch (err) { next(err) }
 }
@@ -105,7 +105,7 @@ export const getServicesAdmin = async (_req: Request, res: Response, next: NextF
 
 export const getServiceBySlug = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const service = await siteServiceService.getBySlug(req.params.slug)
+    const service = await siteServiceService.getBySlug(String(req.params.slug))
     res.json(service)
   } catch (err) { next(err) }
 }
@@ -119,14 +119,14 @@ export const createService = async (req: Request, res: Response, next: NextFunct
 
 export const updateService = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const service = await siteServiceService.update(req.params.id, req.body)
+    const service = await siteServiceService.update(String(req.params.id), req.body)
     res.json(service)
   } catch (err) { next(err) }
 }
 
 export const deleteService = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const result = await siteServiceService.delete(req.params.id)
+    const result = await siteServiceService.delete(String(req.params.id))
     res.json(result)
   } catch (err) { next(err) }
 }

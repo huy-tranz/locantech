@@ -17,14 +17,14 @@ export const getAllFlat = async (_req: Request, res: Response, next: NextFunctio
 
 export const getById = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const category = await categoryService.getById(req.params.id)
+    const category = await categoryService.getById(String(req.params.id))
     res.json(category)
   } catch (err) { next(err) }
 }
 
 export const getBySlug = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const category = await categoryService.getBySlug(req.params.slug)
+    const category = await categoryService.getBySlug(String(req.params.slug))
     res.json(category)
   } catch (err) { next(err) }
 }
@@ -38,14 +38,14 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 
 export const update = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const category = await categoryService.update(req.params.id, req.body)
+    const category = await categoryService.update(String(req.params.id), req.body)
     res.json(category)
   } catch (err) { next(err) }
 }
 
 export const remove = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const result = await categoryService.delete(req.params.id)
+    const result = await categoryService.delete(String(req.params.id))
     res.json(result)
   } catch (err) { next(err) }
 }

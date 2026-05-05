@@ -7,12 +7,29 @@ const prisma = new PrismaClient()
 async function main() {
   const passwordHash = await bcrypt.hash('123456', 12)
 
-  const admin = await prisma.user.update({
+  const admin = await prisma.user.upsert({
     where: { email: 'admin@locan.vn' },
-    data: { passwordHash, status: 'ACTIVE' },
+    update: {
+      passwordHash,
+      status: 'ACTIVE',
+      role: 'SUPERADMIN',
+      name: 'LocAn Admin',
+      phone: '0989386219',
+    },
+    create: {
+      email: 'admin@locan.vn',
+      passwordHash,
+      name: 'LocAn Admin',
+      phone: '0989386219',
+      role: 'SUPERADMIN',
+      status: 'ACTIVE',
+    },
   })
 
-  console.log('✅ Admin password updated:', admin.email)
+  await prisma.refreshToken.deleteMany({ where: { userId: admin.id } })
+
+  console.log('Admin account ready:', admin.email)
+  console.log('Password reset to: 123456')
 }
 
 main()

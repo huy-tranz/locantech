@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, type ChangeEvent } from "react";
 import { Link } from "react-router-dom";
 import { useAdminBanners, useCreateBanner, useUpdateBanner, useDeleteBanner } from "@/hooks/queries/cms.queries";
+import uploadApi from "@/api/upload.api";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -9,7 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
-import { Plus, Pencil, Trash2, Eye, EyeOff } from "lucide-react";
+import { Plus, Pencil, Trash2, Eye, EyeOff, Upload } from "lucide-react";
 
 interface Banner {
   id: string;
@@ -32,6 +33,7 @@ export default function AdminBannersPage() {
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<Banner | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   const openCreate = () => {
     setEditing({
@@ -83,6 +85,27 @@ export default function AdminBannersPage() {
       setDialogOpen(false);
     } catch {
       toast({ title: "Lỗi khi lưu banner", variant: "destructive" });
+    }
+  };
+
+  const handleImageUpload = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file || !editing) return;
+
+    try {
+      setIsUploading(true);
+      const uploaded = await uploadApi.image("banners", file);
+      setEditing({ ...editing, image: uploaded.url });
+      toast({ title: "Da tai anh banner len" });
+    } catch (err: any) {
+      toast({
+        title: "Tai anh that bai",
+        description: err?.response?.data?.error || "Vui long chon file anh duoi 5MB",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -166,6 +189,15 @@ export default function AdminBannersPage() {
               <div className="space-y-2">
                 <Label>URL ảnh</Label>
                 <Input value={editing.image} onChange={(e) => setEditing({ ...editing, image: e.target.value })} />
+                <div className="flex items-center gap-2">
+                  <Input id="banner-image-upload" type="file" accept="image/*" onChange={handleImageUpload} disabled={isUploading} className="hidden" />
+                  <Button type="button" variant="outline" className="shrink-0" asChild>
+                    <label htmlFor="banner-image-upload" className={isUploading ? "pointer-events-none" : "cursor-pointer"}>
+                      <Upload className="w-4 h-4 mr-1" />
+                      {isUploading ? "Dang tai..." : "Upload"}
+                    </label>
+                  </Button>
+                </div>
                 {editing.image && <img src={editing.image} alt="" className="w-full h-32 object-cover rounded border mt-1" />}
               </div>
               <div className="grid grid-cols-2 gap-4">

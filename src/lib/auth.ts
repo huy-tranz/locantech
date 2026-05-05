@@ -173,7 +173,7 @@ export function getCurrentUser(): AuthSession | null {
 
 export function isAuthenticated() {
   if (!hasWindow()) return false;
-  return localStorage.getItem('locan_access_token') !== null || getCurrentUser() !== null;
+  return localStorage.getItem('locan_access_token') !== null;
 }
 
 export function updateCurrentUserProfile(input: {

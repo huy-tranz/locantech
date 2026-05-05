@@ -12,6 +12,7 @@ export interface Product {
   originalPrice?: number;
   discount?: number;
   stock: number;
+  soldCount?: number;
   status: "in_stock" | "coming_soon" | "out_of_stock";
   image: string;
   shortDesc: string;

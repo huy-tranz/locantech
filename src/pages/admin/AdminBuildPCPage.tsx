@@ -8,7 +8,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "@/hooks/use-toast";
-import { formatPrice, getAllProducts } from "@/data/products";
+import { formatPrice, type Product } from "@/data/products";
+import { useProducts } from "@/hooks/queries/product.queries";
+import { getProductsFromResponse } from "@/lib/productAdapter";
 import {
   type BuildPCConfig,
   type BuildPreset,
@@ -43,7 +45,8 @@ function moveItem<T>(items: T[], fromIndex: number, toIndex: number) {
 
 export default function AdminBuildPCPage() {
   const [config, setConfig] = useState<BuildPCConfig>(() => getBuildPCConfig());
-  const allProducts = useMemo(() => getAllProducts(), []);
+  const { data: productsData } = useProducts({ status: "all", limit: 500 });
+  const allProducts = useMemo(() => getProductsFromResponse(productsData), [productsData]);
   const productMap = useMemo(() => new Map(allProducts.map((product) => [product.id, product])), [allProducts]);
 
   const productsByStep = useMemo(() => {
@@ -54,7 +57,7 @@ export default function AdminBuildPCPage() {
         return step.subcategories.includes(product.subcategory);
       });
       return acc;
-    }, {} as Record<BuildStepKey, ReturnType<typeof getAllProducts>>);
+    }, {} as Record<BuildStepKey, Product[]>);
   }, [allProducts, config.steps]);
 
   const updateConfigField = (field: keyof BuildPCConfig, value: string) => {

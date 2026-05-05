@@ -1,6 +1,7 @@
 import { prisma } from '@/config/database'
 import { Prisma } from '@prisma/client'
 import { AppError } from '@/middleware/error.middleware'
+import { cleanupUnreferencedUploads, collectChangedUploads } from '@/utils/upload-cleanup.util'
 
 export const productService = {
   async getAll(filters: {
@@ -25,7 +26,13 @@ export const productService = {
     }
 
     if (filters.category) {
-      where.category = { slug: filters.category }
+      where.category = {
+        OR: [
+          { slug: filters.category },
+          { parent: { slug: filters.category } },
+          { parent: { parent: { slug: filters.category } } },
+        ],
+      }
     }
 
     if (filters.search) {
@@ -69,7 +76,23 @@ export const productService = {
     const [products, total] = await Promise.all([
       prisma.product.findMany({
         where,
-        include: { category: { select: { id: true, name: true, slug: true } } },
+        include: {
+          category: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+              parent: {
+                select: {
+                  id: true,
+                  name: true,
+                  slug: true,
+                  parent: { select: { id: true, name: true, slug: true } },
+                },
+              },
+            },
+          },
+        },
         orderBy,
         skip,
         take: limit,
@@ -91,7 +114,13 @@ export const productService = {
   async getById(id: string) {
     const product = await prisma.product.findUnique({
       where: { id },
-      include: { category: true },
+      include: {
+        category: {
+          include: {
+            parent: { include: { parent: true } },
+          },
+        },
+      },
     })
     if (!product) throw new AppError(404, 'Product not found')
     return product
@@ -100,7 +129,13 @@ export const productService = {
   async getBySlug(slug: string) {
     const product = await prisma.product.findUnique({
       where: { slug },
-      include: { category: true },
+      include: {
+        category: {
+          include: {
+            parent: { include: { parent: true } },
+          },
+        },
+      },
     })
     if (!product) throw new AppError(404, 'Product not found')
     return product
@@ -164,7 +199,15 @@ export const productService = {
     const product = await prisma.product.findUnique({ where: { id } })
     if (!product) throw new AppError(404, 'Product not found')
 
-    return prisma.product.update({ where: { id }, data })
+    const updated = await prisma.product.update({ where: { id }, data })
+    await cleanupUnreferencedUploads(
+      collectChangedUploads(
+        [product.thumbnail, ...product.images],
+        [updated.thumbnail, ...updated.images],
+      ),
+    )
+
+    return updated
   },
 
   async delete(id: string) {
@@ -172,6 +215,8 @@ export const productService = {
     if (!product) throw new AppError(404, 'Product not found')
 
     await prisma.product.delete({ where: { id } })
+    await cleanupUnreferencedUploads([product.thumbnail, ...product.images])
+
     return { message: 'Product deleted' }
   },
 }

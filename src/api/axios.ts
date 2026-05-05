@@ -8,7 +8,6 @@ const api = axios.create({
   },
 })
 
-// ── Request interceptor: attach access token ───────────────────────
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('locan_access_token')
@@ -20,14 +19,32 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 )
 
-// ── Response interceptor: handle 401 → refresh → retry ───────────
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalReq = error.config
+    const currentPath = window.location.pathname
+    const isLoginPage = currentPath === '/dang-nhap' || currentPath === '/admin/login'
+    const isProtectedPath =
+      currentPath.startsWith('/admin') ||
+      currentPath.startsWith('/tai-khoan') ||
+      currentPath.startsWith('/checkout')
+    const loginPath = currentPath.startsWith('/admin') ? '/admin/login' : '/dang-nhap'
 
-    // Handle 401: try to refresh token
-    if (error.response?.status === 401 && !originalReq._retry) {
+    const clearAuth = () => {
+      localStorage.removeItem('locan_access_token')
+      localStorage.removeItem('locan_refresh_token')
+      localStorage.removeItem('locan_auth_user')
+      window.dispatchEvent(new Event('locan-auth-changed'))
+    }
+
+    const redirectIfNeeded = () => {
+      if (!isLoginPage && isProtectedPath) {
+        window.location.href = loginPath
+      }
+    }
+
+    if (error.response?.status === 401 && originalReq && !originalReq._retry) {
       originalReq._retry = true
 
       const refreshToken = localStorage.getItem('locan_refresh_token')
@@ -44,15 +61,12 @@ api.interceptors.response.use(
           originalReq.headers.Authorization = `Bearer ${data.accessToken}`
           return api(originalReq)
         } catch {
-          // Refresh failed → force logout
-          localStorage.removeItem('locan_access_token')
-          localStorage.removeItem('locan_refresh_token')
-          localStorage.removeItem('locan_auth_user')
-          window.location.href = '/dang-nhap'
+          clearAuth()
+          redirectIfNeeded()
         }
       } else {
-        // No refresh token → redirect to login
-        window.location.href = '/dang-nhap'
+        clearAuth()
+        redirectIfNeeded()
       }
     }
 

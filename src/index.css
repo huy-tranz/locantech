@@ -6,8 +6,8 @@
 
 @layer base {
   :root {
-    --background: 210 20% 98%;
-    --foreground: 215 25% 15%;
+    --background: 220 34% 96%;
+    --foreground: 222 42% 12%;
 
     --card: 0 0% 100%;
     --card-foreground: 215 25% 15%;
@@ -15,25 +15,34 @@
     --popover: 0 0% 100%;
     --popover-foreground: 215 25% 15%;
 
-    --primary: 213 70% 28%;
+    --primary: 230 70% 23%;
     --primary-foreground: 0 0% 100%;
 
-    --primary-light: 213 60% 45%;
-    --primary-dark: 213 80% 18%;
+    --primary-light: 218 72% 38%;
+    --primary-dark: 232 82% 11%;
 
-    --secondary: 210 15% 93%;
+    --secondary: 217 28% 92%;
     --secondary-foreground: 215 25% 20%;
 
-    --muted: 210 15% 95%;
-    --muted-foreground: 215 10% 50%;
+    --muted: 220 25% 91%;
+    --muted-foreground: 217 14% 46%;
 
-    --accent: 20 90% 52%;
+    --accent: 193 88% 47%;
     --accent-foreground: 0 0% 100%;
 
-    --accent-hover: 20 95% 45%;
+    --accent-hover: 195 90% 40%;
 
-    --sale: 0 80% 55%;
+    --sale: 0 88% 58%;
     --sale-foreground: 0 0% 100%;
+
+    --gaming: 262 83% 58%;
+    --gaming-foreground: 0 0% 100%;
+
+    --service: 27 94% 55%;
+    --service-foreground: 0 0% 100%;
+
+    --trust: 158 64% 38%;
+    --trust-foreground: 0 0% 100%;
 
     --success: 145 60% 40%;
     --success-foreground: 0 0% 100%;
@@ -44,11 +53,11 @@
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 214 20% 90%;
-    --input: 214 20% 90%;
-    --ring: 213 70% 28%;
+    --border: 218 24% 86%;
+    --input: 218 24% 86%;
+    --ring: 230 65% 25%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -59,10 +68,13 @@
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
 
-    --header-gradient: linear-gradient(135deg, hsl(213 80% 18%), hsl(213 70% 28%));
-    --shadow-card: 0 2px 8px hsl(215 25% 15% / 0.08);
-    --shadow-card-hover: 0 8px 24px hsl(215 25% 15% / 0.12);
-    --shadow-header: 0 2px 12px hsl(215 25% 15% / 0.1);
+    --header-gradient: linear-gradient(135deg, hsl(232 84% 12%) 0%, hsl(219 78% 24%) 48%, hsl(192 78% 32%) 100%);
+    --hero-gradient: linear-gradient(135deg, hsl(232 84% 12%) 0%, hsl(221 80% 18%) 44%, hsl(193 82% 31%) 100%);
+    --surface-gradient: linear-gradient(180deg, hsl(0 0% 100% / 0.94) 0%, hsl(220 45% 98% / 0.86) 100%);
+    --shadow-card: 0 10px 28px hsl(222 42% 12% / 0.08);
+    --shadow-card-hover: 0 18px 42px hsl(222 42% 12% / 0.18);
+    --shadow-panel: 0 20px 60px hsl(222 42% 12% / 0.16);
+    --shadow-header: 0 12px 34px hsl(230 70% 23% / 0.24);
   }
 
   .dark {
@@ -96,16 +108,65 @@
   body {
     @apply bg-background text-foreground font-sans;
     font-family: 'Be Vietnam Pro', sans-serif;
+    background:
+      radial-gradient(circle at 8% -10%, hsl(var(--accent) / 0.16), transparent 28rem),
+      radial-gradient(circle at 100% 18%, hsl(var(--sale) / 0.08), transparent 26rem),
+      linear-gradient(180deg, hsl(220 40% 98%) 0%, hsl(var(--background)) 42%, hsl(220 30% 94%) 100%);
   }
 
   html {
     scroll-behavior: smooth;
   }
+
+  h1, h2, h3 {
+    @apply tracking-tight;
+  }
 }
 
 @layer components {
   .section-container {
-    @apply max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8;
+    width: min(calc(100% - clamp(2rem, 4.5vw, 4rem)), clamp(75rem, 83.333vw, 87.5rem));
+    margin-inline: auto;
+  }
+
+  .brand-section {
+    @apply rounded-xl border border-white/70 shadow-sm backdrop-blur;
+    background: var(--surface-gradient);
+  }
+
+  .home-hero-shell {
+    @apply relative overflow-hidden rounded-2xl border border-white/20;
+    padding: clamp(0.75rem, 1vw, 1.25rem);
+    background: var(--hero-gradient);
+    box-shadow: var(--shadow-panel);
+  }
+  .home-hero-shell::before {
+    content: "";
+    @apply pointer-events-none absolute inset-0;
+    background:
+      radial-gradient(circle at 18% 12%, hsl(var(--accent) / 0.28), transparent 22rem),
+      radial-gradient(circle at 88% 4%, hsl(var(--gaming) / 0.22), transparent 22rem),
+      linear-gradient(90deg, transparent, hsl(0 0% 100% / 0.06));
+  }
+
+  .hero-eyebrow {
+    @apply inline-flex items-center rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-extrabold uppercase tracking-widest text-cyan-100 backdrop-blur;
+  }
+
+  .metric-pill {
+    @apply rounded-xl border border-white/20 bg-white/10 px-3 py-2 text-primary-foreground backdrop-blur;
+  }
+
+  .section-heading {
+    @apply mb-4 flex items-center justify-between gap-3;
+  }
+
+  .section-heading-title {
+    @apply text-lg font-extrabold tracking-tight text-foreground md:text-xl;
+  }
+
+  .section-link {
+    @apply inline-flex items-center gap-1 text-sm font-bold text-primary transition-colors hover:text-accent hover:underline;
   }
 
   .product-price {
@@ -119,41 +180,53 @@
   }
 
   .badge-sale {
-    @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold;
-    background: hsl(var(--sale));
+    @apply inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold shadow-sm;
+    background: linear-gradient(135deg, hsl(var(--sale)) 0%, hsl(22 96% 55%) 100%);
     color: hsl(var(--sale-foreground));
   }
 
   .badge-new {
-    @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold;
+    @apply inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold;
     background: hsl(var(--success));
     color: hsl(var(--success-foreground));
   }
 
   .badge-hot {
-    @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold;
+    @apply inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold;
     background: hsl(var(--accent));
     color: hsl(var(--accent-foreground));
   }
 
   .btn-cta {
-    @apply inline-flex items-center justify-center px-5 py-2.5 rounded-lg font-semibold text-sm transition-all duration-200;
-    background: hsl(var(--accent));
+    @apply inline-flex items-center justify-center px-5 py-2.5 rounded-lg font-bold text-sm transition-all duration-200 select-none;
+    background: linear-gradient(135deg, hsl(var(--accent)) 0%, hsl(204 92% 44%) 100%);
     color: hsl(var(--accent-foreground));
   }
   .btn-cta:hover {
     background: hsl(var(--accent-hover));
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px hsl(var(--accent) / 0.3);
+    box-shadow: 0 4px 12px hsl(var(--accent) / 0.35);
+  }
+  .btn-cta:active {
+    transform: scale(0.96) translateY(0);
+    box-shadow: none;
+    filter: brightness(0.95);
   }
 
   .btn-primary {
-    @apply inline-flex items-center justify-center px-5 py-2.5 rounded-lg font-semibold text-sm transition-all duration-200;
-    background: hsl(var(--primary));
+    @apply inline-flex items-center justify-center px-5 py-2.5 rounded-lg font-bold text-sm transition-all duration-200 select-none;
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-light)) 100%);
     color: hsl(var(--primary-foreground));
   }
   .btn-primary:hover {
     background: hsl(var(--primary-light));
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px hsl(var(--primary) / 0.3);
+  }
+  .btn-primary:active {
+    transform: scale(0.96) translateY(0);
+    box-shadow: none;
+    filter: brightness(0.95);
   }
 
   .header-bg {
@@ -161,15 +234,107 @@
   }
 
   .card-product {
-    @apply bg-card rounded-lg border overflow-hidden transition-all duration-200;
+    @apply relative bg-card rounded-xl border overflow-hidden transition-all duration-200;
+    border-color: hsl(var(--border) / 0.9);
     box-shadow: var(--shadow-card);
   }
   .card-product:hover {
+    border-color: hsl(var(--accent) / 0.45);
     box-shadow: var(--shadow-card-hover);
-    transform: translateY(-2px);
+    transform: translateY(-4px);
   }
 
   .shadow-header {
     box-shadow: var(--shadow-header);
+  }
+
+  .shadow-card {
+    box-shadow: var(--shadow-card);
+  }
+
+  .shadow-panel {
+    box-shadow: var(--shadow-panel);
+  }
+
+  .nav-link {
+    @apply relative block whitespace-nowrap px-3 py-3 text-foreground text-sm font-semibold transition-colors duration-200;
+  }
+  .nav-link::after {
+    content: '';
+    @apply absolute bottom-0 left-3 right-3 h-0.5 rounded-full scale-x-0 transition-transform duration-200;
+    background: hsl(var(--primary));
+  }
+  .nav-link:hover {
+    @apply text-primary bg-primary/5;
+  }
+  .nav-link:hover::after {
+    @apply scale-x-100;
+  }
+
+  .topbar-commitment {
+    @apply hidden sm:flex items-center gap-1.5 text-xs font-medium text-foreground/70;
+  }
+  .topbar-commitment svg {
+    @apply text-primary;
+  }
+
+  /* Typography helpers */
+  .section-title {
+    @apply text-lg md:text-xl font-bold tracking-tight;
+  }
+  .section-label {
+    @apply text-[10px] font-semibold tracking-widest uppercase text-muted-foreground;
+  }
+
+  /* Flash Sale gradient header */
+  .flash-sale-badge {
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-xl text-white font-extrabold text-lg md:text-xl tracking-tight;
+    background: linear-gradient(90deg, #dc2626 0%, #f97316 52%, #facc15 100%);
+    box-shadow: 0 12px 30px rgba(220, 38, 38, 0.28);
+  }
+
+  .brand-quick-card {
+    @apply relative overflow-hidden rounded-xl border border-white/70 bg-white p-4 shadow-sm transition-all duration-200;
+  }
+  .brand-quick-card::before {
+    content: "";
+    @apply absolute inset-x-0 top-0 h-1;
+    background: linear-gradient(90deg, hsl(var(--accent)), hsl(var(--sale)), hsl(var(--warning)));
+  }
+  .brand-quick-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-card-hover);
+    border-color: hsl(var(--accent) / 0.35);
+  }
+
+  .brand-chip {
+    @apply inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold;
+    color: hsl(var(--primary));
+    border-color: hsl(var(--primary) / 0.14);
+    background: hsl(var(--primary) / 0.06);
+  }
+
+  .tone-sale {
+    color: hsl(var(--sale));
+    background: hsl(var(--sale) / 0.1);
+    border-color: hsl(var(--sale) / 0.18);
+  }
+
+  .tone-gaming {
+    color: hsl(var(--gaming));
+    background: hsl(var(--gaming) / 0.1);
+    border-color: hsl(var(--gaming) / 0.18);
+  }
+
+  .tone-service {
+    color: hsl(var(--service));
+    background: hsl(var(--service) / 0.1);
+    border-color: hsl(var(--service) / 0.18);
+  }
+
+  .tone-trust {
+    color: hsl(var(--trust));
+    background: hsl(var(--trust) / 0.1);
+    border-color: hsl(var(--trust) / 0.18);
   }
 }

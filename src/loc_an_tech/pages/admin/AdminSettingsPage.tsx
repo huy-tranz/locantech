@@ -12,7 +12,7 @@ const defaultSettings = {
   siteName: "Lộc An - Máy tính & Dịch vụ IT",
   hotline: "0989386219",
   email: "info@locan.vn",
-  address: "Số 123, Quang Trung, Hà Đông, Hà Nội",
+  address: "7 La Dương, Hà Đông, Hà Nội",
   workingHours: "8:00 - 21:00 (Thứ 2 - Chủ nhật)",
   facebook: "https://facebook.com/locantech",
   zalo: "0989386219",

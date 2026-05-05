@@ -4,15 +4,20 @@ import bcrypt from 'bcryptjs'
 const prisma = new PrismaClient()
 
 export async function seedAdmin() {
-  console.log('🔐 Seeding admin account...')
-
-  // Delete existing admin so we always get a fresh, correct password
-  await prisma.user.deleteMany({ where: { email: 'admin@locan.vn' } })
+  console.log('Seeding admin account...')
 
   const passwordHash = await bcrypt.hash('123456', 12)
 
-  const admin = await prisma.user.create({
-    data: {
+  const admin = await prisma.user.upsert({
+    where: { email: 'admin@locan.vn' },
+    update: {
+      passwordHash,
+      name: 'LocAn Admin',
+      phone: '0989386219',
+      role: 'SUPERADMIN',
+      status: 'ACTIVE',
+    },
+    create: {
       email: 'admin@locan.vn',
       passwordHash,
       name: 'LocAn Admin',
@@ -22,6 +27,6 @@ export async function seedAdmin() {
     },
   })
 
-  console.log(`✅ Admin created: ${admin.email}`)
+  console.log(`Admin ready: ${admin.email}`)
   return admin
 }

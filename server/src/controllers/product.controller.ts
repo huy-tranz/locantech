@@ -10,14 +10,14 @@ export const getAll = async (req: Request, res: Response, next: NextFunction) =>
 
 export const getById = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const product = await productService.getById(req.params.id)
+    const product = await productService.getById(String(req.params.id))
     res.json(product)
   } catch (err) { next(err) }
 }
 
 export const getBySlug = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const product = await productService.getBySlug(req.params.slug)
+    const product = await productService.getBySlug(String(req.params.slug))
     res.json(product)
   } catch (err) { next(err) }
 }
@@ -38,7 +38,7 @@ export const getBestSellers = async (req: Request, res: Response, next: NextFunc
 
 export const getRelated = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const products = await productService.getRelated(req.params.id, Number(req.query.limit) || 4)
+    const products = await productService.getRelated(String(req.params.id), Number(req.query.limit) || 4)
     res.json(products)
   } catch (err) { next(err) }
 }
@@ -60,14 +60,14 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 
 export const update = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const product = await productService.update(req.params.id, req.body)
+    const product = await productService.update(String(req.params.id), req.body)
     res.json(product)
   } catch (err) { next(err) }
 }
 
 export const remove = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const result = await productService.delete(req.params.id)
+    const result = await productService.delete(String(req.params.id))
     res.json(result)
   } catch (err) { next(err) }
 }

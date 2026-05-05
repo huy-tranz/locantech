@@ -10,7 +10,7 @@ export const getAll = async (req: Request, res: Response, next: NextFunction) =>
 
 export const getById = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const request = await repairService.getById(req.params.id, req.user!.id)
+    const request = await repairService.getById(String(req.params.id), req.user!.id)
     res.json(request)
   } catch (err) { next(err) }
 }
@@ -37,7 +37,7 @@ export const getAllAdmin = async (req: Request, res: Response, next: NextFunctio
 export const updateStatus = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { status, note } = req.body
-    const request = await repairService.updateStatus(req.params.id, status, note, req.user!.id)
+    const request = await repairService.updateStatus(String(req.params.id), status, note, req.user!.id)
     res.json(request)
   } catch (err) { next(err) }
 }

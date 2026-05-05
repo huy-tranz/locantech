@@ -8,6 +8,7 @@ import { useGuestCreateOrder } from "@/hooks/queries/order.queries";
 import { formatPrice } from "@/data/products";
 import { toast } from "@/hooks/use-toast";
 import { CheckCircle, Phone, Package, Truck, CreditCard, ArrowLeft } from "lucide-react";
+import type { CreateGuestOrderPayload } from "@/api/order.api";
 
 type PaymentMethod = "cod" | "bank";
 
@@ -65,7 +66,7 @@ export default function CheckoutPage() {
 
     setIsSubmitting(true);
     try {
-      const orderPayload = {
+      const orderPayload: CreateGuestOrderPayload = {
         items: items.map((item) => ({
           productId: item.product.id,
           quantity: item.quantity,
@@ -464,4 +465,3 @@ export default function CheckoutPage() {
     </div>
   );
 }
-

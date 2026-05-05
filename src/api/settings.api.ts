@@ -16,6 +16,6 @@ export interface SiteConfig {
 }
 
 export default {
-  get: () => api.get('/admin/settings').then((r) => r.data as SiteConfig),
+  get: () => api.get('/settings').then((r) => r.data as SiteConfig),
   update: (data: Partial<SiteConfig>) => api.patch('/admin/settings', data).then((r) => r.data as SiteConfig),
 }

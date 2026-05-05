@@ -1,8 +1,23 @@
 import { useEffect, useState, type FormEvent } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import {
-  Search, ShoppingCart, User, Phone, MapPin, Menu, X,
-  Truck, Headphones, ShieldCheck, LogOut
+  BadgeCheck,
+  BadgePercent,
+  Cpu,
+  Gift,
+  Home,
+  LogOut,
+  Menu,
+  Phone,
+  Search,
+  ShieldCheck,
+  ShoppingCart,
+  Sparkles,
+  Truck,
+  User,
+  Wrench,
+  X,
 } from "lucide-react";
 import { useCart } from "@/hooks/use-cart";
 import { getCurrentUser, logoutUser, subscribeAuthChange, type AuthSession } from "@/lib/auth";
@@ -11,24 +26,23 @@ import { cn } from "@/lib/utils";
 import logoLocan from "@/assets/logo/logo_locan.png";
 
 const menuItems = [
-  { name: "🏠 Trang chủ", path: "/" },
-  { name: "⚡Flash Sale", path: "/flash-sale" },
-  { name: "⚙️ Build PC", path: "/build-pc" },
-  { name: "🔧 Sửa chữa vệ sinh máy tính", path: "/dich-vu/" },
-  // { name: "🚚 Giao hàng nhanh", path: "/giao-hang-nhanh" },
-  { name: "💎 Ưu đãi thành viên", path: "/uu-dai-thanh-vien" },
+  { name: "Trang chủ", path: "/", icon: Home },
+  { name: "Flash Sale", path: "/flash-sale", icon: BadgePercent },
+  { name: "Build PC", path: "/build-pc", icon: Cpu },
+  { name: "Sửa chữa máy tính", path: "/dich-vu/", icon: Wrench },
+  { name: "Ưu đãi thành viên", path: "/uu-dai-thanh-vien", icon: Sparkles },
 ];
 
-const commitments = [
-  { icon: Truck, text: "Giao hàng nhanh" },
-  { icon: Headphones, text: "Hỗ trợ kỹ thuật" },
-  { icon: ShieldCheck, text: "Bảo hành rõ ràng" },
+const promoStrip = [
+  { icon: Gift, text: "Combo PC + màn hình giá tốt" },
+  { icon: BadgeCheck, text: "Kiểm tra lỗi, báo giá trước" },
+  { icon: Truck, text: "Lắp đặt tận nơi tại Hà Đông" },
+  { icon: ShieldCheck, text: "Hỗ trợ sau bán rõ ràng" },
 ];
 
 const defaultSiteSettings = {
   siteName: "Lộc An",
   hotline: "0989386219",
-  address: "7 La Dương, Dương Nội, Hà Đông",
 };
 
 export default function Header() {
@@ -59,39 +73,58 @@ export default function Header() {
     setMobileOpen(false);
   };
 
-  const handleSearchSubmit = (e: FormEvent) => {
-    e.preventDefault();
+  const handleSearchSubmit = (event: FormEvent) => {
+    event.preventDefault();
     const q = searchQuery.trim();
     if (!q) return;
     navigate(`/tim-kiem?q=${encodeURIComponent(q)}`);
+    setMobileOpen(false);
   };
+
+  const searchForm = (
+    <form className="relative" onSubmit={handleSearchSubmit}>
+      <input
+        type="text"
+        name="q"
+        placeholder="Tìm sản phẩm, linh kiện, dịch vụ..."
+        value={searchQuery}
+        onChange={(event) => setSearchQuery(event.target.value)}
+        className="w-full rounded-full border border-white/40 bg-white/95 py-2.5 pl-5 pr-12 text-sm text-foreground shadow-[0_10px_30px_rgba(15,23,42,0.16)] focus:outline-none focus:ring-2 focus:ring-white/70"
+      />
+      <button
+        type="submit"
+        className="absolute right-1.5 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-accent text-accent-foreground shadow-sm transition-colors hover:bg-accent-hover"
+        aria-label="Tìm kiếm"
+      >
+        <Search className="h-4 w-4" />
+      </button>
+    </form>
+  );
 
   return (
     <header className={cn("sticky top-0 z-50 transition-shadow duration-300", isScrolled ? "shadow-header" : "shadow-none")}>
-      <div className="bg-white text-foreground">
-        <div className="section-container flex items-center justify-between py-1.5 text-xs">
-          <div className="flex items-center gap-4">
-            {commitments.map((c, i) => (
-              <span key={i} className="hidden sm:flex items-center gap-1">
-                <c.icon className="h-3.5 w-3.5" />
-                {c.text}
-              </span>
-            ))}
-          </div>
-          <div className="flex items-center gap-3">
-            <Link to="/lien-he" className="flex items-center gap-1 hover:underline">
-              <MapPin className="h-3.5 w-3.5" />
-              <span className="hidden md:inline">{settings.address}</span>
-            </Link>
+      <div className="border-b border-primary/10 bg-white/95 text-foreground backdrop-blur">
+        <div className="section-container">
+          <div className="grid grid-cols-2 divide-x divide-y divide-border/60 sm:grid-cols-4 sm:divide-y-0">
+            {promoStrip.map((item) => {
+              const Icon = item.icon;
+              return (
+                <div key={item.text} className="flex min-h-9 items-center justify-center gap-2 px-2 py-2 text-center sm:min-h-10">
+                  <Icon className="h-3.5 w-3.5 shrink-0 text-primary" />
+                  <span className="text-[11px] font-bold leading-4 text-foreground/85 md:text-xs">{item.text}</span>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
 
-      <div className="header-bg text-primary-foreground">
-        <div className="section-container flex items-center gap-4 py-0 h-20">
+      <div className="header-bg text-primary-foreground ring-1 ring-white/10">
+        <div className="section-container flex h-[72px] items-center gap-3 py-2 md:h-20 md:gap-4">
           <button
-            className="lg:hidden p-2 rounded-md hover:bg-primary-light/20"
+            className="rounded-md p-2 hover:bg-primary-light/20 lg:hidden"
             onClick={() => setMobileOpen(!mobileOpen)}
+            aria-label="Mở menu"
           >
             {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
@@ -100,74 +133,58 @@ export default function Header() {
             <img
               src={logoLocan}
               alt={settings.siteName}
-              className="max-h-[120px] w-auto max-w-[200px] object-contain"
+              className="max-h-[62px] w-auto max-w-[130px] object-contain md:max-h-[76px] md:max-w-[170px]"
             />
           </Link>
 
-          <div className="flex-1 max-w-2xl mx-2 md:mx-6">
-            <form className="relative" onSubmit={handleSearchSubmit}>
-              <input
-                type="text"
-                name="q"
-                placeholder="Tìm sản phẩm, linh kiện, dịch vụ..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full py-1 pl-3 pr-10 rounded-lg text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-accent"
-              />
-              <button
-                type="submit"
-                className="absolute right-0 top-0 h-full px-4 rounded-r-lg bg-accent text-accent-foreground hover:bg-accent-hover transition-colors"
-                aria-label="Tìm kiếm"
-              >
-                <Search className="h-4 w-4" />
-              </button>
-            </form>
-          </div>
+          <div className="mx-2 hidden max-w-2xl flex-1 md:mx-6 md:block">{searchForm}</div>
 
-          <a href={`tel:${settings.hotline}`} className="hidden md:flex items-center gap-2 hover:opacity-90 flex-shrink-0">
+          <a href={`tel:${settings.hotline}`} className="hidden flex-shrink-0 items-center gap-2 hover:opacity-90 md:flex">
             <Phone className="h-4 w-4" />
             <div>
               <div className="text-xs opacity-80">Hotline</div>
-              <div className="font-bold text-sm">{settings.hotline}</div>
+              <div className="text-sm font-bold">{settings.hotline}</div>
             </div>
           </a>
 
-          <div className="flex items-center gap-1 md:gap-3">
+          <div className="ml-auto flex items-center gap-1 md:ml-0 md:gap-3">
             {currentUser ? (
               <Link
                 to="/tai-khoan"
-                className="p-1.5 rounded-md hover:bg-primary-light/20 flex flex-col items-center"
+                className="flex flex-col items-center rounded-md p-1.5 hover:bg-primary-light/20"
                 title={currentUser.fullName}
               >
-                <User className="h-4 w-4" />
-                <span className="text-[10px] hidden md:block max-w-[84px] truncate">{currentUser.fullName}</span>
+                <User className="h-5 w-5 md:h-4 md:w-4" />
+                <span className="hidden max-w-[84px] truncate text-[10px] md:block">{currentUser.fullName}</span>
               </Link>
             ) : (
-              <Link to="/dang-nhap" className="p-1.5 rounded-md hover:bg-primary-light/20 flex flex-col items-center">
-                <User className="h-4 w-4" />
-                <span className="text-[10px] hidden md:block">Tài khoản</span>
+              <Link to="/dang-nhap" className="flex flex-col items-center rounded-md p-1.5 hover:bg-primary-light/20">
+                <User className="h-5 w-5 md:h-4 md:w-4" />
+                <span className="hidden text-[10px] md:block">Tài khoản</span>
               </Link>
             )}
 
-            <Link to="/gio-hang" className="p-1.5 rounded-md hover:bg-primary-light/20 flex flex-col items-center relative">
-              <ShoppingCart className="h-4 w-4" />
-              <span className="text-[10px] hidden md:block">Giỏ hàng</span>
-              <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-accent text-accent-foreground text-[10px] flex items-center justify-center font-bold">{totalItems}</span>
+            <Link to="/gio-hang" className="relative flex flex-col items-center rounded-md p-1.5 hover:bg-primary-light/20">
+              <ShoppingCart className="h-5 w-5 md:h-4 md:w-4" />
+              <span className="hidden text-[10px] md:block">Giỏ hàng</span>
+              <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-[10px] font-bold text-accent-foreground">
+                {totalItems}
+              </span>
             </Link>
           </div>
         </div>
+
+        <div className="section-container pb-3 md:hidden">{searchForm}</div>
       </div>
 
-      <nav className="bg-white hidden lg:block border-b border-border/50">
+      <nav className="hidden border-b border-primary/10 bg-white/95 shadow-sm backdrop-blur lg:block">
         <div className="section-container">
           <ul className="flex w-full items-center justify-between">
             {menuItems.map((item) => (
-              <li key={item.path}>
-                <Link
-                  to={item.path}
-                  className="block whitespace-nowrap px-3 py-2.5 text-foreground text-sm font-medium hover:bg-muted transition-colors"
-                >
-                  {item.name}
+              <li key={item.path} className="flex-1 text-center">
+                <Link to={item.path} className="nav-link inline-flex items-center justify-center gap-2">
+                  <item.icon className="h-4 w-4 text-primary" />
+                  <span>{item.name}</span>
                 </Link>
               </li>
             ))}
@@ -175,46 +192,61 @@ export default function Header() {
         </div>
       </nav>
 
-      {mobileOpen && (
-        <nav className="lg:hidden bg-card border-b shadow-lg absolute w-full z-50 max-h-[80vh] overflow-y-auto">
-          <div className="py-2">
-            <a href={`tel:${settings.hotline}`} className="flex items-center gap-3 px-4 py-3 text-sale font-bold border-b">
-              <Phone className="h-5 w-5" />
-              Gọi ngay: {settings.hotline}
-            </a>
+      <AnimatePresence>
+        {mobileOpen && (
+          <motion.nav
+            className="absolute z-50 max-h-[80vh] w-full overflow-y-auto border-b bg-card shadow-lg lg:hidden"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+          >
+            <div className="py-2">
+              <a href={`tel:${settings.hotline}`} className="flex items-center gap-3 border-b px-4 py-3 font-bold text-sale">
+                <Phone className="h-5 w-5" />
+                Gọi ngay: {settings.hotline}
+              </a>
 
-            {menuItems.map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                className="block px-4 py-3 text-sm font-medium text-foreground hover:bg-muted border-b border-border/50"
-                onClick={() => setMobileOpen(false)}
-              >
-                {item.name}
-              </Link>
-            ))}
+              {menuItems.map((item, index) => (
+                <motion.div
+                  key={item.path}
+                  initial={{ opacity: 0, x: -12 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.05, duration: 0.18, ease: "easeOut" }}
+                >
+                  <Link
+                    to={item.path}
+                    className="flex items-center gap-3 border-b border-border/50 px-4 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted hover:text-primary"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    <item.icon className="h-4 w-4 text-primary" />
+                    {item.name}
+                  </Link>
+                </motion.div>
+              ))}
 
-            {currentUser ? (
-              <button
-                type="button"
-                onClick={handleLogout}
-                className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-foreground hover:bg-muted border-b border-border/50"
-              >
-                <LogOut className="h-4 w-4" />
-                Đăng xuất ({currentUser.fullName})
-              </button>
-            ) : (
-              <Link
-                to="/dang-nhap"
-                className="block px-4 py-3 text-sm font-medium text-foreground hover:bg-muted border-b border-border/50"
-                onClick={() => setMobileOpen(false)}
-              >
-                Tài khoản
-              </Link>
-            )}
-          </div>
-        </nav>
-      )}
+              {currentUser ? (
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="flex w-full items-center gap-3 border-b border-border/50 px-4 py-3 text-sm font-medium text-foreground hover:bg-muted"
+                >
+                  <LogOut className="h-4 w-4" />
+                  Đăng xuất ({currentUser.fullName})
+                </button>
+              ) : (
+                <Link
+                  to="/dang-nhap"
+                  className="block border-b border-border/50 px-4 py-3 text-sm font-medium text-foreground hover:bg-muted"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  Tài khoản
+                </Link>
+              )}
+            </div>
+          </motion.nav>
+        )}
+      </AnimatePresence>
     </header>
   );
 }

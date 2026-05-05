@@ -1,4 +1,5 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
+import { motion } from "framer-motion";
 import { HelmetProvider } from "react-helmet-async";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
@@ -49,6 +50,77 @@ import AdminMemberProgramPage from "./pages/admin/AdminMemberProgramPage.tsx";
 import AdminFlashSalePage from "./pages/admin/AdminFlashSalePage.tsx";
 import AdminBuildPCPage from "./pages/admin/AdminBuildPCPage.tsx";
 
+function AppRoutes() {
+  const location = useLocation();
+  return (
+    <motion.div
+      key={location.pathname}
+      className="min-h-screen bg-background"
+      initial={{ opacity: 0.98, y: 4 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.16, ease: "easeOut" }}
+    >
+      <Routes location={location}>
+        <Route path="/" element={<Index />} />
+        <Route path="/laptop" element={<LaptopPage />} />
+        <Route path="/pc" element={<PCPage />} />
+        <Route path="/pc-gaming" element={<PCGamingPage />} />
+        <Route path="/linh-kien" element={<LinhKienPage />} />
+        <Route path="/man-hinh" element={<ManHinhPage />} />
+        <Route path="/thiet-bi-mang" element={<ThietBiMangPage />} />
+        <Route path="/camera" element={<CameraPage />} />
+        <Route path="/ngoai-vi" element={<NgoaiViPage />} />
+        <Route path="/flash-sale" element={<FlashSalePage />} />
+        <Route path="/build-pc" element={<BuildPCPage />} />
+        <Route path="/uu-dai-thanh-vien" element={<UuDaiThanhVienPage />} />
+        <Route path="/chinh-sach/:slug" element={<PolicyPage />} />
+        <Route path="/huong-dan-mua-hang" element={<PolicyPage />} />
+        <Route path="/huong-dan-thanh-toan" element={<PolicyPage />} />
+        <Route path="/dich-vu" element={<DichVuPage />} />
+        <Route path="/dich-vu/:slug" element={<ServiceDetailPage />} />
+        <Route path="/san-pham/:slug" element={<ProductDetailPage />} />
+        <Route path="/gio-hang" element={<CartPage />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/dang-nhap" element={<LoginPage />} />
+        <Route path="/dang-ky" element={<RegisterPage />} />
+        <Route path="/tai-khoan" element={<AccountPage />} />
+        <Route path="/tin-tuc" element={<TinTucPage />} />
+        <Route path="/lien-he" element={<LienHePage />} />
+        <Route path="/gioi-thieu" element={<GioiThieuPage />} />
+        <Route path="/tim-kiem" element={<SearchPage />} />
+
+        {/* Admin */}
+        <Route path="/admin/login" element={<AdminLoginPage />} />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute>
+              <AdminLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<DashboardPage />} />
+          <Route path="san-pham" element={<AdminProductsPage />} />
+          <Route path="danh-muc" element={<AdminCategoriesPage />} />
+          <Route path="don-hang" element={<AdminOrdersPage />} />
+          <Route path="dich-vu" element={<AdminServicesPage />} />
+          <Route path="khach-hang" element={<AdminCustomersPage />} />
+          <Route path="nguoi-dung" element={<AdminUsersPage />} />
+          <Route path="thanh-vien" element={<AdminMemberProgramPage />} />
+          <Route path="build-pc" element={<AdminBuildPCPage />} />
+          <Route path="flash-sale" element={<AdminFlashSalePage />} />
+          <Route path="banner" element={<AdminBannersPage />} />
+          <Route path="tin-tuc" element={<AdminNewsPage />} />
+          <Route path="chinh-sach" element={<AdminPoliciesPage />} />
+          <Route path="cai-dat" element={<AdminSettingsPage />} />
+        </Route>
+
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </motion.div>
+  );
+}
+
 const App = () => (
   <HelmetProvider>
     <TooltipProvider>
@@ -57,64 +129,8 @@ const App = () => (
       <AuthProvider>
         <BrowserRouter>
           <ScrollToTop />
-          <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/laptop" element={<LaptopPage />} />
-          <Route path="/pc" element={<PCPage />} />
-          <Route path="/pc-gaming" element={<PCGamingPage />} />
-          <Route path="/linh-kien" element={<LinhKienPage />} />
-          <Route path="/man-hinh" element={<ManHinhPage />} />
-          <Route path="/thiet-bi-mang" element={<ThietBiMangPage />} />
-          <Route path="/camera" element={<CameraPage />} />
-          <Route path="/ngoai-vi" element={<NgoaiViPage />} />
-          <Route path="/flash-sale" element={<FlashSalePage />} />
-          <Route path="/build-pc" element={<BuildPCPage />} />
-          <Route path="/uu-dai-thanh-vien" element={<UuDaiThanhVienPage />} />
-          <Route path="/chinh-sach/:slug" element={<PolicyPage />} />
-          <Route path="/huong-dan-mua-hang" element={<PolicyPage />} />
-          <Route path="/huong-dan-thanh-toan" element={<PolicyPage />} />
-          <Route path="/dich-vu" element={<DichVuPage />} />
-          <Route path="/dich-vu/:slug" element={<ServiceDetailPage />} />
-          <Route path="/san-pham/:slug" element={<ProductDetailPage />} />
-          <Route path="/gio-hang" element={<CartPage />} />
-          <Route path="/checkout" element={<CheckoutPage />} />
-          <Route path="/dang-nhap" element={<LoginPage />} />
-          <Route path="/dang-ky" element={<RegisterPage />} />
-          <Route path="/tai-khoan" element={<AccountPage />} />
-          <Route path="/tin-tuc" element={<TinTucPage />} />
-          <Route path="/lien-he" element={<LienHePage />} />
-          <Route path="/gioi-thieu" element={<GioiThieuPage />} />
-          <Route path="/tim-kiem" element={<SearchPage />} />
-
-          {/* Admin */}
-          <Route path="/admin/login" element={<AdminLoginPage />} />
-          <Route
-            path="/admin"
-            element={
-              <ProtectedRoute>
-                <AdminLayout />
-              </ProtectedRoute>
-            }
-          >
-            <Route index element={<DashboardPage />} />
-            <Route path="san-pham" element={<AdminProductsPage />} />
-            <Route path="danh-muc" element={<AdminCategoriesPage />} />
-            <Route path="don-hang" element={<AdminOrdersPage />} />
-            <Route path="dich-vu" element={<AdminServicesPage />} />
-            <Route path="khach-hang" element={<AdminCustomersPage />} />
-            <Route path="nguoi-dung" element={<AdminUsersPage />} />
-            <Route path="thanh-vien" element={<AdminMemberProgramPage />} />
-            <Route path="build-pc" element={<AdminBuildPCPage />} />
-            <Route path="flash-sale" element={<AdminFlashSalePage />} />
-            <Route path="banner" element={<AdminBannersPage />} />
-            <Route path="tin-tuc" element={<AdminNewsPage />} />
-            <Route path="chinh-sach" element={<AdminPoliciesPage />} />
-            <Route path="cai-dat" element={<AdminSettingsPage />} />
-          </Route>
-
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+          <AppRoutes />
+        </BrowserRouter>
       </AuthProvider>
     </TooltipProvider>
   </HelmetProvider>

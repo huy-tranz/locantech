@@ -11,7 +11,7 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD:-locan_dev_password}
       POSTGRES_DB: locan_tech_store
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - ./docker-data/postgres:/var/lib/postgresql/data
     ports:
       - '5432:5432'
     healthcheck:
@@ -41,6 +41,3 @@ services:
       - '3001:3001'
     volumes:
       - ./server/uploads:/app/uploads
-
-volumes:
-  postgres_data:

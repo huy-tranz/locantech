@@ -8,7 +8,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useAdminCustomers } from "@/hooks/queries/user.queries";
-import { formatPrice, getAllProducts } from "@/data/products";
+import { formatPrice } from "@/data/products";
+import { useProducts } from "@/hooks/queries/product.queries";
+import { getProductsFromResponse } from "@/lib/productAdapter";
 import type { AdminUser } from "@/api/user.api";
 import type { AccountData, AccountOrder, RepairRequest } from "@/lib/account";
 import { getStoredUsers } from "@/lib/auth";
@@ -83,7 +85,8 @@ export default function AdminCustomersPage() {
   const [search, setSearch] = useState("");
   const [selectedCustomerId, setSelectedCustomerId] = useState("");
   const [notes, setNotes] = useState<Record<string, string>>(() => getCustomerNotes());
-  const allProducts = useMemo(() => getAllProducts(), []);
+  const { data: productsData } = useProducts({ status: "all", limit: 500 });
+  const allProducts = useMemo(() => getProductsFromResponse(productsData), [productsData]);
 
   const customers = useMemo<CustomerProfile[]>(() => {
     const localCustomers: CustomerProfile[] = getStoredUsers().map((user) => ({

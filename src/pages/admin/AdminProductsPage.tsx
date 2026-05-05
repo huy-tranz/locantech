@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ChangeEvent } from "react";
+import uploadApi from "@/api/upload.api";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -16,7 +17,7 @@ import {
   useDeleteProduct,
 } from "@/hooks/queries/product.queries";
 import { useCategoriesFlat } from "@/hooks/queries/category.queries";
-import { Plus, Search, Pencil, Trash2, Save } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, Save, Upload } from "lucide-react";
 
 const formatPrice = (p: number) => p.toLocaleString("vi-VN") + "đ";
 
@@ -92,6 +93,7 @@ export default function AdminProductsPage() {
   const [editing, setEditing] = useState<ProductForm | null>(null);
   const [specKey, setSpecKey] = useState("");
   const [specVal, setSpecVal] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
 
   const { data: productRes, isLoading } = useProductsQuery({ status: "all", limit: 200 });
   const { data: flatCategories = [] } = useCategoriesFlat();
@@ -160,7 +162,7 @@ export default function AdminProductsPage() {
     }
 
     if (!editing.sku.trim()) {
-      toast({ title: "Vui lòng nhập SKU", variant: "destructive" });
+      toast({ title: "Vui lòng nhập mã SP", variant: "destructive" });
       return;
     }
 
@@ -194,6 +196,27 @@ export default function AdminProductsPage() {
       toast({ title: "Đã lưu sản phẩm thành công" });
     } catch (err: any) {
       toast({ title: "Lưu sản phẩm thất bại", description: err?.response?.data?.error || "Có lỗi xảy ra", variant: "destructive" });
+    }
+  };
+
+  const handleImageUpload = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file || !editing) return;
+
+    try {
+      setIsUploading(true);
+      const uploaded = await uploadApi.image("products", file);
+      setEditing({ ...editing, image: uploaded.url });
+      toast({ title: "Da tai anh san pham len" });
+    } catch (err: any) {
+      toast({
+        title: "Tai anh that bai",
+        description: err?.response?.data?.error || "Vui long chon file anh duoi 5MB",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -244,7 +267,7 @@ export default function AdminProductsPage() {
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
-              placeholder="Tìm theo tên, SKU..."
+              placeholder="Tìm theo tên, mã SP..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-9"
@@ -357,7 +380,7 @@ export default function AdminProductsPage() {
                   <Input value={editing.name} onChange={(e) => setEditing({ ...editing, name: e.target.value })} />
                 </div>
                 <div className="space-y-2">
-                  <Label>SKU *</Label>
+                  <Label>Mã SP *</Label>
                   <Input value={editing.sku} onChange={(e) => setEditing({ ...editing, sku: e.target.value })} />
                 </div>
               </div>
@@ -424,6 +447,15 @@ export default function AdminProductsPage() {
               <div className="space-y-2">
                 <Label>URL ảnh</Label>
                 <Input value={editing.image} onChange={(e) => setEditing({ ...editing, image: e.target.value })} placeholder="Đường dẫn ảnh" />
+                <div className="flex items-center gap-2">
+                  <Input id="product-image-upload" type="file" accept="image/*" onChange={handleImageUpload} disabled={isUploading} className="hidden" />
+                  <Button type="button" variant="outline" className="shrink-0" asChild>
+                    <label htmlFor="product-image-upload" className={isUploading ? "pointer-events-none" : "cursor-pointer"}>
+                      <Upload className="w-4 h-4 mr-1" />
+                      {isUploading ? "Dang tai..." : "Upload"}
+                    </label>
+                  </Button>
+                </div>
                 {editing.image && <img src={editing.image} alt="" className="w-20 h-20 object-contain rounded border bg-white mt-1" />}
               </div>
 

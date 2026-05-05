@@ -19,14 +19,14 @@ export const addItem = async (req: Request, res: Response, next: NextFunction) =
 export const updateQuantity = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { quantity } = req.body
-    const item = await cartService.updateQuantity(req.user!.id, req.params.productId, quantity)
+    const item = await cartService.updateQuantity(req.user!.id, String(req.params.productId), quantity)
     res.json(item)
   } catch (err) { next(err) }
 }
 
 export const removeItem = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const result = await cartService.removeItem(req.user!.id, req.params.productId)
+    const result = await cartService.removeItem(req.user!.id, String(req.params.productId))
     res.json(result)
   } catch (err) { next(err) }
 }

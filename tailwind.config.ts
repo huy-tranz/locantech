@@ -49,6 +49,18 @@ export default {
           DEFAULT: "hsl(var(--sale))",
           foreground: "hsl(var(--sale-foreground))",
         },
+        gaming: {
+          DEFAULT: "hsl(var(--gaming))",
+          foreground: "hsl(var(--gaming-foreground))",
+        },
+        service: {
+          DEFAULT: "hsl(var(--service))",
+          foreground: "hsl(var(--service-foreground))",
+        },
+        trust: {
+          DEFAULT: "hsl(var(--trust))",
+          foreground: "hsl(var(--trust-foreground))",
+        },
         success: {
           DEFAULT: "hsl(var(--success))",
           foreground: "hsl(var(--success-foreground))",

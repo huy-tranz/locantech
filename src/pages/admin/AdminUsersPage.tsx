@@ -64,7 +64,13 @@ export default function AdminUsersPage() {
         toast({ title: "Đã cập nhật người dùng" });
       } else {
         if (!editing.password) { toast({ title: "Nhập mật khẩu", variant: "destructive" }); return; }
-        await createUser.mutateAsync(payload);
+        await createUser.mutateAsync({
+          name: editing.name,
+          email: editing.email,
+          phone: editing.phone || undefined,
+          role: uiToDb[editing.role],
+          password: editing.password,
+        });
         toast({ title: "Đã thêm người dùng" });
       }
       setDialogOpen(false);

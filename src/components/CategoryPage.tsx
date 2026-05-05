@@ -4,15 +4,17 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import FloatingActions from "@/components/layout/FloatingActions";
 import ProductCard from "@/components/ProductCard";
-import { type Product, getProductBrands } from "@/data/products";
+import { type Product } from "@/data/products";
 import { categories, type Category } from "@/data/categories";
+import { useProducts } from "@/hooks/queries/product.queries";
+import { getProductsFromResponse } from "@/lib/productAdapter";
 import { ChevronRight, SlidersHorizontal, X } from "lucide-react";
 
 interface CategoryPageProps {
   categoryId: string;
   title: string;
   description?: string;
-  products: Product[];
+  products?: Product[];
 }
 
 type SortOption = "default" | "price-asc" | "price-desc" | "newest" | "best-seller" | "discount";
@@ -35,7 +37,7 @@ const priceRanges = [
   { label: "Trên 30 triệu", min: 30000000, max: Infinity },
 ];
 
-export default function CategoryPage({ categoryId, title, description, products }: CategoryPageProps) {
+export default function CategoryPage({ categoryId, title, description, products: initialProducts }: CategoryPageProps) {
   const [sort, setSort] = useState<SortOption>("default");
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [selectedPrice, setSelectedPrice] = useState<number | null>(null);
@@ -45,8 +47,12 @@ export default function CategoryPage({ categoryId, title, description, products 
 
   const [searchParams] = useSearchParams();
   const subcategorySlug = searchParams.get("subcategory");
+  const { data: productRes, isLoading } = useProducts({ category: categoryId, limit: 100 });
+  const products = initialProducts ?? getProductsFromResponse(productRes);
 
-  const brands = getProductBrands(categoryId);
+  const brands = useMemo(() => {
+    return Array.from(new Set(products.map((p) => p.brand).filter(Boolean))).sort();
+  }, [products]);
   const category = categories.find(c => c.id === categoryId);
   const subcategories = category?.children || [];
 
@@ -279,7 +285,11 @@ export default function CategoryPage({ categoryId, title, description, products 
               </div>
             </div>
 
-            {filtered.length === 0 ? (
+            {isLoading ? (
+              <div className="text-center py-16">
+                <p className="text-muted-foreground">Đang tải sản phẩm...</p>
+              </div>
+            ) : filtered.length === 0 ? (
               <div className="text-center py-16">
                 <p className="text-muted-foreground">Không tìm thấy sản phẩm phù hợp.</p>
                 <button onClick={clearFilters} className="btn-primary mt-3 text-sm">Xóa bộ lọc</button>

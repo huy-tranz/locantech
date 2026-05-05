@@ -1,5 +1,6 @@
 import { prisma } from '@/config/database'
 import { AppError } from '@/middleware/error.middleware'
+import { cleanupUnreferencedUploads, collectChangedUploads } from '@/utils/upload-cleanup.util'
 
 // ── Banners ──────────────────────────────────────────────
 export const bannerService = {
@@ -24,16 +25,37 @@ export const bannerService = {
     })
   },
 
+  async getAllAdmin() {
+    return prisma.banner.findMany({
+      orderBy: [
+        { position: 'asc' },
+        { sortOrder: 'asc' },
+        { createdAt: 'desc' },
+      ],
+    })
+  },
+
   async create(data: any) {
     return prisma.banner.create({ data })
   },
 
   async update(id: string, data: any) {
-    return prisma.banner.update({ where: { id }, data })
+    const current = await prisma.banner.findUnique({ where: { id } })
+    if (!current) throw new AppError(404, 'Banner not found')
+
+    const updated = await prisma.banner.update({ where: { id }, data })
+    await cleanupUnreferencedUploads(collectChangedUploads([current.image], [updated.image]))
+
+    return updated
   },
 
   async delete(id: string) {
+    const current = await prisma.banner.findUnique({ where: { id } })
+    if (!current) throw new AppError(404, 'Banner not found')
+
     await prisma.banner.delete({ where: { id } })
+    await cleanupUnreferencedUploads([current.image])
+
     return { message: 'Banner deleted' }
   },
 }
@@ -61,6 +83,27 @@ export const newsService = {
     return { articles, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } }
   },
 
+  async getAllAdmin(filters: { page?: number; limit?: number; tag?: string }) {
+    const page = Math.max(1, filters.page || 1)
+    const limit = Math.min(100, Math.max(1, filters.limit || 50))
+    const skip = (page - 1) * limit
+
+    const where: any = {}
+    if (filters.tag) where.tags = { has: filters.tag }
+
+    const [articles, total] = await Promise.all([
+      prisma.news.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+      prisma.news.count({ where }),
+    ])
+
+    return { articles, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } }
+  },
+
   async getBySlug(slug: string) {
     const article = await prisma.news.findUnique({ where: { slug } })
     if (!article) throw new AppError(404, 'Article not found')
@@ -76,11 +119,22 @@ export const newsService = {
   },
 
   async update(id: string, data: any) {
-    return prisma.news.update({ where: { id }, data })
+    const current = await prisma.news.findUnique({ where: { id } })
+    if (!current) throw new AppError(404, 'Article not found')
+
+    const updated = await prisma.news.update({ where: { id }, data })
+    await cleanupUnreferencedUploads(collectChangedUploads([current.image], [updated.image]))
+
+    return updated
   },
 
   async delete(id: string) {
+    const current = await prisma.news.findUnique({ where: { id } })
+    if (!current) throw new AppError(404, 'Article not found')
+
     await prisma.news.delete({ where: { id } })
+    await cleanupUnreferencedUploads([current.image])
+
     return { message: 'Article deleted' }
   },
 }
@@ -91,6 +145,15 @@ export const siteServiceService = {
     return prisma.service.findMany({
       where: { isActive: true },
       orderBy: { sortOrder: 'asc' },
+    })
+  },
+
+  async getAllAdmin() {
+    return prisma.service.findMany({
+      orderBy: [
+        { sortOrder: 'asc' },
+        { createdAt: 'desc' },
+      ],
     })
   },
 
@@ -105,11 +168,22 @@ export const siteServiceService = {
   },
 
   async update(id: string, data: any) {
-    return prisma.service.update({ where: { id }, data })
+    const current = await prisma.service.findUnique({ where: { id } })
+    if (!current) throw new AppError(404, 'Service not found')
+
+    const updated = await prisma.service.update({ where: { id }, data })
+    await cleanupUnreferencedUploads(collectChangedUploads([current.image], [updated.image]))
+
+    return updated
   },
 
   async delete(id: string) {
+    const current = await prisma.service.findUnique({ where: { id } })
+    if (!current) throw new AppError(404, 'Service not found')
+
     await prisma.service.delete({ where: { id } })
+    await cleanupUnreferencedUploads([current.image])
+
     return { message: 'Service deleted' }
   },
 }

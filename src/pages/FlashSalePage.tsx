@@ -5,7 +5,9 @@ import Footer from "@/components/layout/Footer";
 import FloatingActions from "@/components/layout/FloatingActions";
 import ProductCard from "@/components/ProductCard";
 import { FLASH_SALE_STORAGE_KEY, getFlashSaleConfig } from "@/data/flashSale";
-import { formatPrice, getAllProducts } from "@/data/products";
+import { formatPrice } from "@/data/products";
+import { useProducts } from "@/hooks/queries/product.queries";
+import { getProductsFromResponse } from "@/lib/productAdapter";
 import { ChevronRight, Clock } from "lucide-react";
 
 interface CountdownProps {
@@ -63,6 +65,8 @@ function CountdownTimer({ targetDate }: CountdownProps) {
 
 export default function FlashSalePage() {
   const [config, setConfig] = useState(() => getFlashSaleConfig());
+  const { data: productRes } = useProducts({ limit: 100 });
+  const allProducts = getProductsFromResponse(productRes);
 
   useEffect(() => {
     const syncConfig = () => setConfig(getFlashSaleConfig());
@@ -80,19 +84,18 @@ export default function FlashSalePage() {
   }, []);
 
   const saleProducts = useMemo(() => {
-    const products = getAllProducts();
     const selected = config.selectedProductIds
-      .map((id) => products.find((product) => product.id === id))
+      .map((id) => allProducts.find((product) => product.id === id))
       .filter(Boolean);
 
     if (selected.length > 0) {
       return selected;
     }
 
-    return products
+    return allProducts
       .filter((product) => (product.discount ?? 0) > 0)
       .sort((a, b) => (b.discount || 0) - (a.discount || 0));
-  }, [config.selectedProductIds]);
+  }, [allProducts, config.selectedProductIds]);
 
   const totalSavings = saleProducts.reduce((acc, product) => {
     if (product.originalPrice) {

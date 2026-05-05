@@ -1,6 +1,7 @@
 import { prisma } from '@/config/database'
 import { generateSlug } from '@/utils/slug.util'
 import { AppError } from '@/middleware/error.middleware'
+import { cleanupUnreferencedUploads, collectChangedUploads } from '@/utils/upload-cleanup.util'
 
 export const categoryService = {
   async getAll() {
@@ -57,10 +58,14 @@ export const categoryService = {
 
     const slug = data.name ? generateSlug(data.name) : category.slug
 
-    return prisma.category.update({
+    const updated = await prisma.category.update({
       where: { id },
       data: { ...data, slug },
     })
+
+    await cleanupUnreferencedUploads(collectChangedUploads([category.image], [updated.image]))
+
+    return updated
   },
 
   async delete(id: string) {
@@ -83,6 +88,8 @@ export const categoryService = {
     }
 
     await prisma.category.delete({ where: { id } })
+    await cleanupUnreferencedUploads([category.image])
+
     return { message: 'Category deleted' }
   },
 }

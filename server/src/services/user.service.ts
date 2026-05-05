@@ -1,31 +1,11 @@
 import { prisma } from '@/config/database'
 import { hashPassword } from '@/utils/bcrypt.util'
-import { Role } from '@prisma/client'
+import { Role, UserStatus } from '@prisma/client'
 
 export const userService = {
   async getAllAdmin() {
     return prisma.user.findMany({
       where: { role: { in: [Role.ADMIN, Role.SUPERADMIN] } },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        phone: true,
-        role: true,
-        status: true,
-        avatar: true,
-        createdAt: true,
-      },
-      orderBy: { createdAt: 'desc' },
-    })
-  },
-
-  async getAllCustomers() {
-    return prisma.user.findMany({
-      where: {
-        role: Role.CUSTOMER,
-        status: { not: 'DELETED' },
-      },
       select: {
         id: true,
         name: true,
@@ -78,8 +58,9 @@ export const userService = {
 
   async create(data: { name: string; email: string; phone?: string; role: Role; password: string }) {
     const passwordHash = await hashPassword(data.password)
+    const { password, ...userData } = data
     return prisma.user.create({
-      data: { ...data, passwordHash },
+      data: { ...userData, passwordHash },
       select: {
         id: true,
         name: true,
@@ -93,7 +74,7 @@ export const userService = {
     })
   },
 
-  async update(id: string, data: { name?: string; phone?: string; role?: Role; status?: string }) {
+  async update(id: string, data: { name?: string; phone?: string; role?: Role; status?: UserStatus }) {
     return prisma.user.update({
       where: { id },
       data,

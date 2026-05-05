@@ -6,47 +6,173 @@ import CategorySidebar from "@/components/home/CategorySidebar";
 import ServiceSection from "@/components/home/ServiceSection";
 import ProductBlock from "@/components/home/ProductBlock";
 import FlashSaleSection from "@/components/home/FlashSaleSection";
+import ShopByNeedSection from "@/components/home/ShopByNeedSection";
 import WhyChooseUs from "@/components/home/WhyChooseUs";
 import NewsSection from "@/components/home/NewsSection";
-import { getProductsByCategory } from "@/data/products";
+import { useProducts } from "@/hooks/queries/product.queries";
+import { getProductsFromResponse } from "@/lib/productAdapter";
 import ScrollReveal from "@/components/ScrollReveal";
+import {
+  Camera,
+  Cpu,
+  Headphones,
+  Laptop,
+  ShieldCheck,
+  Sparkles,
+  Truck,
+  Wrench,
+} from "lucide-react";
+import { Link } from "react-router-dom";
+
+const quickCampaigns = [
+  {
+    label: "Tư vấn cấu hình",
+    title: "Build PC theo ngân sách",
+    desc: "Gaming, đồ họa, văn phòng",
+    href: "/build-pc",
+    icon: Cpu,
+    tone: "from-cyan-50 to-white",
+    toneClass: "tone-gaming",
+    action: "Build ngay",
+  },
+  {
+    label: "Máy học tập",
+    title: "Laptop văn phòng",
+    desc: "Gọn nhẹ, bảo hành rõ, dễ mua",
+    href: "/laptop",
+    icon: Laptop,
+    tone: "from-indigo-50 to-white",
+    toneClass: "tone-trust",
+    action: "Xem laptop",
+  },
+  {
+    label: "Kỹ thuật tận nơi",
+    title: "Sửa chữa máy tính",
+    desc: "Vệ sinh, nâng cấp SSD/RAM, cài Win",
+    href: "/dich-vu",
+    icon: Wrench,
+    tone: "from-orange-50 to-white",
+    toneClass: "tone-service",
+    action: "Đặt lịch",
+  },
+  {
+    label: "Nhà & văn phòng",
+    title: "Camera, mạng nội bộ",
+    desc: "Thi công camera, WiFi, LAN",
+    href: "/camera",
+    icon: Camera,
+    tone: "from-emerald-50 to-white",
+    toneClass: "tone-trust",
+    action: "Tư vấn ngay",
+  },
+];
+
+const heroMetrics = [
+  { value: "60 phút", label: "hỗ trợ kỹ thuật nội thành", icon: Headphones },
+  { value: "36 tháng", label: "bảo hành cấu hình PC", icon: ShieldCheck },
+  { value: "Toàn quốc", label: "giao hàng & đóng gói", icon: Truck },
+];
 
 const Index = () => {
-  const laptops = getProductsByCategory("laptop");
-  const pcs = getProductsByCategory("pc");
-  const pcGaming = getProductsByCategory("pc-gaming");
-  const linhKien = getProductsByCategory("linh-kien");
-  const manHinh = getProductsByCategory("man-hinh");
-  const ngoaiVi = getProductsByCategory("ngoai-vi");
-  const tbMang = getProductsByCategory("thiet-bi-mang");
-  const cameras = getProductsByCategory("camera");
-  
+  const { data: laptopRes } = useProducts({ category: "laptop", limit: 5 });
+  const { data: pcRes } = useProducts({ category: "pc", limit: 5 });
+  const { data: pcGamingRes } = useProducts({ category: "pc-gaming", limit: 5 });
+  const { data: linhKienRes } = useProducts({ category: "linh-kien", limit: 5 });
+  const { data: manHinhRes } = useProducts({ category: "man-hinh", limit: 5 });
+  const { data: ngoaiViRes } = useProducts({ category: "ngoai-vi", limit: 5 });
+  const { data: tbMangRes } = useProducts({ category: "thiet-bi-mang", limit: 5 });
+  const { data: cameraRes } = useProducts({ category: "camera", limit: 5 });
+
+  const laptops = getProductsFromResponse(laptopRes);
+  const pcs = getProductsFromResponse(pcRes);
+  const pcGaming = getProductsFromResponse(pcGamingRes);
+  const linhKien = getProductsFromResponse(linhKienRes);
+  const manHinh = getProductsFromResponse(manHinhRes);
+  const ngoaiVi = getProductsFromResponse(ngoaiViRes);
+  const tbMang = getProductsFromResponse(tbMangRes);
+  const cameras = getProductsFromResponse(cameraRes);
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
 
       <main className="section-container py-4 md:py-6">
-        {/* Hero: Category sidebar + Banner */}
         <ScrollReveal>
-          <div className="flex gap-4 mb-6">
-            {/* Category sidebar - desktop only */}
-            <div className="hidden lg:block w-[240px] flex-shrink-0">
-              <CategorySidebar />
+          <section className="home-hero-shell mb-6">
+            <div className="relative z-10">
+              <div className="mb-4 flex flex-col gap-3 px-1 xl:flex-row xl:items-end xl:justify-between">
+                <div className="max-w-[min(48rem,58vw)]">
+                  <span className="hero-eyebrow">
+                    <Sparkles className="mr-2 h-3.5 w-3.5" />
+                    Lộc An Tech Store
+                  </span>
+                  <h1 className="mt-3 text-[clamp(1.5rem,1.05rem+1.3vw,2.25rem)] font-extrabold leading-tight text-white">
+                    Máy tính, linh kiện và dịch vụ IT cho gia đình, game thủ, văn phòng
+                  </h1>
+                  <p className="mt-2 max-w-2xl text-sm font-medium leading-6 text-cyan-50/80 md:text-base">
+                    Tư vấn đúng nhu cầu, báo giá rõ ràng, hỗ trợ kỹ thuật tại Hà Đông và giao hàng toàn quốc.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2 md:w-[clamp(23rem,24vw,26.875rem)]">
+                  {heroMetrics.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                      <div key={item.value} className="metric-pill">
+                        <div className="mb-1 flex items-center gap-1.5 text-cyan-100">
+                          <Icon className="h-3.5 w-3.5" />
+                          <span className="text-sm font-extrabold">{item.value}</span>
+                        </div>
+                        <p className="text-[11px] leading-4 text-white/70">{item.label}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="grid gap-4 lg:grid-cols-[clamp(14rem,14.2vw,15.625rem)_minmax(0,1fr)]">
+                <div className="hidden lg:block">
+                  <CategorySidebar />
+                </div>
+                <BannerSection />
+              </div>
+
+              <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                {quickCampaigns.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <Link key={item.href} to={item.href} className={`brand-quick-card group bg-gradient-to-br ${item.tone}`}>
+                      <div className="flex items-start gap-3">
+                        <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border transition-colors ${item.toneClass}`}>
+                          <Icon className="h-5 w-5" />
+                        </div>
+                        <div className="min-w-0">
+                          <span className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground">
+                            {item.label}
+                          </span>
+                          <p className="mt-0.5 text-sm font-extrabold text-foreground">{item.title}</p>
+                          <p className="mt-1 text-xs leading-5 text-muted-foreground">{item.desc}</p>
+                          <span className="mt-2 inline-flex text-xs font-extrabold text-primary group-hover:text-accent">
+                            {item.action} →
+                          </span>
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
             </div>
-            {/* Banner */}
-            <div className="flex-1 min-w-0">
-              <BannerSection />
-            </div>
-          </div>
+          </section>
         </ScrollReveal>
 
-        {/* Flash Sale */}
         <ScrollReveal delayMs={100}>
           <FlashSaleSection />
         </ScrollReveal>
 
-        {/* Product blocks */}
+        <ScrollReveal delayMs={150}>
+          <ShopByNeedSection />
+        </ScrollReveal>
+
         <ProductBlock title="Laptop bán chạy" products={laptops} link="/laptop" />
         <ProductBlock title="PC văn phòng" products={pcs} link="/pc" />
         <ProductBlock title="PC Gaming" products={pcGaming} link="/pc-gaming" />
@@ -56,31 +182,26 @@ const Index = () => {
         <ProductBlock title="Thiết bị mạng" products={tbMang} link="/thiet-bi-mang" />
         <ProductBlock title="Camera giám sát" products={cameras} link="/camera" />
 
-        {/* Dịch vụ sửa chữa & CNTT */}
         <ScrollReveal delayMs={200}>
           <ServiceSection />
         </ScrollReveal>
 
-        {/* Why choose us */}
         <ScrollReveal delayMs={300}>
           <WhyChooseUs />
         </ScrollReveal>
 
-        {/* News */}
         <ScrollReveal delayMs={400}>
           <NewsSection />
         </ScrollReveal>
 
-        {/* Brand intro */}
         <ScrollReveal delayMs={500}>
-          <section className="py-8 text-center max-w-3xl mx-auto">
-            <h2 className="text-xl md:text-2xl font-bold text-foreground mb-3">
-              Lộc An – Đồng hành cùng bạn trong mọi giải pháp công nghệ
+          <section className="brand-section mx-auto my-8 max-w-3xl px-6 py-8 text-center">
+            <h2 className="mb-3 text-xl font-extrabold text-foreground md:text-2xl">
+              Lộc An - đồng hành cùng bạn trong mọi giải pháp công nghệ
             </h2>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              Lộc An là cửa hàng chuyên bán và sửa chữa máy tính, laptop, linh kiện, thiết bị mạng và camera giám sát
+            <p className="text-sm leading-relaxed text-muted-foreground">
+              Lộc An chuyên bán và sửa chữa máy tính, laptop, linh kiện, thiết bị mạng và camera giám sát
               tại Hà Đông, Hà Nội. Chúng tôi cam kết tư vấn đúng nhu cầu, báo giá rõ ràng và hỗ trợ kỹ thuật tận tâm.
-              Dù bạn là sinh viên, dân văn phòng, game thủ hay doanh nghiệp nhỏ – Lộc An luôn có giải pháp phù hợp cho bạn.
             </p>
             <a href="tel:0989386219" className="btn-cta mt-4 inline-flex">
               Gọi ngay: 0989.386.219
