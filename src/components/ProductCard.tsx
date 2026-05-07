@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { type Product, formatPrice } from "@/data/products";
 import { useCart } from "@/hooks/use-cart";
 import { toast } from "@/hooks/use-toast";
-import { BadgePercent, Cpu, Eye, Gift, HardDrive, Headphones, MemoryStick, ShieldCheck, ShoppingCart } from "lucide-react";
+import { BadgePercent, Eye, Gift, ShoppingCart } from "lucide-react";
 
 interface ProductCardProps {
   product: Product;
@@ -32,58 +32,6 @@ function stockLabel(status: Product["status"]): string {
   if (status === "in_stock") return "Còn hàng";
   if (status === "coming_soon") return "Sắp về";
   return "Hết hàng";
-}
-
-function pickSpec(product: Product, keys: string[]): string | undefined {
-  if (!product.specs) return undefined;
-  const entries = Object.entries(product.specs);
-  const match = entries.find(([key, value]) =>
-    keys.some((candidate) => {
-      const needle = candidate.toLowerCase();
-      return key.toLowerCase().includes(needle) || value.toLowerCase().includes(needle);
-    })
-  );
-  return match?.[1];
-}
-
-function buildSpecChips(product: Product) {
-  const descParts = product.shortDesc.split(",").map((part) => part.trim()).filter(Boolean);
-  const findFromDesc = (patterns: RegExp[]) => descParts.find((part) => patterns.some((pattern) => pattern.test(part)));
-
-  const chips = [
-    {
-      label: "CPU",
-      value:
-        pickSpec(product, ["CPU", "Số nhân", "Chip", "Core", "Ryzen", "Apple"]) ||
-        findFromDesc([/intel/i, /amd/i, /core\s/i, /ryzen/i, /apple\s/i]),
-      icon: Cpu,
-    },
-    {
-      label: "RAM",
-      value: pickSpec(product, ["RAM"]) || findFromDesc([/\bram\b/i, /\b\d+\s*gb\s*(ddr)?/i]),
-      icon: MemoryStick,
-    },
-    {
-      label: "SSD",
-      value: pickSpec(product, ["Ổ cứng", "SSD", "HDD", "NVMe"]) || findFromDesc([/\bssd\b/i, /\bnvme\b/i, /\bhdd\b/i]),
-      icon: HardDrive,
-    },
-    {
-      label: "VGA",
-      value: pickSpec(product, ["VGA", "VRAM", "GPU", "RTX", "GTX", "RX"]) || findFromDesc([/\brtx\b/i, /\bgtx\b/i, /\brx\s*\d/i]),
-      icon: Cpu,
-    },
-  ];
-
-  const visibleChips = chips.filter((chip) => Boolean(chip.value)).slice(0, 4);
-  const isComputerProduct =
-    ["laptop", "pc", "pc-gaming"].includes(product.category) || /\b(laptop|pc|gaming|macbook)\b/i.test(product.name);
-
-  if (isComputerProduct && visibleChips.length < 4) {
-    return chips.map((chip) => ({ ...chip, value: chip.value || "Cập nhật" })).slice(0, 4);
-  }
-
-  return visibleChips;
 }
 
 function computeTipPosition(clientX: number, clientY: number): TipPos {
@@ -151,7 +99,6 @@ function ProductHoverTip({ product, position }: { product: Product; position: Ti
 export default function ProductCard({ product }: ProductCardProps) {
   const { addItem } = useCart();
   const [tipPos, setTipPos] = useState<TipPos | null>(null);
-  const specChips = buildSpecChips(product);
   const savings = product.originalPrice ? Math.max(0, product.originalPrice - product.price) : 0;
   const stockPercent = Math.max(12, Math.min(100, product.stock * 8));
   const tipPosRef = useRef<TipPos | null>(null);
@@ -243,8 +190,6 @@ export default function ProductCard({ product }: ProductCardProps) {
     });
   };
 
-  const quickConsultHref = `tel:0989386219`;
-
   return (
     <div
       className="card-product group flex h-full flex-col"
@@ -295,30 +240,10 @@ export default function ProductCard({ product }: ProductCardProps) {
             to={detailPath(product.slug)}
             className="rounded-sm text-left outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
-            <h3 className="mb-1 line-clamp-2 h-[42px] text-sm font-bold text-foreground transition-colors group-hover:text-primary">
+            <h3 className="mb-3 line-clamp-2 h-[42px] text-sm font-bold text-foreground transition-colors group-hover:text-primary">
               {product.name}
             </h3>
           </Link>
-          <p className="mb-2 line-clamp-1 h-[18px] text-xs text-muted-foreground">{product.shortDesc}</p>
-
-          {specChips.length > 0 && (
-            <div className="mb-3 grid h-[76px] grid-cols-2 gap-1.5">
-              {specChips.map((chip) => {
-                const Icon = chip.icon;
-                return (
-                <span
-                  key={chip.label}
-                  className="inline-flex min-w-0 items-center gap-1.5 rounded-md border border-primary/10 bg-primary/5 px-2 py-1 text-[10px] font-semibold text-foreground/80"
-                  title={`${chip.label}: ${chip.value}`}
-                >
-                  <Icon className="h-3 w-3 shrink-0 text-primary" />
-                  <span className="shrink-0 font-extrabold text-primary">{chip.label}</span>
-                  <span className="min-w-0 truncate">{chip.value}</span>
-                </span>
-                );
-              })}
-            </div>
-          )}
 
           <div className="mb-3 flex min-h-[26px] flex-wrap gap-1.5">
             <span className="inline-flex min-w-[104px] flex-1 items-center justify-center gap-1 rounded-md border border-sale/20 bg-sale/10 px-2 py-1 text-[10px] font-extrabold text-sale">
@@ -369,32 +294,21 @@ export default function ProductCard({ product }: ProductCardProps) {
           </div>
 
           <div className="mt-3 grid grid-cols-2 gap-1.5">
-            <Link to={detailPath(product.slug)} className="btn-primary py-2 text-xs">
-              <Eye className="mr-1 h-3.5 w-3.5" />
+            <Link to={detailPath(product.slug)} className="btn-primary whitespace-nowrap px-2 py-2 text-[11px] sm:text-xs">
+              <Eye className="mr-1 h-3.5 w-3.5 max-[430px]:hidden" />
               Chi tiết
             </Link>
             <button
               type="button"
               onClick={handleAddToCart}
-              className="btn-cta px-2 py-2 text-xs"
+              className="btn-cta whitespace-nowrap px-2 py-2 text-[11px] sm:text-xs"
               title="Thêm giỏ hàng"
               aria-label="Thêm vào giỏ hàng"
             >
               <ShoppingCart className="mr-1 h-3.5 w-3.5" />
-              <span className="truncate">Thêm giỏ</span>
+              <span className="max-[430px]:hidden">Thêm giỏ</span>
+              <span className="hidden max-[430px]:inline">Giỏ</span>
             </button>
-            <a
-              href={quickConsultHref}
-              className="col-span-2 inline-flex items-center justify-center gap-1.5 rounded-lg border border-primary/15 bg-primary/5 px-3 py-2 text-xs font-extrabold text-primary transition-all hover:border-primary/30 hover:bg-primary/10"
-            >
-              <Headphones className="h-3.5 w-3.5" />
-              Tư vấn nhanh
-            </a>
-          </div>
-
-          <div className="mt-2 flex items-center justify-center gap-1 text-[10px] font-bold text-muted-foreground">
-            <ShieldCheck className="h-3 w-3 text-trust" />
-            Bảo hành rõ ràng, hỗ trợ kỹ thuật
           </div>
         </div>
       </div>
