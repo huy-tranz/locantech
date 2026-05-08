@@ -81,9 +81,9 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Header />
 
-      <main className="section-container py-4 md:py-6">
+      <main className="section-container py-3 md:py-4">
         <ScrollReveal>
-          <section className="home-hero-shell mb-6">
+          <section className="home-hero-shell mb-4">
             <div className="relative z-10">
               <div className="grid gap-4 lg:grid-cols-[clamp(14rem,14.2vw,15.625rem)_minmax(0,1fr)]">
                 <div className="hidden lg:block">
@@ -121,11 +121,11 @@ const Index = () => {
           </section>
         </ScrollReveal>
 
-        <ScrollReveal delayMs={100}>
+        <ScrollReveal>
           <FlashSaleSection />
         </ScrollReveal>
 
-        <ScrollReveal delayMs={150}>
+        <ScrollReveal>
           <ShopByNeedSection />
         </ScrollReveal>
 
@@ -138,20 +138,20 @@ const Index = () => {
         <ProductBlock title="Thiết bị mạng" products={tbMang} link="/thiet-bi-mang" />
         <ProductBlock title="Camera giám sát" products={cameras} link="/camera" />
 
-        <ScrollReveal delayMs={200}>
+        <ScrollReveal>
           <ServiceSection />
         </ScrollReveal>
 
-        <ScrollReveal delayMs={300}>
+        <ScrollReveal>
           <WhyChooseUs />
         </ScrollReveal>
 
-        <ScrollReveal delayMs={400}>
+        <ScrollReveal>
           <NewsSection />
         </ScrollReveal>
 
-        <ScrollReveal delayMs={500}>
-          <section className="brand-section mx-auto my-8 max-w-3xl px-6 py-8 text-center">
+        <ScrollReveal>
+          <section className="brand-section mx-auto my-6 max-w-3xl px-6 py-6 text-center">
             <h2 className="mb-3 text-xl font-extrabold text-foreground md:text-2xl">
               Lộc An - đồng hành cùng bạn trong mọi giải pháp công nghệ
             </h2>

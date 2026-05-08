@@ -23,6 +23,7 @@ import UuDaiThanhVienPage from "./pages/UuDaiThanhVienPage.tsx";
 import PolicyPage from "./pages/PolicyPage.tsx";
 import DichVuPage from "./pages/DichVuPage.tsx";
 import ServiceDetailPage from "./pages/ServiceDetailPage.tsx";
+import ThuCuDoiMoiPage from "./pages/ThuCuDoiMoiPage.tsx";
 import TinTucPage from "./pages/TinTucPage.tsx";
 import LienHePage from "./pages/LienHePage.tsx";
 import GioiThieuPage from "./pages/GioiThieuPage.tsx";
@@ -77,6 +78,7 @@ function AppRoutes() {
         <Route path="/huong-dan-mua-hang" element={<PolicyPage />} />
         <Route path="/huong-dan-thanh-toan" element={<PolicyPage />} />
         <Route path="/dich-vu" element={<DichVuPage />} />
+        <Route path="/dich-vu/thu-cu-doi-moi" element={<ThuCuDoiMoiPage />} />
         <Route path="/dich-vu/:slug" element={<ServiceDetailPage />} />
         <Route path="/san-pham/:slug" element={<ProductDetailPage />} />
         <Route path="/gio-hang" element={<CartPage />} />

@@ -107,6 +107,15 @@ const defaultServices: ServiceItem[] = [
     priceRange: "Từ 500.000đ/máy/tháng",
     duration: "Theo hợp đồng",
   },
+  {
+    id: "s9",
+    name: "Thu cũ đổi mới",
+    slug: "thu-cu-doi-moi",
+    iconKey: "settings",
+    shortDesc: "Định giá minh bạch, nhận tiền mặt ngay tại chỗ hoặc đổi lên máy mới với giá ưu đãi",
+    priceRange: "Theo khảo sát thực tế",
+    duration: "15–30 phút định giá",
+  },
 ];
 
 function hasWindow() {

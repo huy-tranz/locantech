@@ -77,10 +77,11 @@
     --gaming: 262 83% 58%;
     --gaming-foreground: 0 0% 100%;
 
-    --service: 25 100% 50%;          /* aligned to accent orange */
+    /* Teal/cyan — trust signals, service badges, secondary CTA */
+    --service: 186 80% 32%;          /* teal — lắp đặt, dịch vụ */
     --service-foreground: 0 0% 100%;
 
-    --trust: 158 64% 38%;
+    --trust: 192 82% 35%;            /* cyan — bảo hành, freeship, tin cậy */
     --trust-foreground: 0 0% 100%;
 
     --warning: 40 90% 55%;
@@ -135,6 +136,9 @@
     --border: 217 20% 22%;
     --input: 217 20% 22%;
     --ring: 213 60% 50%;
+    /* Teal brighter in dark mode for legibility */
+    --trust: 192 70% 54%;
+    --service: 186 68% 48%;
   }
 }
 
@@ -215,7 +219,7 @@
 
   .btn-cta {
     @apply inline-flex items-center justify-center px-5 py-2.5 rounded-lg font-bold text-sm transition-all duration-200 select-none;
-    background: linear-gradient(135deg, hsl(var(--accent)) 0%, hsl(204 92% 44%) 100%);
+    background: linear-gradient(135deg, hsl(25 100% 52%) 0%, hsl(12 88% 48%) 100%);
     color: hsl(var(--accent-foreground));
   }
   .btn-cta:hover {
@@ -278,7 +282,7 @@
   .nav-link::after {
     content: '';
     @apply absolute bottom-1.5 left-4 right-4 h-0.5 rounded-full scale-x-0 transition-transform duration-200;
-    background: linear-gradient(90deg, hsl(var(--accent)), hsl(var(--service)));
+    background: linear-gradient(90deg, hsl(var(--accent)), hsl(15 90% 50%));
   }
   .nav-link:hover {
     @apply text-primary bg-primary/5 shadow-sm;

@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { type Product, formatPrice } from "@/data/products";
 import { useCart } from "@/hooks/use-cart";
 import { toast } from "@/hooks/use-toast";
+import { flyToCart } from "@/lib/cart-fx";
 import { BadgePercent, Eye, ShoppingCart } from "lucide-react";
 
 interface ProductCardProps {
@@ -106,6 +107,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   const pendingCoordsRef = useRef({ x: 0, y: 0 });
   const lastMoveForResetRef = useRef({ x: 0, y: 0 });
   const showTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const imageRef = useRef<HTMLImageElement | null>(null);
 
   const updateTip = useCallback((clientX: number, clientY: number) => {
     setTipPos(computeTipPosition(clientX, clientY));
@@ -182,6 +184,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   }, [clearShowTipTimer]);
 
   const handleAddToCart = () => {
+    flyToCart(imageRef.current, product.image);
     addItem(product);
     toast({
       title: "Đã thêm vào giỏ hàng",
@@ -192,9 +195,6 @@ export default function ProductCard({ product }: ProductCardProps) {
   return (
     <div
       className="card-product group flex h-full flex-col"
-      onMouseEnter={handlePointerEnter}
-      onMouseMove={handlePointerMove}
-      onMouseLeave={handlePointerLeave}
     >
       {tipPos != null &&
         typeof document !== "undefined" &&
@@ -204,9 +204,13 @@ export default function ProductCard({ product }: ProductCardProps) {
         <Link
           to={detailPath(product.slug)}
           className="relative block aspect-square overflow-hidden bg-gradient-to-br from-slate-100 via-white to-cyan-50 outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-card"
+          onMouseEnter={handlePointerEnter}
+          onMouseMove={handlePointerMove}
+          onMouseLeave={handlePointerLeave}
         >
           <div className="pointer-events-none absolute inset-x-4 bottom-3 top-8 rounded-full bg-cyan-300/20 blur-2xl transition-opacity duration-300 group-hover:opacity-90" />
           <img
+            ref={imageRef}
             src={product.image}
             alt={product.name}
             className="relative h-full w-full object-contain p-4 drop-shadow-[0_18px_24px_rgba(15,23,42,0.16)] transition-transform duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_22px_32px_rgba(15,23,42,0.24)]"

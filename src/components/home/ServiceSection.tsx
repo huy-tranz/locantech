@@ -6,7 +6,7 @@ export default function ServiceSection() {
   const services = getAllServices();
 
   return (
-    <section className="py-8">
+    <section className="py-5">
       <div className="section-heading">
         <div>
           <p className="section-label text-service">Service</p>

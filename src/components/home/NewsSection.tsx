@@ -7,7 +7,7 @@ export default function NewsSection() {
   const articles: any[] = (data as any)?.articles || [];
 
   return (
-    <section className="py-8">
+    <section className="py-5">
       <div className="flex items-center justify-between mb-5">
         <h2 className="text-xl md:text-2xl font-bold text-foreground">Tin tức & Kiến thức</h2>
         <Link to="/tin-tuc" className="text-sm text-primary font-medium flex items-center gap-1 hover:underline">

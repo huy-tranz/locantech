@@ -39,7 +39,7 @@ export default function ProductBlock({ title, products, link, maxItems = 5 }: Pr
 
   return (
     <motion.section
-      className="py-6"
+      className="py-4"
       variants={sectionVariants}
       initial="hidden"
       whileInView="show"

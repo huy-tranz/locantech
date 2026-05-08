@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -9,6 +9,7 @@ import { useProductBySlug, useProducts } from "@/hooks/queries/product.queries";
 import { adaptProduct, getProductsFromResponse } from "@/lib/productAdapter";
 import { useCart } from "@/hooks/use-cart";
 import { toast } from "@/hooks/use-toast";
+import { flyToCart } from "@/lib/cart-fx";
 import { getCurrentUser } from "@/lib/auth";
 import { addRecentlyViewedProduct } from "@/lib/account";
 import {
@@ -47,6 +48,7 @@ export default function ProductDetailPage() {
   const [activeTab, setActiveTab] = useState("desc");
   const [selectedImg, setSelectedImg] = useState(0);
   const [qty, setQty] = useState(1);
+  const mainImageRef = useRef<HTMLImageElement | null>(null);
 
   useEffect(() => {
     if (!product) return;
@@ -85,6 +87,7 @@ export default function ProductDetailPage() {
   }
 
   const handleAddCart = () => {
+    flyToCart(mainImageRef.current, images[selectedImg] || product.image);
     addItem(product, qty);
     toast({
       title: "Đã thêm vào giỏ hàng",
@@ -117,6 +120,7 @@ export default function ProductDetailPage() {
           <div>
             <div className="relative bg-card rounded-lg border overflow-hidden aspect-square group">
               <img
+                ref={mainImageRef}
                 src={images[selectedImg] || product.image}
                 alt={product.name}
                 className="w-full h-full object-contain p-6 group-hover:scale-110 transition-transform duration-500"

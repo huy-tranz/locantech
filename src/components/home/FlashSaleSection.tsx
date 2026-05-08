@@ -1,20 +1,17 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
   BadgePercent,
   Camera,
-  CheckCircle2,
   Clock3,
   Copy,
   Cpu,
   Eye,
   Flame,
-  Gift,
   Laptop,
   Monitor,
   ShoppingCart,
-  Sparkles,
   Zap,
 } from "lucide-react";
 import { formatPrice, type Product } from "@/data/products";
@@ -22,6 +19,7 @@ import { useCart } from "@/hooks/use-cart";
 import { toast } from "@/hooks/use-toast";
 import { useProducts } from "@/hooks/queries/product.queries";
 import { getProductsFromResponse } from "@/lib/productAdapter";
+import { flyToCart } from "@/lib/cart-fx";
 
 const saleTabs = [
   { key: "all", label: "Tất cả", icon: Flame, categories: [] },
@@ -32,8 +30,8 @@ const saleTabs = [
 ] as const;
 
 const coupons = [
-  { code: "LOCAN50", value: "Giảm 50k", description: "cho đơn hàng từ 3 triệu" },
-  { code: "BUILDPC", value: "Ưu đãi combo", description: "khi mua PC kèm màn hình" },
+  { code: "LOCAN50", value: "Giảm 50k", description: "Đơn từ 3 triệu" },
+  { code: "BUILDPC", value: "Ưu đãi combo", description: "PC + màn hình" },
 ];
 
 type SaleTabKey = (typeof saleTabs)[number]["key"];
@@ -60,7 +58,8 @@ function getSaleProgress(product: Product) {
   const seed = product.id.split("").reduce((sum, char) => sum + char.charCodeAt(0), 0);
   const remaining = Math.max(product.status === "in_stock" ? product.stock : 0, 0);
   const estimatedSold = seed % 68 + Math.max(product.discount ?? 0, 0) + (product.bestSeller ? 10 : 0);
-  const sold = product.soldCount && product.soldCount > 0 ? product.soldCount : Math.max(8, Math.min(76, estimatedSold));
+  const sold =
+    product.soldCount && product.soldCount > 0 ? product.soldCount : Math.max(8, Math.min(76, estimatedSold));
   const total = sold + remaining;
   const percent = total > 0 ? Math.round((sold / total) * 100) : 0;
 
@@ -72,51 +71,73 @@ function getSaleProgress(product: Product) {
 }
 
 function getProductsByTab(products: Product[], tab: SaleTab) {
-  if (tab.categories.length === 0) {
-    return products;
-  }
-
+  if (tab.categories.length === 0) return products;
   const categories = new Set<string>(tab.categories);
   return products.filter((product) => categories.has(product.category));
+}
+
+function SaleCountdown() {
+  const [countdown, setCountdown] = useState(() => getSaleCountdownParts());
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setCountdown(getSaleCountdownParts()), 1000);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  return (
+    <div className="flex items-center gap-1 rounded-xl bg-black/20 px-2.5 py-2 backdrop-blur">
+      <Clock3 className="mr-1 h-3.5 w-3.5 shrink-0 text-yellow-200" />
+      {countdown.map((item, index) => (
+        <div key={item.label} className="flex items-center gap-1">
+          <span className="flex min-w-[2.5rem] flex-col items-center rounded-lg bg-white px-1.5 py-1 text-sale shadow">
+            <span className="font-mono text-base font-black leading-none md:text-lg">{item.value}</span>
+            <span className="text-[9px] font-bold uppercase text-slate-400">{item.label}</span>
+          </span>
+          {index < countdown.length - 1 && (
+            <span className="text-xs font-black text-yellow-200">:</span>
+          )}
+        </div>
+      ))}
+    </div>
+  );
 }
 
 function FlashSaleDealCard({ product }: { product: Product }) {
   const { addItem } = useCart();
   const progress = getSaleProgress(product);
   const savings = Math.max((product.originalPrice ?? product.price) - product.price, 0);
+  const isHot = progress.percent >= 70;
+  const imageRef = useRef<HTMLImageElement | null>(null);
 
   const handleAddToCart = () => {
+    flyToCart(imageRef.current, product.image);
     addItem(product);
-    toast({
-      title: "Đã thêm vào giỏ hàng",
-      description: product.name,
-    });
+    toast({ title: "Đã thêm vào giỏ hàng", description: product.name });
   };
 
   return (
-    <article className="group flex h-full min-w-[235px] flex-col overflow-hidden rounded-xl border border-border bg-card text-foreground shadow-card transition hover:-translate-y-0.5 md:min-w-0">
-      <div className="bg-gradient-to-r from-sale via-orange-500 to-yellow-400 px-3 py-2 text-white">
-        <div className="mb-1 flex items-center justify-between gap-2 text-[10px] font-black uppercase tracking-wide">
-          <span>Đã bán {progress.sold}</span>
-          <span>Còn {progress.remaining}</span>
-        </div>
-        <div className="h-1.5 overflow-hidden rounded-full bg-white/30">
-          <div className="h-full rounded-full bg-white" style={{ width: `${progress.percent}%` }} />
-        </div>
-      </div>
-
-      <Link to={`/san-pham/${product.slug}`} className="relative block aspect-[4/3] overflow-hidden bg-gradient-to-br from-cyan-50 via-white to-orange-50">
+    <article className="group flex h-full flex-col overflow-hidden rounded-xl border border-border bg-card text-foreground shadow-card transition hover:-translate-y-0.5">
+      <Link
+        to={`/san-pham/${product.slug}`}
+        className="relative block aspect-[4/3] overflow-hidden bg-gradient-to-br from-cyan-50 via-white to-orange-50"
+      >
         <img
+          ref={imageRef}
           src={product.image}
           alt={product.name}
           className="h-full w-full object-contain p-4 drop-shadow-[0_16px_20px_rgba(15,23,42,0.16)] transition-transform duration-300 group-hover:scale-105"
           loading="lazy"
         />
         {product.discount ? (
-          <span className="absolute left-2 top-2 rounded-full bg-sale px-2.5 py-1 text-xs font-black text-white">
+          <span className="absolute left-2 top-2 rounded-full bg-sale px-2.5 py-1 text-xs font-black text-white shadow">
             -{product.discount}%
           </span>
         ) : null}
+        {isHot && (
+          <span className="absolute right-2 top-2 rounded-full bg-orange-500 px-2 py-0.5 text-[10px] font-black text-white shadow">
+            🔥 Hot
+          </span>
+        )}
       </Link>
 
       <div className="flex flex-1 flex-col p-3">
@@ -132,18 +153,34 @@ function FlashSaleDealCard({ product }: { product: Product }) {
             {product.name}
           </h3>
         </Link>
-        <p className="mt-1 line-clamp-1 text-xs text-slate-500">{product.shortDesc}</p>
 
-        <div className="mt-3">
+        <div className="mt-2.5">
           <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
             <span className="text-lg font-black text-sale">{formatPrice(product.price)}</span>
             {product.originalPrice ? (
               <span className="text-xs font-semibold text-slate-400 line-through">{formatPrice(product.originalPrice)}</span>
             ) : null}
           </div>
-          <p className={`mt-0.5 text-[11px] font-bold ${savings > 0 ? "text-sale" : "text-transparent"}`}>
-            {savings > 0 ? `Tiết kiệm ${formatPrice(savings)}` : "Tiết kiệm 0đ"}
-          </p>
+          {savings > 0 && (
+            <p className="mt-0.5 text-[11px] font-bold text-sale">Tiết kiệm {formatPrice(savings)}</p>
+          )}
+        </div>
+
+        {/* Progress bar */}
+        <div className="mt-2.5 space-y-1">
+          <div className="flex items-center justify-between text-[10px] font-bold">
+            <span className="text-orange-600">Đã bán: {progress.sold}</span>
+            <span className="text-slate-400">Còn: {progress.remaining}</span>
+          </div>
+          <div className="h-2 overflow-hidden rounded-full bg-slate-100">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-sale via-orange-400 to-yellow-400 transition-all duration-500"
+              style={{ width: `${progress.percent}%` }}
+            />
+          </div>
+          {isHot && (
+            <p className="text-[10px] font-black text-sale">Sắp hết hàng!</p>
+          )}
         </div>
 
         <div className="mt-auto grid grid-cols-[1fr_auto] gap-2 pt-3">
@@ -171,16 +208,7 @@ function FlashSaleDealCard({ product }: { product: Product }) {
 
 export default function FlashSaleSection() {
   const [activeTab, setActiveTab] = useState<SaleTabKey>("all");
-  const [countdown, setCountdown] = useState(() => getSaleCountdownParts());
   const { data } = useProducts({ limit: 100 });
-
-  useEffect(() => {
-    const timer = window.setInterval(() => {
-      setCountdown(getSaleCountdownParts());
-    }, 1000);
-
-    return () => window.clearInterval(timer);
-  }, []);
 
   const allSaleProducts = useMemo(
     () =>
@@ -197,10 +225,6 @@ export default function FlashSaleSection() {
   if (allSaleProducts.length === 0) return null;
 
   const maxDiscount = Math.max(...allSaleProducts.map((product) => product.discount || 0));
-  const totalSavings = saleProducts.reduce(
-    (sum, product) => sum + Math.max((product.originalPrice ?? product.price) - product.price, 0),
-    0,
-  );
 
   const handleCopyCoupon = async (code: string) => {
     try {
@@ -212,108 +236,70 @@ export default function FlashSaleSection() {
   };
 
   return (
-    <section className="my-6 overflow-hidden rounded-2xl border border-sale/20 bg-card shadow-card md:my-8">
-      <div className="relative overflow-hidden bg-gradient-to-r from-sale via-orange-500 to-amber-400 p-4 text-white md:p-5">
-        <div className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-white/15 blur-3xl" />
+    <section className="my-4 overflow-hidden rounded-2xl border border-sale/20 bg-card shadow-card md:my-5">
+      {/* ── Compact header ── */}
+      <div className="relative overflow-hidden bg-gradient-to-r from-sale via-orange-500 to-amber-400 px-4 py-3 text-white md:px-5 md:py-3.5">
+        <div className="pointer-events-none absolute -right-20 -top-20 h-56 w-56 rounded-full bg-white/15 blur-3xl" />
 
-        <div className="relative z-10 grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
-          <div>
-            <div className="mb-2 flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-2 rounded-full bg-white/20 px-3 py-1.5 text-xs font-extrabold uppercase tracking-widest text-white backdrop-blur">
-                <Flame className="h-4 w-4 text-yellow-100" />
-                Deal công nghệ hôm nay
+        <div className="relative z-10 flex flex-wrap items-center justify-between gap-3">
+          {/* Branding */}
+          <div className="flex flex-col gap-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="flex items-center gap-1.5 text-xl font-black uppercase tracking-tight md:text-2xl">
+                <Flame className="h-5 w-5 text-yellow-200" />
+                Flash Sale
               </span>
-              <span className="inline-flex items-center gap-2 rounded-full bg-yellow-300 px-3 py-1.5 text-xs font-extrabold uppercase tracking-widest text-slate-950">
-                <BadgePercent className="h-4 w-4" />
+              <span className="inline-flex items-center gap-1 rounded-full bg-yellow-300 px-2.5 py-1 text-xs font-black text-slate-950">
+                <BadgePercent className="h-3.5 w-3.5" />
                 Giảm tới {maxDiscount}%
               </span>
+              <span className="hidden rounded-full bg-white/20 px-2.5 py-1 text-[11px] font-bold backdrop-blur sm:inline-flex">
+                Số lượng có hạn
+              </span>
             </div>
-
-            <h2 className="text-2xl font-extrabold leading-tight md:text-3xl">
-              Flash Sale công nghệ
-              <span className="block text-yellow-100">giá tốt, số lượng có hạn</span>
-            </h2>
-            <p className="mt-2 max-w-2xl text-sm font-semibold leading-6 text-white/90">
-              Chọn nhanh các sản phẩm đang giảm sâu, có quà tặng và hỗ trợ kỹ thuật sau mua tại Lộc An.
+            <p className="text-[11px] font-semibold text-white/85 md:text-xs">
+              Deal công nghệ hôm nay · Giá tốt, hỗ trợ kỹ thuật sau mua tại Lộc An
             </p>
-            <div className="mt-3 flex flex-wrap gap-2 text-xs font-extrabold text-white max-sm:hidden">
-              {["Số lượng có hạn", "Ưu tiên khách chốt nhanh", `Đang tiết kiệm ${formatPrice(totalSavings)}`].map((item) => (
-                <span key={item} className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1.5 backdrop-blur">
-                  <CheckCircle2 className="h-3.5 w-3.5 text-yellow-100" />
-                  {item}
-                </span>
-              ))}
-            </div>
           </div>
 
-          <div className="grid gap-2 sm:grid-cols-[auto_auto] lg:min-w-[420px]">
-            <div className="rounded-2xl bg-black/15 p-2.5 shadow-inner backdrop-blur md:p-3">
-              <div className="mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-yellow-100">
-                <Clock3 className="h-4 w-4" />
-                Kết thúc sau
-              </div>
-              <div className="flex items-center gap-1.5">
-                {countdown.map((item, index) => (
-                  <div key={item.label} className="flex items-center gap-1.5">
-                    <span className="flex min-w-[3.65rem] flex-col items-center justify-center rounded-xl bg-white px-2 py-1.5 text-sale shadow-md md:min-w-[4.15rem] md:py-2">
-                      <span className="font-mono text-xl font-black leading-none md:text-2xl">{item.value}</span>
-                      <span className="mt-1 text-[10px] font-extrabold uppercase tracking-wider text-slate-500">{item.label}</span>
-                    </span>
-                    {index < countdown.length - 1 && <span className="font-black text-yellow-100">:</span>}
-                  </div>
-                ))}
-              </div>
-            </div>
-
+          {/* Countdown + CTA */}
+          <div className="flex items-center gap-2">
+            <SaleCountdown />
             <Link
               to="/flash-sale"
-              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-white px-4 text-sm font-extrabold text-sale shadow-lg transition-all hover:-translate-y-0.5 hover:bg-yellow-50"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-white px-3 py-2 text-xs font-black text-sale shadow transition hover:-translate-y-0.5 hover:bg-yellow-50"
             >
-              Xem tất cả ưu đãi
+              <span className="hidden sm:inline">Xem tất cả</span>
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
         </div>
       </div>
 
-      <div className="bg-card p-3 md:p-5">
-        <div className="mb-3 grid grid-cols-1 gap-2 lg:grid-cols-[0.85fr_1.15fr]">
-          <div className="hidden gap-2 sm:grid sm:grid-cols-3 lg:grid-cols-1">
-            {[
-              { icon: Zap, text: "Giá sale cập nhật mỗi ngày" },
-              { icon: Gift, text: "Kèm quà tặng theo sản phẩm" },
-              { icon: Sparkles, text: "Ưu tiên tư vấn cấu hình phù hợp" },
-            ].map((item) => {
-              const Icon = item.icon;
-              return (
-                <div key={item.text} className="flex items-center gap-2 rounded-xl border border-sale/15 bg-sale/5 px-3 py-2 text-xs font-bold text-foreground">
-                  <Icon className="h-4 w-4 text-sale" />
-                  {item.text}
-                </div>
-              );
-            })}
-          </div>
-          <div className="grid gap-2 sm:grid-cols-2">
-            {coupons.map((coupon) => (
-              <button
-                key={coupon.code}
-                type="button"
-                onClick={() => handleCopyCoupon(coupon.code)}
-                className="group flex items-center justify-between gap-3 rounded-xl border border-dashed border-sale/35 bg-sale/5 px-3 py-2 text-left transition hover:border-sale hover:bg-sale/10"
-              >
-                <span>
-                  <span className="block text-[11px] font-bold uppercase tracking-widest text-sale">{coupon.value}</span>
-                  <span className="mt-0.5 block text-sm font-black text-foreground">Nhập {coupon.code}</span>
-                  <span className="hidden text-[11px] font-semibold text-muted-foreground sm:block">{coupon.description}</span>
-                </span>
-                <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-sale text-white transition group-hover:scale-105 md:h-9 md:w-9">
-                  <Copy className="h-4 w-4" />
-                </span>
-              </button>
-            ))}
-          </div>
+      {/* ── Body ── */}
+      <div className="bg-card p-3 md:p-4">
+        {/* Coupons – compact single row */}
+        <div className="mb-3 grid grid-cols-2 gap-2">
+          {coupons.map((coupon) => (
+            <button
+              key={coupon.code}
+              type="button"
+              onClick={() => handleCopyCoupon(coupon.code)}
+              className="group flex items-center justify-between gap-2 rounded-xl border border-dashed border-sale/35 bg-sale/5 px-3 py-2 text-left transition hover:border-sale hover:bg-sale/10"
+            >
+              <span>
+                <span className="block text-[10px] font-black uppercase tracking-widest text-sale">{coupon.value}</span>
+                <span className="block text-sm font-black text-foreground">{coupon.code}</span>
+                <span className="block text-[10px] font-semibold text-muted-foreground">{coupon.description}</span>
+              </span>
+              <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-sale text-white transition group-hover:scale-105">
+                <Copy className="h-3.5 w-3.5" />
+              </span>
+            </button>
+          ))}
         </div>
 
+        {/* Category tabs */}
         <div className="mb-3 flex gap-2 overflow-x-auto pb-1">
           {saleTabs.map((tab) => {
             const Icon = tab.icon;
@@ -324,13 +310,13 @@ export default function FlashSaleSection() {
                 key={tab.key}
                 type="button"
                 onClick={() => setActiveTab(tab.key)}
-                className={`inline-flex shrink-0 items-center gap-2 rounded-full border px-3 py-2 text-xs font-extrabold transition ${
+                className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-extrabold transition ${
                   isActive
                     ? "border-sale bg-sale text-white shadow-sm"
                     : "border-border bg-muted text-foreground hover:border-sale/40 hover:bg-sale/10"
                 }`}
               >
-                <Icon className="h-4 w-4" />
+                <Icon className="h-3.5 w-3.5" />
                 {tab.label}
                 <span className={`rounded-full px-1.5 py-0.5 text-[10px] ${isActive ? "bg-white/20" : "bg-card"}`}>
                   {count}
@@ -340,17 +326,30 @@ export default function FlashSaleSection() {
           })}
         </div>
 
-        <div className="flex snap-x gap-3 overflow-x-auto pb-1 md:grid md:grid-cols-3 md:overflow-visible md:pb-0 lg:grid-cols-5">
-          {saleProducts.length > 0 ? saleProducts.map((product) => (
-            <div key={product.id} className="snap-start">
-              <FlashSaleDealCard product={product} />
+        {/* Product carousel / grid */}
+        {saleProducts.length > 0 ? (
+          <>
+            <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth pb-2 md:grid md:grid-cols-3 md:snap-none md:overflow-visible md:pb-0 lg:grid-cols-5">
+              {saleProducts.map((product) => (
+                <div
+                  key={product.id}
+                  className="w-[calc(72vw-1rem)] shrink-0 snap-start sm:w-[calc(44vw-1.5rem)] md:w-auto"
+                >
+                  <FlashSaleDealCard product={product} />
+                </div>
+              ))}
             </div>
-          )) : (
-            <div className="col-span-full rounded-xl border border-border bg-muted px-4 py-8 text-center text-sm font-bold text-muted-foreground">
-              Nhóm này chưa có deal đang chạy. Chọn tab khác để xem các sản phẩm đang giảm giá.
+            {/* Mobile scroll hint */}
+            <div className="mt-2 flex items-center justify-center gap-1.5 md:hidden">
+              <Zap className="h-3 w-3 text-sale" />
+              <span className="text-[10px] font-bold text-muted-foreground">Vuốt để xem thêm sản phẩm</span>
             </div>
-          )}
-        </div>
+          </>
+        ) : (
+          <div className="rounded-xl border border-border bg-muted px-4 py-8 text-center text-sm font-bold text-muted-foreground">
+            Nhóm này chưa có deal đang chạy. Chọn tab khác để xem các sản phẩm đang giảm giá.
+          </div>
+        )}
       </div>
     </section>
   );

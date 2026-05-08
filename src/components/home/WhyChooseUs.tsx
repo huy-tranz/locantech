@@ -25,7 +25,7 @@ const commitments = [
 
 export default function WhyChooseUs() {
   return (
-    <section className="my-6 md:my-8">
+    <section className="my-4 md:my-5">
       <div className="grid grid-cols-2 gap-3 rounded-xl border border-border bg-card p-4 shadow-card md:grid-cols-4 md:gap-4">
         {commitments.map((item) => {
           const Icon = item.icon;
