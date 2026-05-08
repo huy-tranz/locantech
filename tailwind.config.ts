@@ -7,14 +7,22 @@ export default {
   theme: {
     container: {
       center: true,
-      padding: "2rem",
+      padding: "1rem",
       screens: {
-        "2xl": "1400px",
+        "2xl": "1280px",
       },
     },
     extend: {
       fontFamily: {
-        sans: ['"Be Vietnam Pro"', 'sans-serif'],
+        sans: ['Inter', '"Be Vietnam Pro"', 'system-ui', 'sans-serif'],
+      },
+      maxWidth: {
+        container: "1280px",
+      },
+      boxShadow: {
+        sm: "0 1px 2px rgba(0, 0, 0, 0.05)",
+        md: "0 4px 12px rgba(0, 0, 0, 0.08)",
+        lg: "0 10px 25px rgba(0, 0, 0, 0.1)",
       },
       colors: {
         border: "hsl(var(--border))",
@@ -27,6 +35,8 @@ export default {
           foreground: "hsl(var(--primary-foreground))",
           light: "hsl(var(--primary-light))",
           dark: "hsl(var(--primary-dark))",
+          tint: "hsl(var(--primary-tint))",
+          hover: "var(--color-primary-hover)",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
@@ -44,10 +54,12 @@ export default {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
           hover: "hsl(var(--accent-hover))",
+          light: "var(--color-accent-light)",
         },
         sale: {
           DEFAULT: "hsl(var(--sale))",
           foreground: "hsl(var(--sale-foreground))",
+          bg: "var(--color-sale-bg)",
         },
         gaming: {
           DEFAULT: "hsl(var(--gaming))",

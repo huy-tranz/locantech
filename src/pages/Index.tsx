@@ -12,23 +12,8 @@ import NewsSection from "@/components/home/NewsSection";
 import { useProducts } from "@/hooks/queries/product.queries";
 import { getProductsFromResponse } from "@/lib/productAdapter";
 import ScrollReveal from "@/components/ScrollReveal";
-import {
-  ArrowRight,
-  Camera,
-  Cpu,
-  Headphones,
-  Laptop,
-  MessageCircle,
-  PhoneCall,
-  ShieldCheck,
-  Sparkles,
-  Truck,
-  Wrench,
-} from "lucide-react";
+import { Camera, Cpu, Laptop, Wrench } from "lucide-react";
 import { Link } from "react-router-dom";
-import heroPcImage from "@/assets/products/pc-gaming.png";
-import heroLaptopImage from "@/assets/products/laptop-gaming.png";
-import heroMonitorImage from "@/assets/products/monitor-gaming.png";
 
 const quickCampaigns = [
   {
@@ -71,18 +56,6 @@ const quickCampaigns = [
     toneClass: "tone-trust",
     action: "Tư vấn ngay",
   },
-];
-
-const heroMetrics = [
-  { value: "60 phút", label: "hỗ trợ kỹ thuật nội thành", icon: Headphones },
-  { value: "36 tháng", label: "bảo hành cấu hình PC", icon: ShieldCheck },
-  { value: "Toàn quốc", label: "giao hàng & đóng gói", icon: Truck },
-];
-
-const heroCampaignBadges = [
-  { label: "PC gaming", value: "Build theo ngân sách" },
-  { label: "Laptop", value: "Văn phòng, học tập, gaming" },
-  { label: "Kỹ thuật", value: "Tư vấn trước khi mua" },
 ];
 
 const Index = () => {
@@ -144,126 +117,6 @@ const Index = () => {
                 })}
               </div>
 
-              <div className="mt-4 grid gap-4 px-1 xl:grid-cols-[minmax(0,1.05fr)_minmax(24rem,0.95fr)] xl:items-stretch">
-                <div className="flex min-h-0 flex-col justify-center rounded-2xl border border-white/15 bg-white/[0.06] p-4 backdrop-blur md:p-6 xl:min-h-[20rem]">
-                  <span className="hero-eyebrow">
-                    <Sparkles className="mr-2 h-3.5 w-3.5" />
-                    Lộc An Tech Store
-                  </span>
-                  <h1 className="mt-4 max-w-3xl text-[clamp(1.9rem,1.2rem+2vw,3.35rem)] font-black leading-[1.04] text-white">
-                    Build PC, chọn laptop và sửa máy tính rõ giá ngay từ đầu
-                  </h1>
-                  <p className="mt-3 max-w-2xl text-sm font-semibold leading-6 text-cyan-50/80 md:text-base">
-                    Tư vấn cấu hình theo ngân sách, chọn máy phù hợp nhu cầu và hỗ trợ kỹ thuật tại Hà Đông. Chốt cấu hình nhanh, bảo hành rõ, giao hàng toàn quốc.
-                  </p>
-
-                  <div className="mt-5 flex flex-wrap gap-2">
-                    {heroCampaignBadges.map((item) => (
-                      <span
-                        key={item.label}
-                        className="rounded-xl border border-white/15 bg-white/10 px-3 py-2 text-left shadow-sm backdrop-blur"
-                      >
-                        <span className="block text-[10px] font-black uppercase tracking-widest text-cyan-100">{item.label}</span>
-                        <span className="mt-0.5 block text-xs font-bold text-white/85">{item.value}</span>
-                      </span>
-                    ))}
-                  </div>
-
-                  <div className="mt-6 flex flex-wrap items-center gap-3">
-                    <Link to="/build-pc" className="btn-cta gap-2 !rounded-xl !px-5 !py-3">
-                      <Cpu className="h-4 w-4" />
-                      Build PC ngay
-                    </Link>
-                    <Link
-                      to="/laptop"
-                      className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-white/20 bg-white px-5 text-sm font-extrabold text-primary shadow-sm transition hover:-translate-y-0.5 hover:bg-cyan-50"
-                    >
-                      <Laptop className="h-4 w-4" />
-                      Xem laptop
-                    </Link>
-                    <a
-                      href="tel:0989386219"
-                      className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/10 px-5 text-sm font-extrabold text-white backdrop-blur transition hover:-translate-y-0.5 hover:bg-white/18"
-                    >
-                      <PhoneCall className="h-4 w-4" />
-                      Gọi tư vấn
-                    </a>
-                  </div>
-
-                  <div className="mt-5 grid grid-cols-3 gap-2 md:max-w-2xl">
-                    {heroMetrics.map((item) => {
-                      const Icon = item.icon;
-                      return (
-                        <div key={item.value} className="metric-pill">
-                          <div className="mb-1 flex items-center gap-1.5 text-cyan-100">
-                            <Icon className="h-3.5 w-3.5" />
-                            <span className="text-sm font-extrabold">{item.value}</span>
-                          </div>
-                          <p className="text-[11px] leading-4 text-white/70">{item.label}</p>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                <div className="relative order-first min-h-[15rem] overflow-hidden rounded-2xl border border-white/15 bg-gradient-to-br from-white/16 via-cyan-200/10 to-slate-950/20 p-4 shadow-[0_22px_55px_rgba(0,0,0,0.22)] backdrop-blur md:min-h-[18rem] xl:order-none xl:min-h-[20rem]">
-                  <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-white/18 to-transparent" />
-                  <div className="absolute right-4 top-4 z-20 rounded-full bg-yellow-300 px-3 py-1.5 text-[11px] font-black uppercase tracking-widest text-slate-950 shadow-lg">
-                    Tư vấn miễn phí
-                  </div>
-                  <div className="relative z-10 flex h-full flex-col">
-                    <div className="grid flex-1 grid-cols-[0.95fr_1.05fr] items-center gap-2">
-                      <div className="relative">
-                        <img
-                          src={heroLaptopImage}
-                          alt="Laptop gaming tại Lộc An"
-                          className="relative z-10 w-full -rotate-3 object-contain drop-shadow-[0_24px_34px_rgba(0,0,0,0.35)]"
-                          loading="eager"
-                        />
-                        <img
-                          src={heroMonitorImage}
-                          alt="Màn hình gaming"
-                          className="absolute -bottom-8 left-2 z-0 w-[62%] rotate-2 object-contain opacity-90 drop-shadow-[0_20px_26px_rgba(0,0,0,0.24)]"
-                          loading="eager"
-                        />
-                      </div>
-                      <div className="relative">
-                        <img
-                          src={heroPcImage}
-                          alt="PC gaming build theo ngân sách"
-                          className="relative z-10 ml-auto w-[94%] object-contain drop-shadow-[0_28px_38px_rgba(0,0,0,0.42)]"
-                          loading="eager"
-                        />
-                        <div className="absolute bottom-2 right-1 z-20 rounded-2xl border border-white/20 bg-white/95 px-3 py-2 text-slate-950 shadow-xl">
-                          <span className="block text-[10px] font-black uppercase tracking-widest text-sale">Build PC</span>
-                          <span className="mt-0.5 block text-sm font-black">Từ 5 triệu</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="mt-3 hidden gap-2 sm:grid sm:grid-cols-3">
-                      {[
-                        "Cân game, học tập, đồ họa",
-                        "Nâng cấp SSD/RAM nhanh",
-                        "Gửi cấu hình qua Zalo",
-                      ].map((item) => (
-                        <div key={item} className="flex min-h-12 items-center gap-2 rounded-xl border border-white/15 bg-white/10 px-3 text-xs font-bold text-white/85 backdrop-blur">
-                          <MessageCircle className="h-4 w-4 shrink-0 text-cyan-100" />
-                          {item}
-                        </div>
-                      ))}
-                    </div>
-
-                    <Link
-                      to="/build-pc"
-                      className="mt-3 inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-white text-sm font-black text-primary shadow-lg transition hover:-translate-y-0.5 hover:bg-cyan-50"
-                    >
-                      Nhận gợi ý cấu hình
-                      <ArrowRight className="h-4 w-4" />
-                    </Link>
-                  </div>
-                </div>
-              </div>
             </div>
           </section>
         </ScrollReveal>

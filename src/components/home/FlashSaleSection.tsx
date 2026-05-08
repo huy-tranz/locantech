@@ -94,7 +94,7 @@ function FlashSaleDealCard({ product }: { product: Product }) {
   };
 
   return (
-    <article className="group flex h-full min-w-[235px] flex-col overflow-hidden rounded-xl border border-white/20 bg-white text-slate-950 shadow-[0_16px_36px_rgba(15,23,42,0.16)] md:min-w-0">
+    <article className="group flex h-full min-w-[235px] flex-col overflow-hidden rounded-xl border border-border bg-card text-foreground shadow-card transition hover:-translate-y-0.5 md:min-w-0">
       <div className="bg-gradient-to-r from-sale via-orange-500 to-yellow-400 px-3 py-2 text-white">
         <div className="mb-1 flex items-center justify-between gap-2 text-[10px] font-black uppercase tracking-wide">
           <span>Đã bán {progress.sold}</span>
@@ -212,145 +212,145 @@ export default function FlashSaleSection() {
   };
 
   return (
-    <section className="relative my-6 overflow-hidden rounded-2xl border border-sale/30 bg-gradient-to-br from-[#15051f] via-[#5f0b1f] to-[#ef3f16] p-3 text-white shadow-[0_26px_70px_rgba(220,38,38,0.3)] md:my-8 md:p-5">
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.1)_0,transparent_32%),radial-gradient(circle_at_16%_12%,rgba(250,204,21,0.3),transparent_24rem),radial-gradient(circle_at_86%_4%,rgba(34,211,238,0.16),transparent_18rem)]" />
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-yellow-200/70 to-transparent" />
-      <div className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
+    <section className="my-6 overflow-hidden rounded-2xl border border-sale/20 bg-card shadow-card md:my-8">
+      <div className="relative overflow-hidden bg-gradient-to-r from-sale via-orange-500 to-amber-400 p-4 text-white md:p-5">
+        <div className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-white/15 blur-3xl" />
 
-      <div className="relative z-10 mb-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
-        <div>
-          <div className="mb-2 flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-extrabold uppercase tracking-widest text-yellow-100 backdrop-blur">
-              <Flame className="h-4 w-4 text-yellow-300" />
-              Deal công nghệ hôm nay
-            </span>
-            <span className="inline-flex items-center gap-2 rounded-full bg-yellow-300 px-3 py-1.5 text-xs font-extrabold uppercase tracking-widest text-slate-950">
-              <BadgePercent className="h-4 w-4" />
-              Giảm tới {maxDiscount}%
-            </span>
-          </div>
-
-          <h2 className="text-2xl font-extrabold leading-tight md:text-3xl">
-            Flash Sale công nghệ
-            <span className="block text-yellow-200">giá tốt, số lượng có hạn</span>
-          </h2>
-          <p className="mt-2 max-w-2xl text-sm font-semibold leading-6 text-white/80">
-            Chọn nhanh các sản phẩm đang giảm sâu, có quà tặng và hỗ trợ kỹ thuật sau mua tại Lộc An.
-          </p>
-          <div className="mt-3 flex flex-wrap gap-2 text-xs font-extrabold text-white/85 max-sm:hidden">
-            {["Số lượng có hạn", "Ưu tiên khách chốt nhanh", `Đang tiết kiệm ${formatPrice(totalSavings)}`].map((item) => (
-              <span key={item} className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 backdrop-blur">
-                <CheckCircle2 className="h-3.5 w-3.5 text-yellow-200" />
-                {item}
+        <div className="relative z-10 grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+          <div>
+            <div className="mb-2 flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-2 rounded-full bg-white/20 px-3 py-1.5 text-xs font-extrabold uppercase tracking-widest text-white backdrop-blur">
+                <Flame className="h-4 w-4 text-yellow-100" />
+                Deal công nghệ hôm nay
               </span>
-            ))}
-          </div>
-        </div>
-
-        <div className="grid gap-2 sm:grid-cols-[auto_auto] lg:min-w-[420px]">
-          <div className="rounded-2xl border border-yellow-200/30 bg-black/20 p-2.5 shadow-inner backdrop-blur md:p-3">
-            <div className="mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-yellow-100">
-              <Clock3 className="h-4 w-4" />
-              Kết thúc sau
+              <span className="inline-flex items-center gap-2 rounded-full bg-yellow-300 px-3 py-1.5 text-xs font-extrabold uppercase tracking-widest text-slate-950">
+                <BadgePercent className="h-4 w-4" />
+                Giảm tới {maxDiscount}%
+              </span>
             </div>
-            <div className="flex items-center gap-1.5">
-              {countdown.map((item, index) => (
-                <div key={item.label} className="flex items-center gap-1.5">
-                  <span className="flex min-w-[3.65rem] flex-col items-center justify-center rounded-xl bg-white px-2 py-1.5 text-sale shadow-[0_10px_24px_rgba(15,23,42,0.2)] md:min-w-[4.15rem] md:py-2">
-                    <span className="font-mono text-xl font-black leading-none md:text-2xl">{item.value}</span>
-                    <span className="mt-1 text-[10px] font-extrabold uppercase tracking-wider text-slate-500">{item.label}</span>
-                  </span>
-                  {index < countdown.length - 1 && <span className="font-black text-yellow-200">:</span>}
-                </div>
+
+            <h2 className="text-2xl font-extrabold leading-tight md:text-3xl">
+              Flash Sale công nghệ
+              <span className="block text-yellow-100">giá tốt, số lượng có hạn</span>
+            </h2>
+            <p className="mt-2 max-w-2xl text-sm font-semibold leading-6 text-white/90">
+              Chọn nhanh các sản phẩm đang giảm sâu, có quà tặng và hỗ trợ kỹ thuật sau mua tại Lộc An.
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2 text-xs font-extrabold text-white max-sm:hidden">
+              {["Số lượng có hạn", "Ưu tiên khách chốt nhanh", `Đang tiết kiệm ${formatPrice(totalSavings)}`].map((item) => (
+                <span key={item} className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1.5 backdrop-blur">
+                  <CheckCircle2 className="h-3.5 w-3.5 text-yellow-100" />
+                  {item}
+                </span>
               ))}
             </div>
           </div>
 
-          <Link
-            to="/flash-sale"
-            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-white px-4 text-sm font-extrabold text-sale shadow-lg transition-all hover:-translate-y-0.5 hover:bg-yellow-100"
-          >
-            Xem tất cả ưu đãi
-            <ArrowRight className="h-4 w-4" />
-          </Link>
+          <div className="grid gap-2 sm:grid-cols-[auto_auto] lg:min-w-[420px]">
+            <div className="rounded-2xl bg-black/15 p-2.5 shadow-inner backdrop-blur md:p-3">
+              <div className="mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-yellow-100">
+                <Clock3 className="h-4 w-4" />
+                Kết thúc sau
+              </div>
+              <div className="flex items-center gap-1.5">
+                {countdown.map((item, index) => (
+                  <div key={item.label} className="flex items-center gap-1.5">
+                    <span className="flex min-w-[3.65rem] flex-col items-center justify-center rounded-xl bg-white px-2 py-1.5 text-sale shadow-md md:min-w-[4.15rem] md:py-2">
+                      <span className="font-mono text-xl font-black leading-none md:text-2xl">{item.value}</span>
+                      <span className="mt-1 text-[10px] font-extrabold uppercase tracking-wider text-slate-500">{item.label}</span>
+                    </span>
+                    {index < countdown.length - 1 && <span className="font-black text-yellow-100">:</span>}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <Link
+              to="/flash-sale"
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-white px-4 text-sm font-extrabold text-sale shadow-lg transition-all hover:-translate-y-0.5 hover:bg-yellow-50"
+            >
+              Xem tất cả ưu đãi
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
         </div>
       </div>
 
-      <div className="relative z-10 mb-3 grid grid-cols-1 gap-2 lg:grid-cols-[0.85fr_1.15fr]">
-        <div className="hidden gap-2 sm:grid sm:grid-cols-3 lg:grid-cols-1">
-          {[
-            { icon: Zap, text: "Giá sale cập nhật mỗi ngày" },
-            { icon: Gift, text: "Kèm quà tặng theo sản phẩm" },
-            { icon: Sparkles, text: "Ưu tiên tư vấn cấu hình phù hợp" },
-          ].map((item) => {
-            const Icon = item.icon;
+      <div className="bg-card p-3 md:p-5">
+        <div className="mb-3 grid grid-cols-1 gap-2 lg:grid-cols-[0.85fr_1.15fr]">
+          <div className="hidden gap-2 sm:grid sm:grid-cols-3 lg:grid-cols-1">
+            {[
+              { icon: Zap, text: "Giá sale cập nhật mỗi ngày" },
+              { icon: Gift, text: "Kèm quà tặng theo sản phẩm" },
+              { icon: Sparkles, text: "Ưu tiên tư vấn cấu hình phù hợp" },
+            ].map((item) => {
+              const Icon = item.icon;
+              return (
+                <div key={item.text} className="flex items-center gap-2 rounded-xl border border-sale/15 bg-sale/5 px-3 py-2 text-xs font-bold text-foreground">
+                  <Icon className="h-4 w-4 text-sale" />
+                  {item.text}
+                </div>
+              );
+            })}
+          </div>
+          <div className="grid gap-2 sm:grid-cols-2">
+            {coupons.map((coupon) => (
+              <button
+                key={coupon.code}
+                type="button"
+                onClick={() => handleCopyCoupon(coupon.code)}
+                className="group flex items-center justify-between gap-3 rounded-xl border border-dashed border-sale/35 bg-sale/5 px-3 py-2 text-left transition hover:border-sale hover:bg-sale/10"
+              >
+                <span>
+                  <span className="block text-[11px] font-bold uppercase tracking-widest text-sale">{coupon.value}</span>
+                  <span className="mt-0.5 block text-sm font-black text-foreground">Nhập {coupon.code}</span>
+                  <span className="hidden text-[11px] font-semibold text-muted-foreground sm:block">{coupon.description}</span>
+                </span>
+                <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-sale text-white transition group-hover:scale-105 md:h-9 md:w-9">
+                  <Copy className="h-4 w-4" />
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="mb-3 flex gap-2 overflow-x-auto pb-1">
+          {saleTabs.map((tab) => {
+            const Icon = tab.icon;
+            const isActive = tab.key === activeTab;
+            const count = getProductsByTab(allSaleProducts, tab).length;
             return (
-              <div key={item.text} className="flex items-center gap-2 rounded-xl border border-white/15 bg-white/10 px-3 py-2 text-xs font-bold text-white/90 backdrop-blur">
-                <Icon className="h-4 w-4 text-yellow-200" />
-                {item.text}
-              </div>
+              <button
+                key={tab.key}
+                type="button"
+                onClick={() => setActiveTab(tab.key)}
+                className={`inline-flex shrink-0 items-center gap-2 rounded-full border px-3 py-2 text-xs font-extrabold transition ${
+                  isActive
+                    ? "border-sale bg-sale text-white shadow-sm"
+                    : "border-border bg-muted text-foreground hover:border-sale/40 hover:bg-sale/10"
+                }`}
+              >
+                <Icon className="h-4 w-4" />
+                {tab.label}
+                <span className={`rounded-full px-1.5 py-0.5 text-[10px] ${isActive ? "bg-white/20" : "bg-card"}`}>
+                  {count}
+                </span>
+              </button>
             );
           })}
         </div>
-        <div className="grid gap-2 sm:grid-cols-2">
-          {coupons.map((coupon) => (
-            <button
-              key={coupon.code}
-              type="button"
-              onClick={() => handleCopyCoupon(coupon.code)}
-              className="group flex items-center justify-between gap-3 rounded-xl border border-dashed border-yellow-200/45 bg-yellow-200/12 px-3 py-2 text-left transition hover:border-yellow-200 hover:bg-yellow-200/20"
-            >
-              <span>
-                <span className="block text-[11px] font-bold uppercase tracking-widest text-yellow-100">{coupon.value}</span>
-                <span className="mt-0.5 block text-sm font-black text-white">Nhập {coupon.code}</span>
-                <span className="hidden text-[11px] font-semibold text-white/70 sm:block">{coupon.description}</span>
-              </span>
-              <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white text-sale transition group-hover:scale-105 md:h-9 md:w-9">
-                <Copy className="h-4 w-4" />
-              </span>
-            </button>
-          ))}
+
+        <div className="flex snap-x gap-3 overflow-x-auto pb-1 md:grid md:grid-cols-3 md:overflow-visible md:pb-0 lg:grid-cols-5">
+          {saleProducts.length > 0 ? saleProducts.map((product) => (
+            <div key={product.id} className="snap-start">
+              <FlashSaleDealCard product={product} />
+            </div>
+          )) : (
+            <div className="col-span-full rounded-xl border border-border bg-muted px-4 py-8 text-center text-sm font-bold text-muted-foreground">
+              Nhóm này chưa có deal đang chạy. Chọn tab khác để xem các sản phẩm đang giảm giá.
+            </div>
+          )}
         </div>
-      </div>
-
-      <div className="relative z-10 mb-3 flex gap-2 overflow-x-auto pb-1">
-        {[
-          ...saleTabs,
-        ].map((tab) => {
-          const Icon = tab.icon;
-          const isActive = tab.key === activeTab;
-          const count = getProductsByTab(allSaleProducts, tab).length;
-          return (
-            <button
-              key={tab.key}
-              type="button"
-              onClick={() => setActiveTab(tab.key)}
-              className={`inline-flex shrink-0 items-center gap-2 rounded-full border px-3 py-2 text-xs font-extrabold transition ${
-                isActive
-                  ? "border-yellow-200 bg-yellow-200 text-slate-950 shadow-lg"
-                  : "border-white/15 bg-white/10 text-white/85 hover:border-white/30 hover:bg-white/15"
-              }`}
-            >
-              <Icon className="h-4 w-4" />
-              {tab.label}
-              <span className={`rounded-full px-1.5 py-0.5 text-[10px] ${isActive ? "bg-slate-950/10" : "bg-white/10"}`}>
-                {count}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-
-      <div className="relative z-10 flex snap-x gap-3 overflow-x-auto pb-1 md:grid md:grid-cols-3 md:overflow-visible md:pb-0 lg:grid-cols-5">
-        {saleProducts.length > 0 ? saleProducts.map((product) => (
-          <div key={product.id} className="snap-start">
-            <FlashSaleDealCard product={product} />
-          </div>
-        )) : (
-          <div className="col-span-full rounded-xl border border-white/15 bg-white/10 px-4 py-8 text-center text-sm font-bold text-white/80 backdrop-blur">
-            Nhóm này chưa có deal đang chạy. Chọn tab khác để xem các sản phẩm đang giảm giá.
-          </div>
-        )}
       </div>
     </section>
   );

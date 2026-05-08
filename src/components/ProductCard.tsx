@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { type Product, formatPrice } from "@/data/products";
 import { useCart } from "@/hooks/use-cart";
 import { toast } from "@/hooks/use-toast";
-import { BadgePercent, Eye, Gift, ShoppingCart } from "lucide-react";
+import { BadgePercent, Eye, ShoppingCart } from "lucide-react";
 
 interface ProductCardProps {
   product: Product;
@@ -100,7 +100,6 @@ export default function ProductCard({ product }: ProductCardProps) {
   const { addItem } = useCart();
   const [tipPos, setTipPos] = useState<TipPos | null>(null);
   const savings = product.originalPrice ? Math.max(0, product.originalPrice - product.price) : 0;
-  const stockPercent = Math.max(12, Math.min(100, product.stock * 8));
   const tipPosRef = useRef<TipPos | null>(null);
   tipPosRef.current = tipPos;
 
@@ -213,14 +212,11 @@ export default function ProductCard({ product }: ProductCardProps) {
             className="relative h-full w-full object-contain p-4 drop-shadow-[0_18px_24px_rgba(15,23,42,0.16)] transition-transform duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_22px_32px_rgba(15,23,42,0.24)]"
             loading="lazy"
           />
-          <div className="pointer-events-none absolute right-2 top-2 rounded-md border border-white/80 bg-white/85 px-2 py-1 text-[10px] font-extrabold text-primary shadow-sm backdrop-blur">
-            Bảo hành 36T
-          </div>
-          <div className="pointer-events-none absolute left-2 top-2 flex flex-col gap-1">
-            {product.discount && product.discount > 0 && <span className="badge-sale">-{product.discount}%</span>}
-            {product.tags.includes("bán chạy") && <span className="badge-hot">Bán chạy</span>}
-            {product.tags.includes("mới") && <span className="badge-new">Mới</span>}
-          </div>
+          {product.discount && product.discount > 0 && (
+            <div className="pointer-events-none absolute left-2 top-2">
+              <span className="badge-sale">-{product.discount}%</span>
+            </div>
+          )}
           {product.status === "out_of_stock" && (
             <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-foreground/50">
               <span className="rounded bg-card px-3 py-1 text-sm font-semibold text-foreground">Hết hàng</span>
@@ -245,52 +241,20 @@ export default function ProductCard({ product }: ProductCardProps) {
             </h3>
           </Link>
 
-          <div className="mb-3 flex min-h-[26px] flex-wrap gap-1.5">
-            <span className="inline-flex min-w-[104px] flex-1 items-center justify-center gap-1 rounded-md border border-sale/20 bg-sale/10 px-2 py-1 text-[10px] font-extrabold text-sale">
-              <BadgePercent className="h-3 w-3" />
-              Trả góp 0%
-            </span>
-            <span className="inline-flex min-w-[104px] flex-1 items-center justify-center gap-1 rounded-md border border-trust/20 bg-trust/10 px-2 py-1 text-[10px] font-extrabold text-trust">
-              <Gift className="h-3 w-3" />
-              Quà tặng
-            </span>
-          </div>
-
-          <div className="mt-auto h-[68px] overflow-hidden">
-            <div className="flex h-[30px] flex-wrap items-baseline gap-x-2 overflow-hidden">
-              <span className="product-price">{formatPrice(product.price)}</span>
+          <div className="mt-auto">
+            <div className="flex flex-wrap items-baseline gap-x-2">
+              <span className="product-price text-xl">{formatPrice(product.price)}</span>
               {product.originalPrice && <span className="product-price-old">{formatPrice(product.originalPrice)}</span>}
             </div>
             <p className={`mt-0.5 min-h-[16px] text-[11px] font-bold ${savings > 0 ? "text-sale" : "text-transparent"}`}>
               {savings > 0 ? `Tiết kiệm ${formatPrice(savings)}` : "Tiết kiệm 0đ"}
             </p>
-            <div className="min-h-[18px]">
-              {product.status === "in_stock" && <span className="text-xs font-bold text-success">✓ Còn hàng</span>}
-              {product.status === "coming_soon" && <span className="text-xs font-bold text-warning">Sắp về</span>}
-              {product.status === "out_of_stock" && <span className="text-xs font-bold text-muted-foreground">Tạm hết hàng</span>}
+            <div className="mt-1.5 min-h-[24px]">
+              <span className="inline-flex items-center gap-1 rounded-md border border-sale/20 bg-sale/10 px-2 py-1 text-[10px] font-extrabold text-sale">
+                <BadgePercent className="h-3 w-3" />
+                Trả góp 0%
+              </span>
             </div>
-          </div>
-
-          <div className="mt-2 h-[33px]">
-            {product.status === "in_stock" ? (
-              <>
-              <div className="mb-1 flex items-center justify-between text-[10px] font-bold text-muted-foreground">
-                <span>Kho sẵn</span>
-                <span>{product.stock} sản phẩm</span>
-              </div>
-              <div className="h-1.5 overflow-hidden rounded-full bg-muted">
-                <div className="h-full rounded-full bg-gradient-to-r from-success to-accent" style={{ width: `${stockPercent}%` }} />
-              </div>
-              </>
-            ) : (
-              <>
-                <div className="mb-1 flex items-center justify-between text-[10px] font-bold text-transparent">
-                  <span>Kho sẵn</span>
-                  <span>0 sản phẩm</span>
-                </div>
-                <div className="h-1.5 overflow-hidden rounded-full bg-muted" />
-              </>
-            )}
           </div>
 
           <div className="mt-3 grid grid-cols-2 gap-1.5">

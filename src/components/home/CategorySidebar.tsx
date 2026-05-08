@@ -53,12 +53,12 @@ export default function CategorySidebar() {
       {activeCategory?.children && (
         <div className="absolute bottom-0 left-full top-0 z-30 flex items-stretch">
           <div className="w-4 shrink-0" aria-hidden />
-          <div className="w-[760px] self-start rounded-xl border bg-card p-5 shadow-2xl">
+          <div className="w-[640px] self-start rounded-xl border bg-card p-5 shadow-2xl">
             <div className="mb-4 border-b border-border/70 pb-3">
               <p className="text-[15px] font-bold text-foreground">{activeCategory.name}</p>
             </div>
 
-            <div className="grid grid-cols-[repeat(3,minmax(180px,1fr))] gap-x-8 gap-y-6 text-sm">
+            <div className="grid grid-cols-[repeat(3,minmax(160px,1fr))] gap-x-6 gap-y-5 text-sm">
               {activeCategory.children.map((group) => (
                 <div key={group.id} className={`min-w-0 ${getColumnSpan(group)}`}>
                   <p className="mb-2 text-[15px] font-bold text-sale">{group.name}</p>

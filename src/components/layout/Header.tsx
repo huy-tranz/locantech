@@ -2,20 +2,17 @@ import { useEffect, useState, type FormEvent } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import {
-  BadgeCheck,
   BadgePercent,
   ChevronDown,
   ChevronRight,
   ClipboardCheck,
   Cpu,
-  Gift,
   LogOut,
   MapPin,
   Menu,
   Phone,
   RefreshCw,
   Search,
-  ShieldCheck,
   ShoppingCart,
   Truck,
   User,
@@ -36,8 +33,6 @@ const menuItems = [
   { name: "Thu cũ đổi mới", path: "/dich-vu/thu-cu-doi-moi", icon: RefreshCw, tone: "text-trust" },
   { name: "Tra cứu bảo hành", path: "/chinh-sach/chinh-sach-bao-hanh", icon: ClipboardCheck, tone: "text-primary" },
 ];
-
-const hotKeywords = ["PC gaming 15 triệu", "Laptop văn phòng", "SSD 500GB", "RTX 4060", "Vệ sinh laptop"];
 
 const promoStrip = [
   // { icon: Gift, text: "Combo PC + màn hình giá tốt", tone: "text-service" },
@@ -62,6 +57,7 @@ export default function Header() {
   const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
   const settings = { ...defaultSiteSettings, ...siteSettings };
+  const hotlineDisplay = settings.hotline.replace(/^(\d{4})(\d{3})(\d{3,4})$/, "$1.$2.$3");
 
   useEffect(() => {
     const syncUser = () => setCurrentUser(getCurrentUser());
@@ -112,116 +108,60 @@ export default function Header() {
     </form>
   );
 
-  const searchPanel = (
-    <div>
-      {searchForm}
-    </div>
-  );
-
   const activeCatInDropdown = categories.find((c) => c.id === hoveredDropdownCat) ?? null;
 
-  const categoryNavMenu = isScrolled ? (
-    <li
-      className="relative shrink-0"
-      onMouseEnter={() => setCategoryOpen(true)}
-      onMouseLeave={() => { setCategoryOpen(false); setHoveredDropdownCat(null); }}
-    >
-      <button
-        type="button"
-        aria-expanded={categoryOpen}
-        onClick={() => setCategoryOpen((prev) => !prev)}
-        className="inline-flex min-h-10 min-w-[210px] items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-extrabold text-primary-foreground shadow-sm transition hover:bg-primary-light"
-      >
-        <Menu className="h-4 w-4" />
-        <span>Danh mục sản phẩm</span>
-        <ChevronDown className={cn("h-4 w-4 transition-transform", categoryOpen && "rotate-180")} />
-      </button>
+  return (
+    <header>
+      {/* Tier 1 — Top Bar: 32px, navy background, white 12px — scrolls away */}
+      <div className="hidden bg-primary text-white md:block">
+        <div className="section-container flex h-8 items-center justify-between gap-4 text-[12px] leading-none">
+          <Link
+            to="/lien-he"
+            className="flex items-center gap-1.5 transition-colors hover:text-accent"
+          >
+            <MapPin className="h-3.5 w-3.5" />
+            <span>Hệ thống cửa hàng</span>
+          </Link>
 
-      <div
-        className={cn(
-          "absolute left-0 top-full z-50 pt-2 transition-all duration-150",
-          categoryOpen ? "visible translate-y-0 opacity-100" : "invisible translate-y-2 opacity-0",
-        )}
-      >
-        <div className="flex items-start">
-          <div className="w-[280px] overflow-hidden rounded-xl border border-border bg-card text-foreground shadow-panel">
-            <div className="border-b bg-gradient-to-r from-primary to-primary-light px-4 py-3 text-sm font-extrabold text-primary-foreground">
-              Danh mục sản phẩm
-            </div>
-            <div className="max-h-[min(70vh,32rem)] overflow-y-auto py-1">
-              {categories.map((cat) => {
-                const Icon = cat.icon;
-                const isActive = hoveredDropdownCat === cat.id;
-                return (
-                  <Link
-                    key={cat.id}
-                    to={`/${cat.slug}`}
-                    onMouseEnter={() => setHoveredDropdownCat(cat.id)}
-                    onClick={() => { setCategoryOpen(false); setHoveredDropdownCat(null); }}
-                    className={cn(
-                      "flex items-center gap-3 px-4 py-3 text-sm font-semibold transition-colors",
-                      isActive ? "bg-primary/5 text-primary" : "hover:bg-primary/5 hover:text-primary",
-                    )}
-                  >
-                    {Icon && <Icon className="h-4 w-4 shrink-0 text-muted-foreground" />}
-                    <span className="min-w-0 flex-1 truncate">{cat.name}</span>
-                    {cat.children ? (
-                      <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/70" />
-                    ) : (
-                      <ChevronDown className="-rotate-90 h-3.5 w-3.5 text-muted-foreground/70" />
-                    )}
-                  </Link>
-                );
-              })}
-            </div>
+          <a
+            href={`tel:${settings.hotline}`}
+            className="flex items-center gap-1.5 font-semibold transition-colors hover:text-accent"
+          >
+            <Phone className="h-3.5 w-3.5" />
+            <span>Hotline: {hotlineDisplay}</span>
+          </a>
+
+          <div className="flex items-center gap-4">
+            <Link
+              to="/tai-khoan"
+              className="flex items-center gap-1.5 transition-colors hover:text-accent"
+            >
+              <Truck className="h-3.5 w-3.5" />
+              <span>Tra cứu đơn hàng</span>
+            </Link>
+            <span className="h-3 w-px bg-white/25" aria-hidden />
+            {currentUser ? (
+              <Link
+                to="/tai-khoan"
+                className="flex items-center gap-1.5 transition-colors hover:text-accent"
+                title={currentUser.fullName}
+              >
+                <User className="h-3.5 w-3.5" />
+                <span className="max-w-[140px] truncate">{currentUser.fullName}</span>
+              </Link>
+            ) : (
+              <Link
+                to="/dang-nhap"
+                className="flex items-center gap-1.5 transition-colors hover:text-accent"
+              >
+                <User className="h-3.5 w-3.5" />
+                <span>Đăng nhập / Đăng ký</span>
+              </Link>
+            )}
           </div>
-
-          {activeCatInDropdown?.children && (
-            <div className="ml-1 w-[520px] self-start rounded-xl border bg-card p-5 shadow-2xl">
-              <div className="mb-4 border-b border-border/70 pb-3">
-                <p className="text-[15px] font-bold text-foreground">{activeCatInDropdown.name}</p>
-              </div>
-              <div className="grid grid-cols-3 gap-x-6 gap-y-5 text-sm">
-                {activeCatInDropdown.children.map((group) => (
-                  <div
-                    key={group.id}
-                    className={cn("min-w-0", (group.children?.length ?? 0) >= 5 ? "col-span-2" : "")}
-                  >
-                    <p className="mb-2 text-[15px] font-bold text-sale">{group.name}</p>
-                    {group.children?.length ? (
-                      <div className="space-y-1.5">
-                        {group.children.map((child) => (
-                          <Link
-                            key={child.id}
-                            to={`/${activeCatInDropdown.slug}?subcategory=${encodeURIComponent(child.slug)}`}
-                            onClick={() => { setCategoryOpen(false); setHoveredDropdownCat(null); }}
-                            className="block break-words leading-6 text-foreground/90 transition-colors hover:text-primary"
-                          >
-                            {child.name}
-                          </Link>
-                        ))}
-                      </div>
-                    ) : (
-                      <Link
-                        to={`/${activeCatInDropdown.slug}?subcategory=${encodeURIComponent(group.slug)}`}
-                        onClick={() => { setCategoryOpen(false); setHoveredDropdownCat(null); }}
-                        className="block leading-6 text-foreground/90 transition-colors hover:text-primary"
-                      >
-                        {group.name}
-                      </Link>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       </div>
-    </li>
-  ) : null;
 
-  return (
-    <header className={cn("sticky top-0 z-50 transition-shadow duration-300", isScrolled ? "shadow-header" : "shadow-none")}>
       {promoStrip.length > 0 && (
         <div
           className={cn(
@@ -248,6 +188,8 @@ export default function Header() {
         </div>
       )}
 
+      {/* === STICKY WRAPPER: chỉ phần logo + search dính khi cuộn === */}
+      <div className={cn("sticky top-0 z-50 transition-shadow duration-300", isScrolled ? "shadow-header" : "shadow-none")}>
       <div className="header-bg text-primary-foreground ring-1 ring-white/10">
         <div
           className={cn(
@@ -279,8 +221,108 @@ export default function Header() {
             />
           </a>
 
+          {isScrolled && (
+            <div
+              className="relative hidden shrink-0 lg:block"
+              onMouseEnter={() => setCategoryOpen(true)}
+              onMouseLeave={() => { setCategoryOpen(false); setHoveredDropdownCat(null); }}
+            >
+              <button
+                type="button"
+                aria-expanded={categoryOpen}
+                onClick={() => setCategoryOpen((prev) => !prev)}
+                className="inline-flex min-h-10 min-w-[210px] items-center justify-center gap-2 rounded-xl bg-white/15 px-4 text-sm font-extrabold text-primary-foreground shadow-sm transition hover:bg-white/25"
+              >
+                <Menu className="h-4 w-4" />
+                <span>Danh mục sản phẩm</span>
+                <ChevronDown className={cn("h-4 w-4 transition-transform", categoryOpen && "rotate-180")} />
+              </button>
+
+              <div
+                className={cn(
+                  "absolute left-0 top-full z-50 pt-2 transition-all duration-150",
+                  categoryOpen ? "visible translate-y-0 opacity-100" : "invisible translate-y-2 opacity-0",
+                )}
+              >
+                <div className="flex items-start">
+                  <div className="w-[280px] overflow-hidden rounded-xl border border-border bg-card text-foreground shadow-panel">
+                    <div className="border-b bg-gradient-to-r from-primary to-primary-light px-4 py-3 text-sm font-extrabold text-primary-foreground">
+                      Danh mục sản phẩm
+                    </div>
+                    <div className="max-h-[min(70vh,32rem)] overflow-y-auto py-1">
+                      {categories.map((cat) => {
+                        const Icon = cat.icon;
+                        const isActive = hoveredDropdownCat === cat.id;
+                        return (
+                          <Link
+                            key={cat.id}
+                            to={`/${cat.slug}`}
+                            onMouseEnter={() => setHoveredDropdownCat(cat.id)}
+                            onClick={() => { setCategoryOpen(false); setHoveredDropdownCat(null); }}
+                            className={cn(
+                              "flex items-center gap-3 px-4 py-3 text-sm font-semibold transition-colors",
+                              isActive ? "bg-primary/5 text-primary" : "hover:bg-primary/5 hover:text-primary",
+                            )}
+                          >
+                            {Icon && <Icon className="h-4 w-4 shrink-0 text-muted-foreground" />}
+                            <span className="min-w-0 flex-1 truncate">{cat.name}</span>
+                            {cat.children ? (
+                              <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/70" />
+                            ) : (
+                              <ChevronDown className="-rotate-90 h-3.5 w-3.5 text-muted-foreground/70" />
+                            )}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {activeCatInDropdown?.children && (
+                    <div className="ml-1 w-[520px] self-start rounded-xl border bg-card p-5 shadow-2xl">
+                      <div className="mb-4 border-b border-border/70 pb-3">
+                        <p className="text-[15px] font-bold text-foreground">{activeCatInDropdown.name}</p>
+                      </div>
+                      <div className="grid grid-cols-3 gap-x-6 gap-y-5 text-sm">
+                        {activeCatInDropdown.children.map((group) => (
+                          <div
+                            key={group.id}
+                            className={cn("min-w-0", (group.children?.length ?? 0) >= 5 ? "col-span-2" : "")}
+                          >
+                            <p className="mb-2 text-[15px] font-bold text-sale">{group.name}</p>
+                            {group.children?.length ? (
+                              <div className="space-y-1.5">
+                                {group.children.map((child) => (
+                                  <Link
+                                    key={child.id}
+                                    to={`/${activeCatInDropdown.slug}?subcategory=${encodeURIComponent(child.slug)}`}
+                                    onClick={() => { setCategoryOpen(false); setHoveredDropdownCat(null); }}
+                                    className="block break-words leading-6 text-foreground/90 transition-colors hover:text-primary"
+                                  >
+                                    {child.name}
+                                  </Link>
+                                ))}
+                              </div>
+                            ) : (
+                              <Link
+                                to={`/${activeCatInDropdown.slug}?subcategory=${encodeURIComponent(group.slug)}`}
+                                onClick={() => { setCategoryOpen(false); setHoveredDropdownCat(null); }}
+                                className="block leading-6 text-foreground/90 transition-colors hover:text-primary"
+                              >
+                                {group.name}
+                              </Link>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className={cn("mx-1 hidden min-w-[20rem] flex-1 md:block", isScrolled ? "max-w-4xl" : "max-w-3xl xl:max-w-4xl")}>
-            {searchPanel}
+            {searchForm}
           </div>
 
           <a
@@ -357,27 +399,6 @@ export default function Header() {
         </div>
       </div>
 
-      <nav
-        className={cn(
-          "hidden overflow-visible border-b border-primary/10 bg-white/95 shadow-sm backdrop-blur transition-all duration-300 lg:block",
-          isScrolled ? "max-h-14 opacity-100" : "max-h-16 opacity-100",
-        )}
-      >
-        <div className="section-container">
-          <ul className="flex min-h-14 w-full items-center justify-between gap-2 py-1.5">
-            {categoryNavMenu}
-            {menuItems.map((item) => (
-              <li key={item.path} className="flex-1 text-center">
-                <Link to={item.path} className="nav-link inline-flex items-center justify-center gap-2 px-3">
-                  <item.icon className={cn("h-4 w-4", item.tone)} />
-                  <span>{item.name}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </nav>
-
       <AnimatePresence>
         {mobileOpen && (
           <motion.nav
@@ -453,6 +474,24 @@ export default function Header() {
           </motion.nav>
         )}
       </AnimatePresence>
+      </div>
+      {/* === END STICKY WRAPPER === */}
+
+      {/* Nav bar — scrolls away, không sticky */}
+      <nav className="hidden overflow-visible border-b border-primary/10 bg-white/95 shadow-sm backdrop-blur lg:block">
+        <div className="section-container">
+          <ul className="flex min-h-14 w-full items-center justify-between gap-2 py-1.5">
+            {menuItems.map((item) => (
+              <li key={item.path} className="flex-1 text-center">
+                <Link to={item.path} className="nav-link inline-flex items-center justify-center gap-2 px-3">
+                  <item.icon className={cn("h-4 w-4", item.tone)} />
+                  <span>{item.name}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </nav>
     </header>
   );
 }

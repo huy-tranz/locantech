@@ -1,83 +1,118 @@
-@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 210 50% 96.86%;
-    --foreground: 222 42% 12%;
+    /* ===== Design System — raw palette (Task 0.1) ===== */
+    /* Primary — Navy */
+    --color-primary: #0a2540;
+    --color-primary-hover: #133a6b;
+    --color-primary-light: #e6edf5;
 
-    --card: 0 0% 100%;
-    --card-foreground: 215 25% 15%;
+    /* Accent — Orange (CTA, flash sale) */
+    --color-accent: #ff6b00;
+    --color-accent-hover: #e55f00;
+    --color-accent-light: #fff4ec;
+
+    /* Sale — Red (sale price + discount badge only) */
+    --color-sale: #e30613;
+    --color-sale-bg: #fff0f0;
+
+    /* Success / Promo — Green (new + freeship badges) */
+    --color-success: #16a34a;
+
+    /* Neutral */
+    --color-bg: #f5f5f7;
+    --color-card: #ffffff;
+    --color-border: #e5e7eb;
+    --color-text: #1a1a1a;
+    --color-text-secondary: #6b7280;
+    --color-text-muted: #9ca3af;
+
+    /* ===== Shadows (Task 0.4) ===== */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1);
+
+    /* ===== Layout (Task 0.3) ===== */
+    --container-max: 1280px;
+    --container-padding-x: 1rem;
+    --section-gap: 3rem; /* 48px between sections */
+
+    /* ===== HSL tokens consumed by Tailwind / shadcn (mapped to palette above) ===== */
+    --background: 240 8% 96%;        /* #f5f5f7 */
+    --foreground: 0 0% 10%;          /* #1a1a1a */
+
+    --card: 0 0% 100%;               /* #ffffff */
+    --card-foreground: 0 0% 10%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 215 25% 15%;
+    --popover-foreground: 0 0% 10%;
 
-    --primary: 230 70% 23%;
+    --primary: 213 73% 15%;          /* #0a2540 */
     --primary-foreground: 0 0% 100%;
+    --primary-light: 213 70% 25%;    /* #133a6b — used for gradient hover */
+    --primary-dark: 213 80% 10%;
+    --primary-tint: 213 38% 93%;     /* #e6edf5 */
 
-    --primary-light: 218 72% 38%;
-    --primary-dark: 232 82% 11%;
+    --secondary: 220 13% 91%;        /* matches border */
+    --secondary-foreground: 0 0% 10%;
 
-    --secondary: 217 28% 92%;
-    --secondary-foreground: 215 25% 20%;
+    --muted: 240 8% 96%;
+    --muted-foreground: 220 9% 46%;  /* #6b7280 */
+    --muted-foreground-strong: 220 9% 65%; /* #9ca3af */
 
-    --muted: 220 25% 91%;
-    --muted-foreground: 217 14% 46%;
-
-    --accent: 193 88% 47%;
+    --accent: 25 100% 50%;           /* #ff6b00 */
     --accent-foreground: 0 0% 100%;
+    --accent-hover: 25 100% 45%;     /* #e55f00 */
 
-    --accent-hover: 195 90% 40%;
-
-    --sale: 0 88% 58%;
+    --sale: 357 95% 46%;             /* #e30613 */
     --sale-foreground: 0 0% 100%;
 
+    --success: 142 76% 36%;          /* #16a34a */
+    --success-foreground: 0 0% 100%;
+
+    /* Domain accents kept for legacy components (gaming/service/trust/warning) */
     --gaming: 262 83% 58%;
     --gaming-foreground: 0 0% 100%;
 
-    --service: 27 94% 55%;
+    --service: 25 100% 50%;          /* aligned to accent orange */
     --service-foreground: 0 0% 100%;
 
     --trust: 158 64% 38%;
     --trust-foreground: 0 0% 100%;
 
-    --success: 145 60% 40%;
-    --success-foreground: 0 0% 100%;
-
     --warning: 40 90% 55%;
-    --warning-foreground: 215 25% 15%;
+    --warning-foreground: 0 0% 10%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 357 95% 46%;      /* aligned to sale red */
     --destructive-foreground: 0 0% 100%;
 
-    --border: 218 24% 86%;
-    --input: 218 24% 86%;
-    --ring: 230 65% 25%;
+    --border: 220 13% 91%;           /* #e5e7eb */
+    --input: 220 13% 91%;
+    --ring: 213 73% 15%;
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;                /* card = rounded-lg = 8px, button = rounded-md = 6px */
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-primary: 213 73% 15%;
+    --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 240 4.8% 95.9%;
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-ring: 213 73% 15%;
 
     --header-gradient:
       radial-gradient(circle at 18% 0%, hsl(193 88% 48% / 0.34), transparent 18rem),
       radial-gradient(circle at 86% 12%, hsl(27 94% 55% / 0.18), transparent 16rem),
       linear-gradient(120deg, hsl(231 78% 12%) 0%, hsl(219 76% 24%) 48%, hsl(190 78% 30%) 100%);
-    --hero-gradient: linear-gradient(135deg, hsl(232 84% 12%) 0%, hsl(221 80% 18%) 44%, hsl(193 82% 31%) 100%);
-    --surface-gradient: linear-gradient(180deg, hsl(0 0% 100% / 0.94) 0%, hsl(220 45% 98% / 0.86) 100%);
-    --shadow-card: 0 10px 28px hsl(222 42% 12% / 0.08);
-    --shadow-card-hover: 0 18px 42px hsl(222 42% 12% / 0.18);
-    --shadow-panel: 0 20px 60px hsl(222 42% 12% / 0.16);
-    --shadow-header: 0 14px 36px hsl(222 42% 12% / 0.18);
+    --surface-gradient: linear-gradient(180deg, hsl(0 0% 100% / 0.94) 0%, hsl(240 8% 98% / 0.86) 100%);
+    --shadow-card: var(--shadow-md);
+    --shadow-card-hover: var(--shadow-lg);
+    --shadow-panel: var(--shadow-lg);
+    --shadow-header: var(--shadow-md);
   }
 
   .dark {
@@ -110,7 +145,7 @@
 
   body {
     @apply bg-background text-foreground font-sans;
-    font-family: 'Be Vietnam Pro', sans-serif;
+    font-family: 'Inter', 'Be Vietnam Pro', system-ui, sans-serif;
     background: hsl(var(--background));
   }
 
@@ -135,26 +170,7 @@
   }
 
   .home-hero-shell {
-    @apply relative overflow-hidden rounded-2xl border border-white/20;
-    padding: clamp(0.75rem, 1vw, 1.25rem);
-    background: var(--hero-gradient);
-    box-shadow: var(--shadow-panel);
-  }
-  .home-hero-shell::before {
-    content: "";
-    @apply pointer-events-none absolute inset-0;
-    background:
-      radial-gradient(circle at 18% 12%, hsl(var(--accent) / 0.28), transparent 22rem),
-      radial-gradient(circle at 88% 4%, hsl(var(--gaming) / 0.22), transparent 22rem),
-      linear-gradient(90deg, transparent, hsl(0 0% 100% / 0.06));
-  }
-
-  .hero-eyebrow {
-    @apply inline-flex items-center rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-extrabold uppercase tracking-widest text-cyan-100 backdrop-blur;
-  }
-
-  .metric-pill {
-    @apply rounded-xl border border-white/20 bg-white/10 px-3 py-2 text-primary-foreground backdrop-blur;
+    @apply relative;
   }
 
   .section-heading {
