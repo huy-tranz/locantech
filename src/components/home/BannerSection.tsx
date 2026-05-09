@@ -41,8 +41,8 @@ export default function BannerSection() {
 
   return (
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(clamp(15rem,19vw,20rem),0.9fr)] [@media(min-width:1800px)]:grid-cols-3">
-      <div className="group relative overflow-hidden rounded-xl border border-white/70 bg-primary shadow-card [@media(min-width:1800px)]:col-span-2">
-        <div className="pointer-events-none absolute inset-0 z-20 bg-[radial-gradient(circle_at_18%_18%,rgba(34,211,238,0.24),transparent_24rem)]" />
+      <div className="group relative overflow-hidden rounded-xl border border-border/70 bg-primary shadow-card [@media(min-width:1800px)]:col-span-2">
+        <div className="pointer-events-none absolute inset-0 z-20 bg-[radial-gradient(circle_at_18%_18%,rgba(34,211,238,0.24),transparent_24rem)] dark:bg-[radial-gradient(circle_at_18%_18%,rgba(56,189,248,0.14),transparent_24rem)]" />
         <div className="relative h-[clamp(18rem,17vw,20rem)]">
           {mainBanners.map((banner, index) => (
             <Link
@@ -50,7 +50,7 @@ export default function BannerSection() {
               to={banner.link || "/"}
               className={`absolute inset-0 transition-opacity duration-500 ${index === current ? "opacity-100" : "pointer-events-none opacity-0"}`}
             >
-              <div className="absolute inset-0 z-10 flex items-center bg-gradient-to-r from-primary-dark via-primary-dark/95 to-primary-dark/45">
+              <div className="absolute inset-0 z-10 flex items-center bg-gradient-to-r from-primary-dark via-primary-dark/95 to-primary-dark/45 dark:via-primary-dark/90 dark:to-primary-dark/68">
                 <div className="max-w-[min(40rem,62vw)] px-[clamp(1.25rem,2vw,2.5rem)]">
                   <div className="mb-3 flex flex-wrap gap-2">
                     <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-cyan-100 backdrop-blur">
@@ -141,9 +141,9 @@ export default function BannerSection() {
           <Link
             key={banner.id}
             to={banner.link || "/"}
-            className="group/sub relative min-h-[clamp(8.75rem,8.2vw,9.5rem)] overflow-hidden rounded-xl border border-white/70 bg-primary shadow-card"
+            className="group/sub relative min-h-[clamp(8.75rem,8.2vw,9.5rem)] overflow-hidden rounded-xl border border-border/70 bg-primary shadow-card"
           >
-            <div className="absolute inset-0 z-10 flex items-end bg-gradient-to-t from-primary-dark/98 via-primary/55 to-transparent">
+            <div className="absolute inset-0 z-10 flex items-end bg-gradient-to-t from-primary-dark/98 via-primary/55 to-transparent dark:via-primary-dark/70">
               <div className="p-4">
                 <span className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-white/20 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-cyan-100 backdrop-blur">
                   <Gift className="h-3 w-3" />

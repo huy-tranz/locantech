@@ -122,7 +122,7 @@ export default function Footer() {
               <input
                 type="email"
                 placeholder="Email của bạn..."
-                className="px-4 py-2 rounded-lg text-foreground text-sm flex-1 md:w-64 focus:outline-none focus:ring-2 focus:ring-accent"
+                className="flex-1 rounded-lg border border-border bg-card px-4 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent md:w-64"
               />
               <button className="btn-cta whitespace-nowrap">Đăng ký</button>
             </div>

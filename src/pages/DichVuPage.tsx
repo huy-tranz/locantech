@@ -20,13 +20,13 @@ export default function DichVuPage() {
         </nav>
 
         <h1 className="text-xl md:text-2xl font-bold text-foreground mb-2">Dịch vụ sửa chữa & CNTT</h1>
-        <p className="text-sm text-muted-foreground mb-6">Lộc An cung cấp dịch vụ sửa chữa, bảo trì máy tính, lắp đặt camera và mạng tại Hà Đông, Hà Nội. Hotline: 0989.386.219</p>
+        <p className="text-sm text-muted-foreground mb-6">Lộc An cung cấp dịch vụ sửa chữa, bảo trì máy tính, lắp đặt camera và mạng tại Hà Nội. Hotline: 0989.386.219</p>
 
         {/* CTA */}
         <div className="bg-primary rounded-xl p-6 md:p-8 mb-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <div>
             <h2 className="text-lg md:text-xl font-bold text-primary-foreground">Cần sửa chữa gấp?</h2>
-            <p className="text-sm text-primary-foreground/80">Gọi ngay hotline, kỹ thuật viên có mặt trong 60 phút tại Hà Đông</p>
+            <p className="text-sm text-primary-foreground/80">Gọi ngay hotline, kỹ thuật viên có mặt trong 60 phút tại Hà Nội</p>
           </div>
           <a href="tel:0989386219" className="btn-cta text-base flex items-center gap-2 whitespace-nowrap">
             <Phone className="h-5 w-5" />

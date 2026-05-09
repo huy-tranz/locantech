@@ -23,7 +23,7 @@
     --color-success: #16a34a;
 
     /* Neutral */
-    --color-bg: #f5f5f7;
+    --color-bg: #EEF3F8;
     --color-card: #ffffff;
     --color-border: #e5e7eb;
     --color-text: #1a1a1a;
@@ -41,7 +41,7 @@
     --section-gap: 3rem; /* 48px between sections */
 
     /* ===== HSL tokens consumed by Tailwind / shadcn (mapped to palette above) ===== */
-    --background: 240 8% 96%;        /* #f5f5f7 */
+    --background: 210 43% 95%;        /* #f5f5f7 */
     --foreground: 0 0% 10%;          /* #1a1a1a */
 
     --card: 0 0% 100%;               /* #ffffff */
@@ -117,28 +117,58 @@
   }
 
   .dark {
-    --background: 215 25% 10%;
-    --foreground: 210 20% 95%;
-    --card: 215 25% 13%;
+    --color-primary: #38bdf8;
+    --color-primary-hover: #7dd3fc;
+    --color-primary-light: #082f49;
+    --color-accent-light: #431407;
+    --color-sale-bg: #450a0a;
+    --color-border: #243244;
+    --color-text: #e5edf7;
+    --color-text-secondary: #a8b3c5;
+    --color-text-muted: #748096;
+
+    --background: 216 28% 7%;
+    --foreground: 213 31% 91%;
+    --card: 216 24% 11%;
     --card-foreground: 210 20% 95%;
-    --popover: 215 25% 13%;
+    --popover: 216 24% 11%;
     --popover-foreground: 210 20% 95%;
-    --primary: 213 60% 50%;
+    --primary: 199 89% 58%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 217 20% 18%;
+    --primary-light: 199 92% 66%;
+    --primary-dark: 216 55% 9%;
+    --primary-tint: 214 28% 17%;
+    --secondary: 217 24% 16%;
     --secondary-foreground: 210 20% 90%;
-    --muted: 217 20% 18%;
-    --muted-foreground: 215 15% 60%;
+    --muted: 217 24% 16%;
+    --muted-foreground: 215 17% 68%;
+    --muted-foreground-strong: 214 14% 76%;
     --accent: 20 90% 52%;
     --accent-foreground: 0 0% 100%;
+    --accent-hover: 24 95% 58%;
+    --sale: 357 86% 58%;
+    --sale-foreground: 0 0% 100%;
     --destructive: 0 62% 30%;
     --destructive-foreground: 210 20% 95%;
-    --border: 217 20% 22%;
-    --input: 217 20% 22%;
-    --ring: 213 60% 50%;
+    --border: 216 20% 21%;
+    --input: 216 20% 21%;
+    --ring: 199 89% 58%;
+    --sidebar-background: 216 24% 10%;
+    --sidebar-foreground: 213 31% 91%;
+    --sidebar-primary: 199 89% 58%;
+    --sidebar-primary-foreground: 216 36% 8%;
+    --sidebar-accent: 217 24% 16%;
+    --sidebar-accent-foreground: 213 31% 91%;
+    --sidebar-border: 216 20% 21%;
+    --sidebar-ring: 199 89% 58%;
     /* Teal brighter in dark mode for legibility */
     --trust: 192 70% 54%;
     --service: 186 68% 48%;
+    --surface-gradient: linear-gradient(180deg, hsl(216 24% 12% / 0.96) 0%, hsl(217 27% 9% / 0.9) 100%);
+    --shadow-card: 0 14px 34px hsl(220 45% 3% / 0.42);
+    --shadow-card-hover: 0 18px 44px hsl(220 45% 3% / 0.55);
+    --shadow-panel: 0 18px 48px hsl(220 45% 3% / 0.58);
+    --shadow-header: 0 10px 28px hsl(220 45% 3% / 0.34);
   }
 }
 
@@ -169,7 +199,7 @@
   }
 
   .brand-section {
-    @apply rounded-xl border border-white/70 shadow-sm backdrop-blur;
+    @apply rounded-xl border border-border/70 shadow-sm backdrop-blur;
     background: var(--surface-gradient);
   }
 
@@ -314,7 +344,7 @@
   }
 
   .brand-quick-card {
-    @apply relative overflow-hidden rounded-xl border border-white/70 bg-white p-4 shadow-sm transition-all duration-200;
+    @apply relative overflow-hidden rounded-xl border border-border/70 bg-card p-4 shadow-sm transition-all duration-200;
   }
   .brand-quick-card::before {
     content: "";

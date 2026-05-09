@@ -41,7 +41,7 @@ export default function CategorySidebar() {
 
   return (
     <div className="relative" onMouseLeave={() => setHoveredCat(null)}>
-      <div className="overflow-hidden rounded-xl border border-white/70 bg-card shadow-card">
+      <div className="overflow-hidden rounded-xl border border-border/70 bg-card shadow-card">
         <div className="bg-gradient-to-r from-primary-dark to-primary px-4 py-3">
           <h3 className="text-sm font-extrabold text-primary-foreground">Danh mục sản phẩm</h3>
         </div>

@@ -10,10 +10,10 @@ const defaults = {
   workingHours: '8:00 - 21:00 (Thứ 2 - Chủ nhật)',
   facebook: 'https://facebook.com/locantech',
   zalo: '0989386219',
-  footerText: '© 2025 Lộc An. Chuyên máy tính, linh kiện, dịch vụ sửa chữa tại Hà Đông.',
-  seoTitle: 'Lộc An - Máy tính, Linh kiện, Sửa chữa tại Hà Đông',
+  footerText: '© 2025 Lộc An. Chuyên máy tính, linh kiện, dịch vụ sửa chữa tại Hà Nội.',
+  seoTitle: 'Lộc An - Máy tính, Linh kiện, Sửa chữa tại Hà Nội',
   seoDescription:
-    'Lộc An cung cấp laptop, PC, linh kiện máy tính chính hãng và dịch vụ sửa chữa uy tín tại Hà Đông, Hà Nội.',
+    'Lộc An cung cấp laptop, PC, linh kiện máy tính chính hãng và dịch vụ sửa chữa uy tín tại Hà Nội.',
   metaImage: null,
 }
 

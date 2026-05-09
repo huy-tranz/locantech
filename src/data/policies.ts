@@ -73,7 +73,7 @@ const defaultPolicies: PolicyItem[] = [
       {
         heading: "Khu vực giao hàng",
         content:
-          "Nội thành Hà Đông: giao trong 2 giờ\nNội thành Hà Nội: giao trong ngày\nTỉnh thành khác: 2-3 ngày qua GHTK/GHN",
+          "Nội thành Hà Nội: giao trong 2 giờ\nTỉnh thành khác: 2-3 ngày qua GHTK/GHN",
       },
       {
         heading: "Phí vận chuyển",

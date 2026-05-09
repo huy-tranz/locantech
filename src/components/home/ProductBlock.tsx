@@ -1,16 +1,15 @@
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, type Variants } from "framer-motion";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { type Product } from "@/data/products";
 import ProductCard from "@/components/ProductCard";
+import { useCarouselAutoplay } from "@/hooks/use-carousel-autoplay";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-  type CarouselApi,
 } from "@/components/ui/carousel";
 
 interface ProductBlockProps {
@@ -36,24 +35,11 @@ const cardVariants: Variants = {
 
 export default function ProductBlock({ title, products, link, maxItems = 12 }: ProductBlockProps) {
   const displayed = products.slice(0, maxItems);
-  const [api, setApi] = useState<CarouselApi>();
-  const [isPointerInside, setIsPointerInside] = useState(false);
-
-  useEffect(() => {
-    if (!api || displayed.length <= 1) return;
-
-    const timer = window.setInterval(() => {
-      if (document.hidden || isPointerInside) return;
-
-      if (api.canScrollNext()) {
-        api.scrollNext();
-      } else {
-        api.scrollTo(0);
-      }
-    }, 3200);
-
-    return () => window.clearInterval(timer);
-  }, [api, displayed.length, isPointerInside]);
+  const carouselAutoplay = useCarouselAutoplay({
+    itemCount: displayed.length,
+    delayMs: 3200,
+    enabled: displayed.length > 6,
+  });
 
   if (displayed.length === 0) return null;
 
@@ -79,13 +65,11 @@ export default function ProductBlock({ title, products, link, maxItems = 12 }: P
       </div>
 
       <Carousel
-        setApi={setApi}
-        opts={{ align: "start", loop: displayed.length > 6, dragFree: true }}
+        ref={carouselAutoplay.rootRef}
+        setApi={carouselAutoplay.setApi}
+        opts={{ align: "start", loop: displayed.length > 6, dragFree: true, duration: 18 }}
         className="group/product-carousel"
-        onMouseEnter={() => setIsPointerInside(true)}
-        onMouseLeave={() => setIsPointerInside(false)}
-        onFocusCapture={() => setIsPointerInside(true)}
-        onBlurCapture={() => setIsPointerInside(false)}
+        {...carouselAutoplay.autoplayProps}
       >
         <CarouselContent className="-ml-2 md:-ml-3">
           {displayed.map((product) => (
@@ -99,8 +83,8 @@ export default function ProductBlock({ title, products, link, maxItems = 12 }: P
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselPrevious className="left-1 hidden border-white/80 bg-white/95 text-primary shadow-md transition hover:bg-white md:inline-flex md:opacity-0 md:group-hover/product-carousel:opacity-100" />
-        <CarouselNext className="right-1 hidden border-white/80 bg-white/95 text-primary shadow-md transition hover:bg-white md:inline-flex md:opacity-0 md:group-hover/product-carousel:opacity-100" />
+        <CarouselPrevious className="left-1 hidden border-border bg-card/95 text-primary shadow-md transition hover:bg-card md:inline-flex md:opacity-0 md:group-hover/product-carousel:opacity-100" />
+        <CarouselNext className="right-1 hidden border-border bg-card/95 text-primary shadow-md transition hover:bg-card md:inline-flex md:opacity-0 md:group-hover/product-carousel:opacity-100" />
       </Carousel>
     </motion.section>
   );

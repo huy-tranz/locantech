@@ -23,7 +23,7 @@ export default function ServiceSection() {
             <Link
               key={service.id}
               to={`/dich-vu/${service.slug}`}
-              className="group rounded-xl border border-white/70 bg-card p-4 shadow-card transition-all duration-200 hover:-translate-y-1 hover:border-service/30"
+              className="group rounded-xl border border-border/70 bg-card p-4 shadow-card transition-all duration-200 hover:-translate-y-1 hover:border-service/30"
             >
               <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-service/10 transition-colors group-hover:bg-service">
                 <Icon className="h-5 w-5 text-service group-hover:text-service-foreground" />

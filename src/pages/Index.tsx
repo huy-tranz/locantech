@@ -22,7 +22,7 @@ const quickCampaigns = [
     desc: "Gaming, đồ họa, văn phòng",
     href: "/build-pc",
     icon: Cpu,
-    tone: "from-cyan-50 to-white",
+    tone: "from-cyan-50 to-white dark:from-cyan-950/35 dark:to-card",
     toneClass: "tone-gaming",
     action: "Build ngay",
   },
@@ -32,7 +32,7 @@ const quickCampaigns = [
     desc: "Gọn nhẹ, bảo hành rõ, dễ mua",
     href: "/laptop",
     icon: Laptop,
-    tone: "from-indigo-50 to-white",
+    tone: "from-indigo-50 to-white dark:from-indigo-950/35 dark:to-card",
     toneClass: "tone-trust",
     action: "Xem laptop",
   },
@@ -42,7 +42,7 @@ const quickCampaigns = [
     desc: "Vệ sinh, nâng cấp SSD/RAM, cài Win",
     href: "/dich-vu",
     icon: Wrench,
-    tone: "from-orange-50 to-white",
+    tone: "from-orange-50 to-white dark:from-orange-950/35 dark:to-card",
     toneClass: "tone-service",
     action: "Đặt lịch",
   },
@@ -52,7 +52,7 @@ const quickCampaigns = [
     desc: "Thi công camera, WiFi, LAN",
     href: "/camera",
     icon: Camera,
-    tone: "from-emerald-50 to-white",
+    tone: "from-emerald-50 to-white dark:from-emerald-950/35 dark:to-card",
     toneClass: "tone-trust",
     action: "Tư vấn ngay",
   },
@@ -157,7 +157,7 @@ const Index = () => {
             </h2>
             <p className="text-sm leading-relaxed text-muted-foreground">
               Lộc An chuyên bán và sửa chữa máy tính, laptop, linh kiện, thiết bị mạng và camera giám sát
-              tại Hà Đông, Hà Nội. Chúng tôi cam kết tư vấn đúng nhu cầu, báo giá rõ ràng và hỗ trợ kỹ thuật tận tâm.
+              tại Hà Nội. Chúng tôi cam kết tư vấn đúng nhu cầu, báo giá rõ ràng và hỗ trợ kỹ thuật tận tâm.
             </p>
             <a href="tel:0989386219" className="btn-cta mt-4 inline-flex">
               Gọi ngay: 0989.386.219

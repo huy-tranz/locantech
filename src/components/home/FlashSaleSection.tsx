@@ -19,13 +19,13 @@ import { toast } from "@/hooks/use-toast";
 import { useProducts } from "@/hooks/queries/product.queries";
 import { getProductsFromResponse } from "@/lib/productAdapter";
 import { flyToCart } from "@/lib/cart-fx";
+import { useCarouselAutoplay } from "@/hooks/use-carousel-autoplay";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-  type CarouselApi,
 } from "@/components/ui/carousel";
 
 const saleTabs = [
@@ -118,9 +118,9 @@ function SaleCountdown() {
       <Clock3 className="mr-1 h-3.5 w-3.5 shrink-0 text-yellow-200" />
       {countdown.map((item, index) => (
         <div key={item.label} className="flex items-center gap-1">
-          <span className="flex min-w-[2.5rem] flex-col items-center rounded-lg bg-white px-1.5 py-1 text-sale shadow">
+          <span className="flex min-w-[2.5rem] flex-col items-center rounded-lg bg-card px-1.5 py-1 text-sale shadow">
             <span className="font-mono text-base font-black leading-none md:text-lg">{item.value}</span>
-            <span className="text-[9px] font-bold uppercase text-slate-400">{item.label}</span>
+            <span className="text-[9px] font-bold uppercase text-muted-foreground">{item.label}</span>
           </span>
           {index < countdown.length - 1 && (
             <span className="text-xs font-black text-yellow-200">:</span>
@@ -149,7 +149,7 @@ function FlashSaleDealCard({ product }: { product: Product }) {
     <article className="group flex h-full flex-col overflow-hidden rounded-xl border border-border bg-card text-foreground shadow-card transition hover:-translate-y-0.5 hover:border-sale/30 hover:shadow-lg">
       <Link
         to={`/san-pham/${product.slug}`}
-        className="relative block aspect-[4/3] overflow-hidden bg-gradient-to-br from-cyan-50 via-white to-orange-50"
+        className="relative block aspect-[4/3] overflow-hidden bg-white"
       >
         <img
           ref={imageRef}
@@ -176,7 +176,7 @@ function FlashSaleDealCard({ product }: { product: Product }) {
         </div>
 
         <Link to={`/san-pham/${product.slug}`}>
-          <h3 className="line-clamp-2 min-h-[2.5rem] text-sm font-black leading-5 text-slate-950 transition-colors group-hover:text-primary">
+          <h3 className="line-clamp-2 min-h-[2.5rem] text-sm font-black leading-5 text-foreground transition-colors group-hover:text-primary">
             {product.name}
           </h3>
         </Link>
@@ -186,7 +186,7 @@ function FlashSaleDealCard({ product }: { product: Product }) {
             {specHighlights.map((spec) => (
               <span
                 key={spec}
-                className="max-w-full truncate rounded-md bg-slate-100 px-1.5 py-1 text-[10px] font-bold leading-none text-slate-600"
+                className="max-w-full truncate rounded-md bg-muted px-1.5 py-1 text-[10px] font-bold leading-none text-muted-foreground"
                 title={spec}
               >
                 {spec}
@@ -199,7 +199,7 @@ function FlashSaleDealCard({ product }: { product: Product }) {
           <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
             <span className="text-lg font-black text-sale">{formatPrice(product.price)}</span>
             {product.originalPrice ? (
-              <span className="text-xs font-semibold text-slate-400 line-through">{formatPrice(product.originalPrice)}</span>
+              <span className="text-xs font-semibold text-muted-foreground line-through">{formatPrice(product.originalPrice)}</span>
             ) : null}
           </div>
           {savings > 0 && (
@@ -211,9 +211,9 @@ function FlashSaleDealCard({ product }: { product: Product }) {
         <div className="mt-2.5 space-y-1">
           <div className="flex items-center justify-between gap-2 text-[10px] font-bold">
             <span className="text-orange-600">Đã bán: {progress.sold}</span>
-            <span className="text-slate-400">Còn: {progress.remaining}</span>
+            <span className="text-muted-foreground">Còn: {progress.remaining}</span>
           </div>
-          <div className="h-2 overflow-hidden rounded-full bg-slate-100">
+          <div className="h-2 overflow-hidden rounded-full bg-muted">
             <div
               className="h-full rounded-full bg-gradient-to-r from-sale via-orange-400 to-yellow-400 transition-all duration-500"
               style={{ width: `${progress.percent}%` }}
@@ -248,8 +248,6 @@ function FlashSaleDealCard({ product }: { product: Product }) {
 
 export default function FlashSaleSection() {
   const [activeTab, setActiveTab] = useState<SaleTabKey>("all");
-  const [api, setApi] = useState<CarouselApi>();
-  const [isPointerInside, setIsPointerInside] = useState(false);
   const { data } = useProducts({ limit: 100 });
 
   const allSaleProducts = useMemo(
@@ -263,22 +261,11 @@ export default function FlashSaleSection() {
   const activeTabConfig = saleTabs.find((tab) => tab.key === activeTab) ?? saleTabs[0];
   const filteredProducts = getProductsByTab(allSaleProducts, activeTabConfig);
   const saleProducts = filteredProducts.slice(0, 12);
-
-  useEffect(() => {
-    if (!api || saleProducts.length <= 1) return;
-
-    const timer = window.setInterval(() => {
-      if (document.hidden || isPointerInside) return;
-
-      if (api.canScrollNext()) {
-        api.scrollNext();
-      } else {
-        api.scrollTo(0);
-      }
-    }, 2800);
-
-    return () => window.clearInterval(timer);
-  }, [api, isPointerInside, saleProducts.length]);
+  const carouselAutoplay = useCarouselAutoplay({
+    itemCount: saleProducts.length,
+    delayMs: 2800,
+    enabled: saleProducts.length > 1,
+  });
 
   if (allSaleProducts.length === 0) return null;
 
@@ -325,7 +312,7 @@ export default function FlashSaleSection() {
             <SaleCountdown />
             <Link
               to="/flash-sale"
-              className="inline-flex items-center gap-1.5 rounded-xl bg-white px-3 py-2 text-xs font-black text-sale shadow transition hover:-translate-y-0.5 hover:bg-yellow-50"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-card px-3 py-2 text-xs font-black text-sale shadow transition hover:-translate-y-0.5 hover:bg-yellow-50 dark:hover:bg-muted"
             >
               <span className="hidden sm:inline">Xem tất cả</span>
               <ArrowRight className="h-4 w-4" />
@@ -388,13 +375,11 @@ export default function FlashSaleSection() {
         {saleProducts.length > 0 ? (
           <>
             <Carousel
-              setApi={setApi}
-              opts={{ align: "start", loop: saleProducts.length > 6, dragFree: true }}
+              ref={carouselAutoplay.rootRef}
+              setApi={carouselAutoplay.setApi}
+              opts={{ align: "start", loop: saleProducts.length > 1, dragFree: true, duration: 18 }}
               className="group/flash-sale"
-              onMouseEnter={() => setIsPointerInside(true)}
-              onMouseLeave={() => setIsPointerInside(false)}
-              onFocusCapture={() => setIsPointerInside(true)}
-              onBlurCapture={() => setIsPointerInside(false)}
+              {...carouselAutoplay.autoplayProps}
             >
               <CarouselContent className="-ml-2 md:-ml-3">
                 {saleProducts.map((product) => (
@@ -406,8 +391,8 @@ export default function FlashSaleSection() {
                   </CarouselItem>
                 ))}
               </CarouselContent>
-              <CarouselPrevious className="left-1 hidden border-white/80 bg-white/95 text-sale shadow-md transition hover:bg-white md:inline-flex md:opacity-0 md:group-hover/flash-sale:opacity-100" />
-              <CarouselNext className="right-1 hidden border-white/80 bg-white/95 text-sale shadow-md transition hover:bg-white md:inline-flex md:opacity-0 md:group-hover/flash-sale:opacity-100" />
+              <CarouselPrevious className="left-1 hidden border-border bg-card/95 text-sale shadow-md transition hover:bg-card md:inline-flex md:opacity-0 md:group-hover/flash-sale:opacity-100" />
+              <CarouselNext className="right-1 hidden border-border bg-card/95 text-sale shadow-md transition hover:bg-card md:inline-flex md:opacity-0 md:group-hover/flash-sale:opacity-100" />
             </Carousel>
             {/* Mobile scroll hint */}
             <div className="mt-2 flex items-center justify-center gap-1.5 md:hidden">

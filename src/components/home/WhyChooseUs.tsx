@@ -14,7 +14,7 @@ const commitments = [
   {
     icon: Headphones,
     title: "Hỗ trợ 60 phút",
-    desc: "Kỹ thuật có mặt nội thành Hà Đông",
+    desc: "Kỹ thuật có mặt nội thành Hà Nội trong 60 phút",
   },
   {
     icon: Truck,

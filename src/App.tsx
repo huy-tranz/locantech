@@ -1,4 +1,4 @@
-import { Suspense, lazy } from "react";
+import { Suspense, lazy, useEffect } from "react";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { HelmetProvider } from "react-helmet-async";
@@ -128,9 +128,35 @@ function AppRoutes() {
   );
 }
 
+function ThemeSync() {
+  useEffect(() => {
+    const root = document.documentElement;
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+
+    const applyTheme = () => {
+      const storedTheme = window.localStorage.getItem("theme");
+      const shouldUseDark = storedTheme === "dark" || (!storedTheme && media.matches);
+      root.classList.toggle("dark", shouldUseDark);
+      root.style.colorScheme = shouldUseDark ? "dark" : "light";
+    };
+
+    applyTheme();
+    media.addEventListener("change", applyTheme);
+    window.addEventListener("storage", applyTheme);
+
+    return () => {
+      media.removeEventListener("change", applyTheme);
+      window.removeEventListener("storage", applyTheme);
+    };
+  }, []);
+
+  return null;
+}
+
 const App = () => (
   <HelmetProvider>
     <TooltipProvider>
+      <ThemeSync />
       <Toaster />
       <Sonner />
       <AuthProvider>

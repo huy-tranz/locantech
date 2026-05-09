@@ -40,7 +40,7 @@ const menuItems = [
 ];
 
 const promoStrip = [
-  { icon: Truck, text: "Giao nhanh nội thành Hà Đông", tone: "text-trust" },
+  { icon: Truck, text: "Giao nhanh nội thành Hà Nội", tone: "text-trust" },
   { icon: ShieldCheck, text: "Bảo hành rõ ràng, hỗ trợ kỹ thuật", tone: "text-primary" },
   { icon: Cpu, text: "Tư vấn build PC miễn phí", tone: "text-accent" },
   { icon: BadgeCheck, text: "Báo giá minh bạch trước khi làm", tone: "text-sale" },
@@ -152,7 +152,7 @@ export default function Header() {
         value={searchQuery}
         onChange={(event) => setSearchQuery(event.target.value)}
         className={cn(
-          "w-full rounded-xl border border-white/70 bg-white pl-5 pr-14 text-sm font-semibold text-foreground shadow-[0_12px_28px_rgba(15,23,42,0.2)] transition-all duration-300 placeholder:text-muted-foreground/80 focus:outline-none focus:ring-2 focus:ring-accent/50",
+          "w-full rounded-xl border border-white/70 bg-white pl-5 pr-14 text-sm font-semibold text-foreground shadow-[0_12px_28px_rgba(15,23,42,0.2)] transition-all duration-300 placeholder:text-muted-foreground/80 focus:outline-none focus:ring-2 focus:ring-accent/50 dark:border-white/15 dark:bg-card/95 dark:text-foreground",
           isScrolled ? "py-2.5" : "py-3.5",
         )}
       />
@@ -295,7 +295,7 @@ export default function Header() {
         <div className="section-container flex h-8 items-center justify-between gap-4 text-[12px] leading-none">
           <Link to="/lien-he" className="flex items-center gap-1.5 transition-colors hover:text-accent">
             <MapPin className="h-3.5 w-3.5" />
-            <span>Hệ thống cửa hàng tại Hà Đông</span>
+            <span>Hệ thống cửa hàng tại Hà Nội</span>
           </Link>
 
           <div className="flex items-center gap-5">
@@ -553,7 +553,7 @@ export default function Header() {
         </AnimatePresence>
       </header>
 
-      <nav className="hidden overflow-visible border-b border-primary/10 bg-white/95 shadow-sm backdrop-blur lg:block">
+      <nav className="hidden overflow-visible border-b border-border bg-card/95 shadow-sm backdrop-blur lg:block">
         <div className="section-container">
           <ul className="flex min-h-14 w-full items-center justify-between gap-2 py-1.5">
             {menuItems.map((item) => (

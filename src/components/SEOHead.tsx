@@ -8,7 +8,7 @@ interface SEOHeadProps {
 
 export default function SEOHead({
   title = "Lộc An – Máy tính, laptop, sửa chữa và giải pháp công nghệ",
-  description = "Lộc An – Cửa hàng máy tính, laptop, linh kiện, thiết bị mạng, camera giám sát và dịch vụ sửa chữa tại Hà Đông, Hà Nội. Hotline: 0989386219",
+  description = "Lộc An – Cửa hàng máy tính, laptop, linh kiện, thiết bị mạng, camera giám sát và dịch vụ sửa chữa tại Hà Nội. Hotline: 0989386219",
   canonical,
 }: SEOHeadProps) {
   return (
@@ -29,7 +29,7 @@ export default function SEOHead({
           "address": {
             "@type": "PostalAddress",
             "streetAddress": "7 La Dương, Dương Nội",
-            "addressLocality": "Hà Đông",
+            "addressLocality": "Hà Nội",
             "addressRegion": "Hà Nội",
             "addressCountry": "VN"
           },

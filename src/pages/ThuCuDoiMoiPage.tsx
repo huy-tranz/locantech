@@ -96,7 +96,7 @@ const steps = [
   {
     Icon: Camera,
     title: "Gửi ảnh hoặc mang máy đến",
-    desc: "Chụp ảnh 4 góc + thông số máy (CPU, RAM, SSD) gửi qua Zalo 0989.386.219, hoặc mang trực tiếp đến cửa hàng tại Hà Đông.",
+    desc: "Chụp ảnh 4 góc + thông số máy (CPU, RAM, SSD) gửi qua Zalo 0989.386.219, hoặc mang trực tiếp đến cửa hàng tại Hà Nội.",
   },
   {
     Icon: CheckCircle,
@@ -130,7 +130,7 @@ const faqs = [
   },
   {
     q: "Thu mua tận nơi không?",
-    a: "Hỗ trợ thu tận nơi trong khu vực Hà Đông và các quận lân cận với đơn từ 5 triệu trở lên. Liên hệ trước để đặt lịch.",
+    a: "Hỗ trợ thu tận nơi trong khu vực Hà Nội với đơn từ 5 triệu trở lên. Liên hệ trước để đặt lịch.",
   },
   {
     q: "Nếu mua máy mới tại Lộc An có ưu đãi thêm không?",

@@ -64,7 +64,7 @@ const trustItems = [
 ];
 
 const servicePolicies = [
-  { icon: Truck, title: "Giao nhanh Hà Đông", desc: "Hỗ trợ giao và lắp đặt trong khu vực." },
+  { icon: Truck, title: "Giao nhanh Hà Nội", desc: "Hỗ trợ giao và lắp đặt trong khu vực." },
   { icon: Wrench, title: "Hỗ trợ kỹ thuật", desc: "Tư vấn nâng cấp RAM/SSD, cài đặt cơ bản." },
   { icon: ShieldCheck, title: "Bảo hành rõ ràng", desc: "Kiểm tra tình trạng và phiếu bảo hành khi nhận máy." },
   { icon: RotateCcw, title: "Đổi trả 7 ngày", desc: "Áp dụng theo tình trạng sản phẩm và chính sách cửa hàng." },
@@ -327,7 +327,7 @@ export default function ProductDetailPage() {
               <div className="mt-4 flex flex-wrap items-center gap-3 text-sm font-semibold text-muted-foreground">
                 <span className="inline-flex items-center gap-2">
                   <Truck className="h-4 w-4 text-primary" />
-                  Miễn phí giao hàng nội khu Hà Đông
+                  Miễn phí giao hàng nội thành Hà Nội
                 </span>
                 <span className="inline-flex items-center gap-2">
                   <CreditCard className="h-4 w-4 text-primary" />
@@ -369,7 +369,7 @@ export default function ProductDetailPage() {
                 <div className="space-y-3 p-4 text-sm">
                   <a href="tel:0989386219" className="flex items-center gap-2 font-bold text-foreground">
                     <Phone className="h-4 w-4 text-primary" />
-                    Hotline Hà Đông: <span className="text-sale">0989.386.219</span>
+                    Hotline Hà Nội: <span className="text-sale">0989.386.219</span>
                   </a>
                   <a
                     href="https://zalo.me/0989386219"

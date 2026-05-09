@@ -24,7 +24,7 @@ const serviceDetails: Record<string, {
     causes: ["Lỗi nguồn (PSU), mainboard hỏng", "RAM lỏng hoặc hỏng", "Lỗi driver, HDD/SSD bad sector", "Bụi bẩn, keo tản nhiệt khô"],
     process: ["Nhận máy, kiểm tra miễn phí", "Báo giá rõ ràng", "Khách đồng ý → Tiến hành sửa", "Test stress máy kỹ", "Bàn giao + bảo hành"],
     pricing: [{ item: "Sửa mainboard", price: "300.000 - 1.500.000đ" }, { item: "Thay nguồn PSU", price: "Linh kiện + 100.000đ công" }, { item: "Sửa lỗi phần mềm", price: "150.000 - 300.000đ" }],
-    faq: [{ q: "Có sửa tại nhà không?", a: "Có, Lộc An hỗ trợ sửa tại nhà trong khu vực Hà Đông và lân cận." }],
+    faq: [{ q: "Có sửa tại nhà không?", a: "Có, Lộc An hỗ trợ sửa tại nhà trong khu vực Hà Nội và lân cận." }],
   },
 };
 

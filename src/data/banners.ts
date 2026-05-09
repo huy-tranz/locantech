@@ -14,7 +14,7 @@ const defaultBanners: Banner[] = [
   { id: "b1", title: "PC Gaming Lộc An - Cấu hình mạnh, giá hợp lý", subtitle: "Tư vấn build PC theo ngân sách, bảo hành 36 tháng", image: bannerImages.bannerPcGaming, link: "/pc-gaming", active: true, type: "main" },
   { id: "b2", title: "Laptop văn phòng từ 9.990.000đ", subtitle: "Hàng chính hãng, bảo hành toàn quốc", image: bannerImages.bannerLaptop, link: "/laptop", active: true, type: "main" },
   { id: "b3", title: "Dịch vụ sửa chữa máy tính tận nơi", subtitle: "Hotline: 0989386219 - Có mặt trong 60 phút", image: bannerImages.bannerRepair, link: "/dich-vu", active: true, type: "main" },
-  { id: "b4", title: "Combo camera giám sát từ 3.990.000đ", subtitle: "Lắp đặt miễn phí tại Hà Đông", image: bannerImages.bannerCamera, link: "/camera", active: true, type: "sub" },
+  { id: "b4", title: "Combo camera giám sát từ 3.990.000đ", subtitle: "Lắp đặt miễn phí tại Hà Nội", image: bannerImages.bannerCamera, link: "/camera", active: true, type: "sub" },
   { id: "b5", title: "Nâng cấp SSD - Máy nhanh gấp 5 lần", subtitle: "Chỉ từ 590.000đ bao gồm công lắp", image: bannerImages.bannerSsd, link: "/dich-vu/nang-cap-ssd-ram", active: true, type: "sub" },
 ];
 
