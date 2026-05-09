@@ -250,6 +250,8 @@ export function changeCurrentUserPassword(currentPassword: string, newPassword: 
 
 export function logoutUser() {
   if (!hasWindow()) return;
+  localStorage.removeItem("locan_access_token");
+  localStorage.removeItem("locan_refresh_token");
   localStorage.removeItem(AUTH_STORAGE_KEY);
   sessionStorage.removeItem(AUTH_SESSION_KEY);
   emitAuthChanged();

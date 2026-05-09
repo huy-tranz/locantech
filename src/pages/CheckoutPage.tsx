@@ -4,7 +4,8 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import FloatingActions from "@/components/layout/FloatingActions";
 import { useCart } from "@/hooks/use-cart";
-import { useGuestCreateOrder } from "@/hooks/queries/order.queries";
+import { useCreateOrder, useGuestCreateOrder } from "@/hooks/queries/order.queries";
+import { useAuth } from "@/hooks/useAuth";
 import { formatPrice } from "@/data/products";
 import { toast } from "@/hooks/use-toast";
 import { CheckCircle, Phone, Package, Truck, CreditCard, ArrowLeft } from "lucide-react";
@@ -14,6 +15,7 @@ type PaymentMethod = "cod" | "bank";
 
 export default function CheckoutPage() {
   const { items, totalPrice, clearCart } = useCart();
+  const { isLoggedIn } = useAuth();
 
   const shippingFee = useMemo(
     () => (totalPrice >= 2000000 ? 0 : 30000),
@@ -25,6 +27,7 @@ export default function CheckoutPage() {
   const [savedOrder, setSavedOrder] = useState<{ orderNumber: string } | null>(null);
 
   const createOrder = useGuestCreateOrder();
+  const createUserOrder = useCreateOrder();
 
   const [form, setForm] = useState({
     fullName: "",
@@ -83,7 +86,9 @@ export default function CheckoutPage() {
         note: form.note || undefined,
       };
 
-      const result = await createOrder.mutateAsync(orderPayload);
+      const result = isLoggedIn
+        ? await createUserOrder.mutateAsync(orderPayload)
+        : await createOrder.mutateAsync(orderPayload);
       clearCart();
       setSavedOrder({ orderNumber: result.orderNumber });
       setOrderSuccess(true);

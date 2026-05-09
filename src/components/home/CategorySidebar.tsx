@@ -83,12 +83,12 @@ export default function CategorySidebar() {
       </div>
 
       {activeCategory?.children && (
-        <div className="absolute bottom-0 left-full top-0 z-30 flex items-stretch">
+        <div className="absolute bottom-0 left-full top-0 z-50 flex items-stretch">
           {/* Bridge gap so hover doesn't break when moving cursor between sidebar and panel */}
           <div className="w-4 shrink-0" aria-hidden />
 
           <div
-            className={`${panelLayout.width} max-h-[calc(100vh-8rem)] self-start overflow-y-auto rounded-xl border bg-card p-5 shadow-2xl`}
+            className={`${panelLayout.width} h-full overflow-y-auto rounded-xl border bg-card p-5 shadow-2xl`}
           >
             {/* Panel header */}
             <div className="mb-4 flex items-center justify-between border-b border-border/70 pb-3">

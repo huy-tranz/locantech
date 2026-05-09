@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent, type MouseEvent } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
@@ -29,6 +29,8 @@ import { cn } from "@/lib/utils";
 import logoLocan from "@/assets/logo/logo_locan.png";
 import { categories } from "@/data/categories";
 
+const LOGO_HOME_RELOAD_SCROLL_KEY = "locan:logo-home-reload-scroll-top";
+
 const menuItems = [
   { name: "Flash Sale", path: "/flash-sale", icon: BadgePercent, tone: "text-sale", strong: true },
   { name: "Build PC miễn phí", path: "/build-pc", icon: Cpu, tone: "text-primary", strong: true },
@@ -48,6 +50,8 @@ const defaultSiteSettings = {
   siteName: "Lộc An",
   hotline: "0989386219",
 };
+
+const CATEGORY_DROPDOWN_PANEL_HEIGHT = "h-[min(70vh,32rem)]";
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -78,6 +82,27 @@ export default function Header() {
   }, []);
 
   useEffect(() => {
+    if (isScrolled) return;
+    setCategoryOpen(false);
+    setHoveredDropdownCat(null);
+  }, [isScrolled]);
+
+  useEffect(() => {
+    if (location.pathname !== "/") return;
+    if (window.sessionStorage.getItem(LOGO_HOME_RELOAD_SCROLL_KEY) !== "1") return;
+
+    window.sessionStorage.removeItem(LOGO_HOME_RELOAD_SCROLL_KEY);
+    window.history.scrollRestoration = "manual";
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+
+    const timer = window.setTimeout(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    }, 0);
+
+    return () => window.clearTimeout(timer);
+  }, [location.pathname]);
+
+  useEffect(() => {
     const onBump = () => setCartBumpKey((prev) => prev + 1);
     window.addEventListener("cart:bump", onBump);
     return () => window.removeEventListener("cart:bump", onBump);
@@ -102,6 +127,20 @@ export default function Header() {
     if (!q) return;
     navigate(`/tim-kiem?q=${encodeURIComponent(q)}`);
     setMobileOpen(false);
+  };
+
+  const handleLogoClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    setMobileOpen(false);
+    setCategoryOpen(false);
+    setHoveredDropdownCat(null);
+
+    if (location.pathname === "/") {
+      event.preventDefault();
+      window.sessionStorage.setItem(LOGO_HOME_RELOAD_SCROLL_KEY, "1");
+      window.history.scrollRestoration = "manual";
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+      window.location.assign("/");
+    }
   };
 
   const searchForm = (
@@ -159,11 +198,16 @@ export default function Header() {
         )}
       >
         <div className="flex items-start">
-          <div className="w-[280px] overflow-hidden rounded-xl border border-border bg-card text-foreground shadow-panel">
-            <div className="border-b bg-gradient-to-r from-primary to-primary-light px-4 py-3 text-sm font-extrabold text-primary-foreground">
+          <div
+            className={cn(
+              "flex w-[280px] flex-col overflow-hidden rounded-xl border border-border bg-card text-foreground shadow-panel",
+              CATEGORY_DROPDOWN_PANEL_HEIGHT,
+            )}
+          >
+            <div className="shrink-0 border-b bg-gradient-to-r from-primary to-primary-light px-4 py-3 text-sm font-extrabold text-primary-foreground">
               Danh mục sản phẩm
             </div>
-            <div className="max-h-[min(70vh,32rem)] overflow-y-auto py-1">
+            <div className="min-h-0 flex-1 overflow-y-auto py-1">
               {categories.map((cat) => {
                 const Icon = cat.icon;
                 const isActive = hoveredDropdownCat === cat.id;
@@ -191,7 +235,12 @@ export default function Header() {
           </div>
 
           {activeCatInDropdown?.children && (
-            <div className="ml-1 w-[560px] self-start rounded-xl border bg-card p-5 shadow-2xl">
+            <div
+              className={cn(
+                "ml-1 w-[560px] self-start overflow-y-auto rounded-xl border bg-card p-5 shadow-2xl",
+                CATEGORY_DROPDOWN_PANEL_HEIGHT,
+              )}
+            >
               <div className="mb-4 border-b border-border/70 pb-3">
                 <p className="text-[15px] font-bold text-foreground">{activeCatInDropdown.name}</p>
               </div>
@@ -305,12 +354,7 @@ export default function Header() {
             <Link
               to="/"
               className="shrink-0 rounded-xl px-1.5 py-1 transition-colors hover:bg-white/10"
-              onClick={(e) => {
-                if (location.pathname === "/") {
-                  e.preventDefault();
-                  window.location.reload();
-                }
-              }}
+              onClick={handleLogoClick}
             >
               <img
                 src={logoLocan}
@@ -322,7 +366,7 @@ export default function Header() {
               />
             </Link>
 
-            {categoryDropdown}
+            {isScrolled && categoryDropdown}
 
             <div className="mx-1 hidden min-w-[20rem] flex-1 md:block">{searchForm}</div>
 

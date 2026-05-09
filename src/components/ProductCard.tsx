@@ -5,10 +5,11 @@ import { type Product, formatPrice } from "@/data/products";
 import { useCart } from "@/hooks/use-cart";
 import { toast } from "@/hooks/use-toast";
 import { flyToCart } from "@/lib/cart-fx";
-import { BadgePercent, Eye, ShoppingCart } from "lucide-react";
+import { BadgePercent, ShoppingCart } from "lucide-react";
 
 interface ProductCardProps {
   product: Product;
+  compact?: boolean;
 }
 
 const detailPath = (slug: string) => `/san-pham/${slug}`;
@@ -33,6 +34,17 @@ function stockLabel(status: Product["status"]): string {
   if (status === "in_stock") return "Còn hàng";
   if (status === "coming_soon") return "Sắp về";
   return "Hết hàng";
+}
+
+function getProductSpecHighlights(product: Product) {
+  if (product.specs) {
+    return Object.values(product.specs).slice(0, 4);
+  }
+  return product.shortDesc
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .slice(0, 4);
 }
 
 function computeTipPosition(clientX: number, clientY: number): TipPos {
@@ -97,10 +109,11 @@ function ProductHoverTip({ product, position }: { product: Product; position: Ti
   );
 }
 
-export default function ProductCard({ product }: ProductCardProps) {
+export default function ProductCard({ product, compact = false }: ProductCardProps) {
   const { addItem } = useCart();
   const [tipPos, setTipPos] = useState<TipPos | null>(null);
   const savings = product.originalPrice ? Math.max(0, product.originalPrice - product.price) : 0;
+  const specHighlights = getProductSpecHighlights(product);
   const tipPosRef = useRef<TipPos | null>(null);
   tipPosRef.current = tipPos;
 
@@ -213,7 +226,9 @@ export default function ProductCard({ product }: ProductCardProps) {
             ref={imageRef}
             src={product.image}
             alt={product.name}
-            className="relative h-full w-full object-contain p-4 drop-shadow-[0_18px_24px_rgba(15,23,42,0.16)] transition-transform duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_22px_32px_rgba(15,23,42,0.24)]"
+            className={`relative h-full w-full object-contain drop-shadow-[0_18px_24px_rgba(15,23,42,0.16)] transition-transform duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_22px_32px_rgba(15,23,42,0.24)] ${
+              compact ? "p-3" : "p-4"
+            }`}
             loading="lazy"
           />
           {product.discount && product.discount > 0 && (
@@ -228,32 +243,47 @@ export default function ProductCard({ product }: ProductCardProps) {
           )}
         </Link>
 
-        <div className="relative flex flex-1 flex-col p-3">
-          <div className="mb-2 flex h-5 items-center justify-between gap-2">
+        <div className={`relative flex flex-1 flex-col ${compact ? "p-2.5" : "p-3"}`}>
+          <div className={`${compact ? "mb-1 h-4" : "mb-2 h-5"} flex items-center justify-between gap-2`}>
             <span className="truncate text-[10px] font-extrabold uppercase tracking-wider text-primary">{product.brand}</span>
-            <span className="shrink-0 rounded-full bg-muted px-2 py-0.5 text-[10px] font-bold text-muted-foreground">
-              {product.sku}
-            </span>
           </div>
 
           <Link
             to={detailPath(product.slug)}
             className="rounded-sm text-left outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
-            <h3 className="mb-3 line-clamp-2 h-[42px] text-sm font-bold text-foreground transition-colors group-hover:text-primary">
+            <h3
+              className={`line-clamp-2 font-bold text-foreground transition-colors group-hover:text-primary ${
+                compact ? "mb-2 h-10 text-[13px] leading-5" : "mb-3 h-[42px] text-sm"
+              }`}
+            >
               {product.name}
             </h3>
           </Link>
 
+          {specHighlights.length > 0 && !compact && (
+            <div className="mb-3 flex min-h-[3.25rem] flex-wrap content-start gap-1">
+              {specHighlights.map((spec) => (
+                <span
+                  key={spec}
+                  className="max-w-full truncate rounded-md bg-muted px-1.5 py-1 text-[10px] font-semibold leading-none text-muted-foreground"
+                  title={spec}
+                >
+                  {spec}
+                </span>
+              ))}
+            </div>
+          )}
+
           <div className="mt-auto">
             <div className="flex flex-wrap items-baseline gap-x-2">
-              <span className="product-price text-xl">{formatPrice(product.price)}</span>
+              <span className={`product-price ${compact ? "text-base" : "text-xl"}`}>{formatPrice(product.price)}</span>
               {product.originalPrice && <span className="product-price-old">{formatPrice(product.originalPrice)}</span>}
             </div>
             <p className={`mt-0.5 min-h-[16px] text-[11px] font-bold ${savings > 0 ? "text-sale" : "text-transparent"}`}>
               {savings > 0 ? `Tiết kiệm ${formatPrice(savings)}` : "Tiết kiệm 0đ"}
             </p>
-            <div className="mt-1.5 min-h-[24px]">
+            <div className={`${compact ? "mt-1 min-h-[22px]" : "mt-1.5 min-h-[24px]"}`}>
               <span className="inline-flex items-center gap-1 rounded-md border border-sale/20 bg-sale/10 px-2 py-1 text-[10px] font-extrabold text-sale">
                 <BadgePercent className="h-3 w-3" />
                 Trả góp 0%
@@ -261,21 +291,20 @@ export default function ProductCard({ product }: ProductCardProps) {
             </div>
           </div>
 
-          <div className="mt-3 grid grid-cols-2 gap-1.5">
-            <Link to={detailPath(product.slug)} className="btn-primary whitespace-nowrap px-2 py-2 text-[11px] sm:text-xs">
-              <Eye className="mr-1 h-3.5 w-3.5 max-[430px]:hidden" />
+          <div className={`${compact ? "mt-2" : "mt-3"} flex items-center justify-end gap-2`}>
+            <Link to={detailPath(product.slug)} className="sr-only">
               Chi tiết
             </Link>
             <button
               type="button"
               onClick={handleAddToCart}
-              className="btn-cta whitespace-nowrap px-2 py-2 text-[11px] sm:text-xs"
+              className={`inline-flex shrink-0 items-center justify-center rounded-lg bg-sale text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-sale/90 ${
+                compact ? "h-8 w-9" : "h-9 w-10"
+              }`}
               title="Thêm giỏ hàng"
               aria-label="Thêm vào giỏ hàng"
             >
-              <ShoppingCart className="mr-1 h-3.5 w-3.5" />
-              <span className="max-[430px]:hidden">Thêm giỏ</span>
-              <span className="hidden max-[430px]:inline">Giỏ</span>
+              <ShoppingCart className="h-4 w-4" />
             </button>
           </div>
         </div>

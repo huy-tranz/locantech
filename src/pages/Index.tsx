@@ -59,14 +59,14 @@ const quickCampaigns = [
 ];
 
 const Index = () => {
-  const { data: laptopRes } = useProducts({ category: "laptop", limit: 5 });
-  const { data: pcRes } = useProducts({ category: "pc", limit: 5 });
-  const { data: pcGamingRes } = useProducts({ category: "pc-gaming", limit: 5 });
-  const { data: linhKienRes } = useProducts({ category: "linh-kien", limit: 5 });
-  const { data: manHinhRes } = useProducts({ category: "man-hinh", limit: 5 });
-  const { data: ngoaiViRes } = useProducts({ category: "ngoai-vi", limit: 5 });
-  const { data: tbMangRes } = useProducts({ category: "thiet-bi-mang", limit: 5 });
-  const { data: cameraRes } = useProducts({ category: "camera", limit: 5 });
+  const { data: laptopRes } = useProducts({ category: "laptop", limit: 12 });
+  const { data: pcRes } = useProducts({ category: "pc", limit: 12 });
+  const { data: pcGamingRes } = useProducts({ category: "pc-gaming", limit: 12 });
+  const { data: linhKienRes } = useProducts({ category: "linh-kien", limit: 12 });
+  const { data: manHinhRes } = useProducts({ category: "man-hinh", limit: 12 });
+  const { data: ngoaiViRes } = useProducts({ category: "ngoai-vi", limit: 12 });
+  const { data: tbMangRes } = useProducts({ category: "thiet-bi-mang", limit: 12 });
+  const { data: cameraRes } = useProducts({ category: "camera", limit: 12 });
 
   const laptops = getProductsFromResponse(laptopRes);
   const pcs = getProductsFromResponse(pcRes);

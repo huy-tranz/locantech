@@ -94,6 +94,7 @@ export default function UuDaiThanhVienPage() {
     );
 
     const timer = window.setInterval(() => {
+      if (document.hidden) return;
       setCountdowns(
         program.promotions.reduce((acc, promo) => {
           acc[promo.id] = formatCountdown(promo.expiresAt);

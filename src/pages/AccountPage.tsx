@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -9,7 +10,10 @@ import { useCart } from "@/hooks/use-cart";
 import { toast } from "@/hooks/use-toast";
 import { useProducts } from "@/hooks/queries/product.queries";
 import { getProductsFromResponse } from "@/lib/productAdapter";
-import { changeCurrentUserPassword, getCurrentUser, isAuthenticated, logoutUser, updateCurrentUserProfile, type AuthSession } from "@/lib/auth";
+import { useAuth } from "@/hooks/useAuth";
+import orderApi from "@/api/order.api";
+import repairApi from "@/api/repair.api";
+import type { AuthSession } from "@/lib/auth";
 import { getAccountData, saveAccountData, type AccountAddress, type AccountData, type AccountOrder, type RepairRequest } from "@/lib/account";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -37,12 +41,15 @@ const orderStatusMap = {
   processing: "bg-blue-100 text-blue-700 border-blue-200",
   shipping: "bg-sky-100 text-sky-700 border-sky-200",
   completed: "bg-emerald-100 text-emerald-700 border-emerald-200",
+  cancelled: "bg-red-100 text-red-700 border-red-200",
+  refunded: "bg-purple-100 text-purple-700 border-purple-200",
 } as const;
 
 const repairStatusMap = {
   received: "bg-orange-100 text-orange-700 border-orange-200",
   repairing: "bg-blue-100 text-blue-700 border-blue-200",
   completed: "bg-emerald-100 text-emerald-700 border-emerald-200",
+  cancelled: "bg-red-100 text-red-700 border-red-200",
 } as const;
 
 const labels = {
@@ -50,6 +57,8 @@ const labels = {
   processing: "Đang xử lý",
   shipping: "Đang giao",
   completed: "Hoàn thành",
+  cancelled: "Đã hủy",
+  refunded: "Đã hoàn tiền",
   received: "Đã tiếp nhận",
   repairing: "Đang sửa chữa",
 };
@@ -59,9 +68,47 @@ const formatDateTime = (v: string) => new Date(v).toLocaleString("vi-VN");
 const buildAddressText = (a: AccountAddress) => [a.line1, a.ward, a.district, a.city].filter(Boolean).join(", ");
 const emptyAddress = (u: AuthSession | null): AccountAddress => ({ id: "", fullName: u?.fullName ?? "", phone: u?.phone ?? "", line1: "", ward: "", district: "", city: "Ha Noi", note: "", isDefault: false });
 
+const normalizeOrderStatus = (status?: string): AccountOrder["status"] => {
+  switch (status) {
+    case "CONFIRMED":
+    case "PROCESSING":
+      return "processing";
+    case "SHIPPED":
+      return "shipping";
+    case "DELIVERED":
+      return "completed";
+    case "CANCELLED":
+      return "cancelled";
+    case "REFUNDED":
+      return "refunded";
+    default:
+      return "pending";
+  }
+};
+
+const normalizeRepairStatus = (status?: string): RepairRequest["status"] => {
+  switch (status) {
+    case "DELIVERED":
+    case "READY":
+      return "completed";
+    case "CANCELLED":
+    case "REJECTED":
+      return "cancelled";
+    case "DIAGNOSING":
+    case "QUOTING":
+    case "APPROVED":
+    case "REPAIRING":
+    case "TESTING":
+      return "repairing";
+    default:
+      return "received";
+  }
+};
+
 export default function AccountPage() {
   const navigate = useNavigate();
   const { addItem } = useCart();
+  const { user: authUser, isLoading: authLoading, logout: logoutAuth, updateProfile, changePassword } = useAuth();
   const [section, setSection] = useState<SectionKey>("profile");
   const [user, setUser] = useState<AuthSession | null>(null);
   const [data, setData] = useState<AccountData | null>(null);
@@ -72,19 +119,82 @@ export default function AccountPage() {
   const [addressOpen, setAddressOpen] = useState(false);
   const [editingAddress, setEditingAddress] = useState<AccountAddress | null>(null);
   const { data: productsData } = useProducts({ status: "all", limit: 500 });
+  const { data: ordersData, isLoading: ordersLoading } = useQuery({
+    queryKey: ["orders", "me", { limit: 100 }],
+    queryFn: () => orderApi.getAll({ limit: 100 }),
+    enabled: !!authUser,
+  });
+  const { data: repairsData, isLoading: repairsLoading } = useQuery({
+    queryKey: ["repair", "me"],
+    queryFn: () => repairApi.getAll(),
+    enabled: !!authUser,
+  });
   const allProducts = useMemo(() => getProductsFromResponse(productsData), [productsData]);
 
   useEffect(() => {
-    if (!isAuthenticated()) {
+    if (authLoading) return;
+    if (!authUser) {
       navigate("/dang-nhap", { replace: true });
       return;
     }
-    const current = getCurrentUser();
-    if (!current) return;
+    const current: AuthSession = {
+      id: authUser.id,
+      fullName: authUser.name,
+      phone: authUser.phone ?? "",
+      email: authUser.email,
+      avatar: authUser.avatar,
+    };
     setUser(current);
     setProfile({ fullName: current.fullName, phone: current.phone, email: current.email, avatar: current.avatar ?? "" });
     setData(getAccountData(current.id));
-  }, [navigate]);
+  }, [authLoading, authUser, navigate]);
+
+  const orders = useMemo<AccountOrder[]>(() => {
+    const source = Array.isArray(ordersData) ? ordersData : ordersData?.orders ?? [];
+    return source.map((order: any) => ({
+      id: order.id,
+      code: order.orderNumber,
+      createdAt: order.createdAt,
+      status: normalizeOrderStatus(order.status),
+      address: order.shippingAddress,
+      paymentMethod: order.paymentMethod,
+      shippingFee: Number(order.shippingFee || 0),
+      note: order.note,
+      items: (order.items ?? []).map((item: any) => ({
+        productId: item.productId,
+        quantity: item.quantity,
+        price: Number(item.price || 0),
+        productName: item.productName,
+        productSku: item.productSku,
+        productImage: item.productImage,
+      })),
+    }));
+  }, [ordersData]);
+
+  const repairs = useMemo<RepairRequest[]>(() => {
+    const source = Array.isArray(repairsData) ? repairsData : repairsData?.requests ?? [];
+    return source.map((repair: any) => {
+      const status = normalizeRepairStatus(repair.status);
+      const timeline = repair.timeline ?? [];
+      return {
+        id: repair.id,
+        code: repair.ticketNumber,
+        deviceName: [repair.deviceBrand, repair.deviceModel].filter(Boolean).join(" ") || repair.product?.name || "Thiết bị",
+        issueDescription: repair.faultDescription,
+        receivedAt: repair.createdAt,
+        status,
+        estimate: repair.estimatedCost ? `Dự kiến: ${formatPrice(Number(repair.estimatedCost))}` : "Đang cập nhật",
+        history: timeline.length
+          ? timeline.map((entry: any) => ({
+              id: entry.id,
+              title: labels[normalizeRepairStatus(entry.status)] ?? entry.status,
+              time: formatDateTime(entry.createdAt),
+              note: entry.note,
+            }))
+          : [{ id: repair.id, title: labels[status], time: formatDateTime(repair.updatedAt ?? repair.createdAt) }],
+      };
+    });
+  }, [repairsData]);
 
   const wishlist = useMemo(() => (data?.wishlist ?? []).map((id) => allProducts.find((p) => p.id === id)).filter(Boolean), [allProducts, data]);
   const recent = useMemo(() => (data?.recentlyViewed ?? []).map((id) => allProducts.find((p) => p.id === id)).filter(Boolean), [allProducts, data]);
@@ -97,18 +207,19 @@ export default function AccountPage() {
   };
 
   const logout = () => {
-    logoutUser();
+    logoutAuth();
     toast({ title: "Đã đăng xuất", description: "Hẹn gặp lại bạn tại Lộc An." });
     navigate("/dang-nhap", { replace: true });
   };
 
-  const saveProfile = () => {
-    const result = updateCurrentUserProfile(profile);
-    if (!result.ok) {
-      return toast({ title: "Cập nhật thất bại", description: result.message, variant: "destructive" });
+  const saveProfile = async () => {
+    try {
+      await updateProfile({ name: profile.fullName, phone: profile.phone, avatar: profile.avatar });
+      setUser((current) => current ? { ...current, fullName: profile.fullName, phone: profile.phone, avatar: profile.avatar } : current);
+      toast({ title: "Đã lưu thông tin", description: "Hồ sơ của bạn đã được cập nhật." });
+    } catch (err: any) {
+      toast({ title: "Cập nhật thất bại", description: err?.response?.data?.error || "Vui lòng thử lại.", variant: "destructive" });
     }
-    setUser(result.user);
-    toast({ title: "Đã lưu thông tin", description: "Hồ sơ của bạn đã được cập nhật." });
   };
 
   const uploadAvatar = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -119,19 +230,20 @@ export default function AccountPage() {
     reader.readAsDataURL(file);
   };
 
-  const savePassword = () => {
+  const savePassword = async () => {
     if (password.newPassword.length < 6) {
       return toast({ title: "Mật khẩu mới quá ngắn", description: "Vui lòng nhập tối thiểu 6 ký tự.", variant: "destructive" });
     }
     if (password.newPassword !== password.confirmPassword) {
       return toast({ title: "Xác nhận mật khẩu chưa khớp", description: "Vui lòng kiểm tra lại.", variant: "destructive" });
     }
-    const result = changeCurrentUserPassword(password.currentPassword, password.newPassword);
-    if (!result.ok) {
-      return toast({ title: "Không đổi được mật khẩu", description: result.message, variant: "destructive" });
+    try {
+      await changePassword(password.currentPassword, password.newPassword);
+      setPassword({ currentPassword: "", newPassword: "", confirmPassword: "" });
+      toast({ title: "Đổi mật khẩu thành công", description: "Thông tin bảo mật đã được cập nhật." });
+    } catch (err: any) {
+      toast({ title: "Không đổi được mật khẩu", description: err?.response?.data?.error || "Vui lòng thử lại.", variant: "destructive" });
     }
-    setPassword({ currentPassword: "", newPassword: "", confirmPassword: "" });
-    toast({ title: "Đổi mật khẩu thành công", description: "Thông tin bảo mật đã được cập nhật." });
   };
 
   const saveAddress = () => {
@@ -165,8 +277,8 @@ export default function AccountPage() {
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-              <div className="rounded-2xl bg-white/12 px-4 py-3"><p className="text-xs text-white/70">Đơn hàng</p><p className="mt-1 text-xl font-semibold">{data.orders.length}</p></div>
-              <div className="rounded-2xl bg-white/12 px-4 py-3"><p className="text-xs text-white/70">Sửa chữa</p><p className="mt-1 text-xl font-semibold">{data.repairs.length}</p></div>
+              <div className="rounded-2xl bg-white/12 px-4 py-3"><p className="text-xs text-white/70">Đơn hàng</p><p className="mt-1 text-xl font-semibold">{orders.length}</p></div>
+              <div className="rounded-2xl bg-white/12 px-4 py-3"><p className="text-xs text-white/70">Sửa chữa</p><p className="mt-1 text-xl font-semibold">{repairs.length}</p></div>
               <div className="rounded-2xl bg-white/12 px-4 py-3"><p className="text-xs text-white/70">Yêu thích</p><p className="mt-1 text-xl font-semibold">{data.wishlist.length}</p></div>
               <div className="rounded-2xl bg-white/12 px-4 py-3"><p className="text-xs text-white/70">Địa chỉ</p><p className="mt-1 text-sm font-semibold line-clamp-2">{data.addresses.find((a) => a.isDefault)?.district ?? "Chưa có"}</p></div>
             </div>
@@ -215,7 +327,7 @@ export default function AccountPage() {
                     <Input value={profile.fullName} onChange={(e) => setProfile((p) => ({ ...p, fullName: e.target.value }))} placeholder="Họ và tên" />
                     <Input value={profile.phone} onChange={(e) => setProfile((p) => ({ ...p, phone: e.target.value }))} placeholder="Số điện thoại" />
                     <div className="md:col-span-2">
-                      <Input value={profile.email} onChange={(e) => setProfile((p) => ({ ...p, email: e.target.value }))} placeholder="Email" />
+                      <Input value={profile.email} disabled placeholder="Email" />
                     </div>
                   </div>
                   <div className="flex justify-end">
@@ -235,7 +347,9 @@ export default function AccountPage() {
                   <CardDescription>Danh sách đơn hàng, trạng thái.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {data.orders.map((order) => {
+                  {ordersLoading && <p className="text-sm text-slate-500">Đang tải đơn hàng...</p>}
+                  {!ordersLoading && orders.length === 0 && <p className="text-sm text-slate-500">Bạn chưa có đơn hàng nào.</p>}
+                  {orders.map((order) => {
                     const total = order.items.reduce((s, i) => s + i.price * i.quantity, 0) + order.shippingFee;
                     return (
                       <div key={order.id} className="rounded-3xl border border-slate-200 p-4">
@@ -271,7 +385,9 @@ export default function AccountPage() {
                   <CardDescription>Danh sách yêu cầu sửa chữa, lịch sử.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {data.repairs.map((repair) => (
+                  {repairsLoading && <p className="text-sm text-slate-500">Đang tải yêu cầu sửa chữa...</p>}
+                  {!repairsLoading && repairs.length === 0 && <p className="text-sm text-slate-500">Bạn chưa có yêu cầu sửa chữa nào.</p>}
+                  {repairs.map((repair) => (
                     <div key={repair.id} className="rounded-3xl border border-slate-200 p-4">
                       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                         <div>
@@ -445,16 +561,18 @@ export default function AccountPage() {
               <div className="space-y-4">
                 {orderDetail.items.map((item) => {
                   const product = allProducts.find((p) => p.id === item.productId);
-                  return product ? (
+                  const name = product?.name ?? item.productName ?? item.productSku ?? item.productId;
+                  const image = product?.image ?? item.productImage;
+                  return (
                     <div key={`${orderDetail.id}-${item.productId}`} className="flex items-center gap-4 rounded-2xl border border-slate-200 p-3">
-                      <img src={product.image} alt={product.name} className="h-20 w-20 rounded-2xl bg-slate-50 object-contain p-2" />
+                      {image && <img src={image} alt={name} className="h-20 w-20 rounded-2xl bg-slate-50 object-contain p-2" />}
                       <div className="min-w-0 flex-1">
-                        <p className="line-clamp-2 font-semibold text-slate-900">{product.name}</p>
+                        <p className="line-clamp-2 font-semibold text-slate-900">{name}</p>
                         <p className="text-sm text-slate-500">Số lượng: {item.quantity}</p>
                       </div>
                       <p className="font-semibold text-orange-600">{formatPrice(item.price * item.quantity)}</p>
                     </div>
-                  ) : null;
+                  );
                 })}
                 <div className="rounded-2xl bg-slate-50 p-4">
                   <p className="text-sm text-slate-500">Địa chỉ</p>

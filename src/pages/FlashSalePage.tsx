@@ -83,7 +83,10 @@ function CountdownTimer({ targetDate }: CountdownProps) {
     };
 
     calculateTimeLeft();
-    const timer = setInterval(calculateTimeLeft, 1000);
+    const timer = setInterval(() => {
+      if (document.hidden) return;
+      calculateTimeLeft();
+    }, 1000);
 
     return () => clearInterval(timer);
   }, [targetDate]);

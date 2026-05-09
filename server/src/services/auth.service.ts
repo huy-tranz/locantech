@@ -178,20 +178,35 @@ export const authService = {
   // ── Private helpers ────────────────────────────────────────────
 
   async _createTokenResponse(userId: string, email: string, role: string, name: string) {
-    const accessToken = generateAccessToken({ sub: userId, email, role, type: 'access' })
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        phone: true,
+        role: true,
+        avatar: true,
+        status: true,
+        createdAt: true,
+      },
+    })
+    if (!user) throw new AppError(404, 'User not found')
+
+    const accessToken = generateAccessToken({ sub: user.id, email: user.email, role: user.role, type: 'access' })
     const refreshToken = generateRefreshToken({ sub: userId, type: 'refresh' })
 
     // Save refresh token to DB (for revocation)
     await prisma.refreshToken.create({
       data: {
         token: refreshToken,
-        userId,
+        userId: user.id,
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
       },
     })
 
     return {
-      user: { id: userId, email, role, name },
+      user,
       accessToken,
       refreshToken,
     }

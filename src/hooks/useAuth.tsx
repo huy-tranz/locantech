@@ -21,7 +21,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<AuthUser>
   register: (data: { email: string; password: string; name: string; phone?: string }) => Promise<void>
   logout: () => void
-  updateProfile: (data: { name?: string; phone?: string }) => Promise<void>
+  updateProfile: (data: { name?: string; phone?: string; avatar?: string }) => Promise<void>
   changePassword: (currentPassword: string, newPassword: string) => Promise<void>
 }
 
@@ -104,7 +104,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
-  const updateProfile = useCallback(async (data: { name?: string; phone?: string }) => {
+  const updateProfile = useCallback(async (data: { name?: string; phone?: string; avatar?: string }) => {
     const updated = await authApi.updateProfile(data)
     setUser(updated)
     localStorage.setItem('locan_auth_user', JSON.stringify(updated))

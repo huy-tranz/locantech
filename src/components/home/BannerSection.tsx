@@ -30,6 +30,7 @@ export default function BannerSection() {
   useEffect(() => {
     if (mainBanners.length <= 1) return;
     const timer = setInterval(() => {
+      if (document.hidden) return;
       setCurrent((prev) => (prev + 1) % mainBanners.length);
     }, 5000);
     return () => clearInterval(timer);

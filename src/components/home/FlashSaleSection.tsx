@@ -7,7 +7,6 @@ import {
   Clock3,
   Copy,
   Cpu,
-  Eye,
   Flame,
   Laptop,
   Monitor,
@@ -20,6 +19,14 @@ import { toast } from "@/hooks/use-toast";
 import { useProducts } from "@/hooks/queries/product.queries";
 import { getProductsFromResponse } from "@/lib/productAdapter";
 import { flyToCart } from "@/lib/cart-fx";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+  type CarouselApi,
+} from "@/components/ui/carousel";
 
 const saleTabs = [
   { key: "all", label: "Tất cả", icon: Flame, categories: [] },
@@ -76,12 +83,34 @@ function getProductsByTab(products: Product[], tab: SaleTab) {
   return products.filter((product) => categories.has(product.category));
 }
 
+function getProductSpecHighlights(product: Product) {
+  if (product.specs) {
+    return Object.values(product.specs).slice(0, 4);
+  }
+  return product.shortDesc
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .slice(0, 4);
+}
+
 function SaleCountdown() {
   const [countdown, setCountdown] = useState(() => getSaleCountdownParts());
 
   useEffect(() => {
-    const timer = window.setInterval(() => setCountdown(getSaleCountdownParts()), 1000);
-    return () => window.clearInterval(timer);
+    const tick = () => {
+      if (document.hidden) return;
+      setCountdown(getSaleCountdownParts());
+    };
+    const timer = window.setInterval(tick, 1000);
+    const onVisibilityChange = () => {
+      if (!document.hidden) setCountdown(getSaleCountdownParts());
+    };
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    return () => {
+      window.clearInterval(timer);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+    };
   }, []);
 
   return (
@@ -108,6 +137,7 @@ function FlashSaleDealCard({ product }: { product: Product }) {
   const savings = Math.max((product.originalPrice ?? product.price) - product.price, 0);
   const isHot = progress.percent >= 70;
   const imageRef = useRef<HTMLImageElement | null>(null);
+  const specHighlights = getProductSpecHighlights(product);
 
   const handleAddToCart = () => {
     flyToCart(imageRef.current, product.image);
@@ -116,7 +146,7 @@ function FlashSaleDealCard({ product }: { product: Product }) {
   };
 
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-xl border border-border bg-card text-foreground shadow-card transition hover:-translate-y-0.5">
+    <article className="group flex h-full flex-col overflow-hidden rounded-xl border border-border bg-card text-foreground shadow-card transition hover:-translate-y-0.5 hover:border-sale/30 hover:shadow-lg">
       <Link
         to={`/san-pham/${product.slug}`}
         className="relative block aspect-[4/3] overflow-hidden bg-gradient-to-br from-cyan-50 via-white to-orange-50"
@@ -143,9 +173,6 @@ function FlashSaleDealCard({ product }: { product: Product }) {
       <div className="flex flex-1 flex-col p-3">
         <div className="mb-1 flex items-center justify-between gap-2">
           <span className="truncate text-[10px] font-black uppercase tracking-wider text-primary">{product.brand}</span>
-          <span className="shrink-0 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-500">
-            {product.sku}
-          </span>
         </div>
 
         <Link to={`/san-pham/${product.slug}`}>
@@ -153,6 +180,20 @@ function FlashSaleDealCard({ product }: { product: Product }) {
             {product.name}
           </h3>
         </Link>
+
+        {specHighlights.length > 0 && (
+          <div className="mt-2 flex min-h-[3.25rem] flex-wrap content-start gap-1">
+            {specHighlights.map((spec) => (
+              <span
+                key={spec}
+                className="max-w-full truncate rounded-md bg-slate-100 px-1.5 py-1 text-[10px] font-bold leading-none text-slate-600"
+                title={spec}
+              >
+                {spec}
+              </span>
+            ))}
+          </div>
+        )}
 
         <div className="mt-2.5">
           <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
@@ -168,7 +209,7 @@ function FlashSaleDealCard({ product }: { product: Product }) {
 
         {/* Progress bar */}
         <div className="mt-2.5 space-y-1">
-          <div className="flex items-center justify-between text-[10px] font-bold">
+          <div className="flex items-center justify-between gap-2 text-[10px] font-bold">
             <span className="text-orange-600">Đã bán: {progress.sold}</span>
             <span className="text-slate-400">Còn: {progress.remaining}</span>
           </div>
@@ -183,18 +224,17 @@ function FlashSaleDealCard({ product }: { product: Product }) {
           )}
         </div>
 
-        <div className="mt-auto grid grid-cols-[1fr_auto] gap-2 pt-3">
+        <div className="mt-auto flex items-center justify-end gap-2 pt-3">
           <Link
             to={`/san-pham/${product.slug}`}
-            className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-lg bg-primary px-3 text-xs font-black text-primary-foreground transition hover:bg-primary/90"
+            className="sr-only"
           >
-            <Eye className="h-3.5 w-3.5" />
             Chi tiết
           </Link>
           <button
             type="button"
             onClick={handleAddToCart}
-            className="inline-flex h-9 w-10 items-center justify-center rounded-lg bg-sale text-white transition hover:bg-sale/90"
+            className="inline-flex h-9 w-10 shrink-0 items-center justify-center rounded-lg bg-sale text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-sale/90"
             aria-label="Thêm vào giỏ hàng"
             title="Thêm vào giỏ hàng"
           >
@@ -208,6 +248,8 @@ function FlashSaleDealCard({ product }: { product: Product }) {
 
 export default function FlashSaleSection() {
   const [activeTab, setActiveTab] = useState<SaleTabKey>("all");
+  const [api, setApi] = useState<CarouselApi>();
+  const [isPointerInside, setIsPointerInside] = useState(false);
   const { data } = useProducts({ limit: 100 });
 
   const allSaleProducts = useMemo(
@@ -220,7 +262,23 @@ export default function FlashSaleSection() {
 
   const activeTabConfig = saleTabs.find((tab) => tab.key === activeTab) ?? saleTabs[0];
   const filteredProducts = getProductsByTab(allSaleProducts, activeTabConfig);
-  const saleProducts = filteredProducts.slice(0, 5);
+  const saleProducts = filteredProducts.slice(0, 12);
+
+  useEffect(() => {
+    if (!api || saleProducts.length <= 1) return;
+
+    const timer = window.setInterval(() => {
+      if (document.hidden || isPointerInside) return;
+
+      if (api.canScrollNext()) {
+        api.scrollNext();
+      } else {
+        api.scrollTo(0);
+      }
+    }, 2800);
+
+    return () => window.clearInterval(timer);
+  }, [api, isPointerInside, saleProducts.length]);
 
   if (allSaleProducts.length === 0) return null;
 
@@ -329,16 +387,28 @@ export default function FlashSaleSection() {
         {/* Product carousel / grid */}
         {saleProducts.length > 0 ? (
           <>
-            <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth pb-2 md:grid md:grid-cols-3 md:snap-none md:overflow-visible md:pb-0 lg:grid-cols-5">
-              {saleProducts.map((product) => (
-                <div
-                  key={product.id}
-                  className="w-[calc(72vw-1rem)] shrink-0 snap-start sm:w-[calc(44vw-1.5rem)] md:w-auto"
-                >
-                  <FlashSaleDealCard product={product} />
-                </div>
-              ))}
-            </div>
+            <Carousel
+              setApi={setApi}
+              opts={{ align: "start", loop: saleProducts.length > 6, dragFree: true }}
+              className="group/flash-sale"
+              onMouseEnter={() => setIsPointerInside(true)}
+              onMouseLeave={() => setIsPointerInside(false)}
+              onFocusCapture={() => setIsPointerInside(true)}
+              onBlurCapture={() => setIsPointerInside(false)}
+            >
+              <CarouselContent className="-ml-2 md:-ml-3">
+                {saleProducts.map((product) => (
+                  <CarouselItem
+                    key={product.id}
+                    className="basis-[72%] pl-2 sm:basis-[42%] md:basis-1/3 md:pl-3 lg:basis-1/5 xl:basis-1/6"
+                  >
+                    <FlashSaleDealCard product={product} />
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious className="left-1 hidden border-white/80 bg-white/95 text-sale shadow-md transition hover:bg-white md:inline-flex md:opacity-0 md:group-hover/flash-sale:opacity-100" />
+              <CarouselNext className="right-1 hidden border-white/80 bg-white/95 text-sale shadow-md transition hover:bg-white md:inline-flex md:opacity-0 md:group-hover/flash-sale:opacity-100" />
+            </Carousel>
             {/* Mobile scroll hint */}
             <div className="mt-2 flex items-center justify-center gap-1.5 md:hidden">
               <Zap className="h-3 w-3 text-sale" />

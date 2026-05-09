@@ -1,4 +1,5 @@
 import { type Product } from "@/data/products";
+import { getCurrentUser, subscribeAuthChange } from "@/lib/auth";
 
 export interface CartItem {
   product: Product;
@@ -7,9 +8,14 @@ export interface CartItem {
 
 const CART_KEY = "locan_cart";
 
+function storageKey() {
+  const user = getCurrentUser();
+  return user?.id ? `${CART_KEY}:${user.id}` : CART_KEY;
+}
+
 function loadFromStorage(): CartItem[] {
   try {
-    const stored = localStorage.getItem(CART_KEY);
+    const stored = localStorage.getItem(storageKey());
     return stored ? JSON.parse(stored) : [];
   } catch {
     return [];
@@ -18,7 +24,7 @@ function loadFromStorage(): CartItem[] {
 
 function saveToStorage(items: CartItem[]) {
   try {
-    localStorage.setItem(CART_KEY, JSON.stringify(items));
+    localStorage.setItem(storageKey(), JSON.stringify(items));
   } catch {
     // Storage full or unavailable — fail silently
   }
@@ -26,6 +32,13 @@ function saveToStorage(items: CartItem[]) {
 
 let _items: CartItem[] = loadFromStorage();
 let _listeners: (() => void)[] = [];
+
+if (typeof window !== "undefined") {
+  subscribeAuthChange(() => {
+    _items = loadFromStorage();
+    notify();
+  });
+}
 
 function notify() {
   _listeners.forEach((l) => l());
