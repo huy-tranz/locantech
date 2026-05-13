@@ -119,11 +119,11 @@ function SaleCountdown() {
       {countdown.map((item, index) => (
         <div key={item.label} className="flex items-center gap-1">
           <span className="flex min-w-[2.5rem] flex-col items-center rounded-lg bg-card px-1.5 py-1 text-sale shadow">
-            <span className="font-mono text-base font-black leading-none md:text-lg">{item.value}</span>
-            <span className="text-[9px] font-bold uppercase text-muted-foreground">{item.label}</span>
+            <span className="font-mono text-base font-semibold leading-none md:text-lg">{item.value}</span>
+            <span className="text-[9px] font-medium text-muted-foreground">{item.label}</span>
           </span>
           {index < countdown.length - 1 && (
-            <span className="text-xs font-black text-yellow-200">:</span>
+            <span className="text-xs font-semibold text-yellow-200">:</span>
           )}
         </div>
       ))}
@@ -159,12 +159,12 @@ function FlashSaleDealCard({ product }: { product: Product }) {
           loading="lazy"
         />
         {product.discount ? (
-          <span className="absolute left-2 top-2 rounded-full bg-sale px-2.5 py-1 text-xs font-black text-white shadow">
+          <span className="absolute left-2 top-2 rounded-full bg-sale px-2.5 py-1 text-xs font-semibold text-white shadow">
             -{product.discount}%
           </span>
         ) : null}
         {isHot && (
-          <span className="absolute right-2 top-2 rounded-full bg-orange-500 px-2 py-0.5 text-[10px] font-black text-white shadow">
+          <span className="absolute right-2 top-2 rounded-full bg-orange-500 px-2 py-0.5 text-[10px] font-semibold text-white shadow">
             🔥 Hot
           </span>
         )}
@@ -172,11 +172,11 @@ function FlashSaleDealCard({ product }: { product: Product }) {
 
       <div className="flex flex-1 flex-col p-3">
         <div className="mb-1 flex items-center justify-between gap-2">
-          <span className="truncate text-[10px] font-black uppercase tracking-wider text-primary">{product.brand}</span>
+          <span className="truncate text-[10px] font-medium text-primary">{product.brand}</span>
         </div>
 
         <Link to={`/san-pham/${product.slug}`}>
-          <h3 className="line-clamp-2 min-h-[2.5rem] text-sm font-black leading-5 text-foreground transition-colors group-hover:text-primary">
+          <h3 className="line-clamp-2 min-h-[2.5rem] text-sm font-medium leading-5 text-foreground transition-colors group-hover:text-primary">
             {product.name}
           </h3>
         </Link>
@@ -186,7 +186,7 @@ function FlashSaleDealCard({ product }: { product: Product }) {
             {specHighlights.map((spec) => (
               <span
                 key={spec}
-                className="max-w-full truncate rounded-md bg-muted px-1.5 py-1 text-[10px] font-bold leading-none text-muted-foreground"
+                className="max-w-full truncate rounded-md bg-muted px-1.5 py-1 text-[10px] font-medium leading-none text-muted-foreground"
                 title={spec}
               >
                 {spec}
@@ -197,19 +197,19 @@ function FlashSaleDealCard({ product }: { product: Product }) {
 
         <div className="mt-2.5">
           <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-            <span className="text-lg font-black text-sale">{formatPrice(product.price)}</span>
+            <span className="text-lg font-semibold text-sale">{formatPrice(product.price)}</span>
             {product.originalPrice ? (
               <span className="text-xs font-semibold text-muted-foreground line-through">{formatPrice(product.originalPrice)}</span>
             ) : null}
           </div>
           {savings > 0 && (
-            <p className="mt-0.5 text-[11px] font-bold text-sale">Tiết kiệm {formatPrice(savings)}</p>
+            <p className="mt-0.5 text-[11px] font-medium text-sale">Tiết kiệm {formatPrice(savings)}</p>
           )}
         </div>
 
         {/* Progress bar */}
         <div className="mt-2.5 space-y-1">
-          <div className="flex items-center justify-between gap-2 text-[10px] font-bold">
+          <div className="flex items-center justify-between gap-2 text-[10px] font-medium">
             <span className="text-orange-600">Đã bán: {progress.sold}</span>
             <span className="text-muted-foreground">Còn: {progress.remaining}</span>
           </div>
@@ -220,7 +220,7 @@ function FlashSaleDealCard({ product }: { product: Product }) {
             />
           </div>
           {isHot && (
-            <p className="text-[10px] font-black text-sale">Sắp hết hàng!</p>
+            <p className="text-[10px] font-semibold text-sale">Sắp hết hàng!</p>
           )}
         </div>
 
@@ -290,15 +290,15 @@ export default function FlashSaleSection() {
           {/* Branding */}
           <div className="flex flex-col gap-1">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="flex items-center gap-1.5 text-xl font-black uppercase tracking-tight md:text-2xl">
+              <span className="flex items-center gap-1.5 text-xl font-semibold md:text-2xl">
                 <Flame className="h-5 w-5 text-yellow-200" />
                 Flash Sale
               </span>
-              <span className="inline-flex items-center gap-1 rounded-full bg-yellow-300 px-2.5 py-1 text-xs font-black text-slate-950">
+              <span className="inline-flex items-center gap-1 rounded-full bg-yellow-300 px-2.5 py-1 text-xs font-semibold text-slate-950">
                 <BadgePercent className="h-3.5 w-3.5" />
                 Giảm tới {maxDiscount}%
               </span>
-              <span className="hidden rounded-full bg-white/20 px-2.5 py-1 text-[11px] font-bold backdrop-blur sm:inline-flex">
+              <span className="hidden rounded-full bg-white/20 px-2.5 py-1 text-[11px] font-medium backdrop-blur sm:inline-flex">
                 Số lượng có hạn
               </span>
             </div>
@@ -312,7 +312,7 @@ export default function FlashSaleSection() {
             <SaleCountdown />
             <Link
               to="/flash-sale"
-              className="inline-flex items-center gap-1.5 rounded-xl bg-card px-3 py-2 text-xs font-black text-sale shadow transition hover:-translate-y-0.5 hover:bg-yellow-50 dark:hover:bg-muted"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-card px-3 py-2 text-xs font-semibold text-sale shadow transition hover:-translate-y-0.5 hover:bg-yellow-50 dark:hover:bg-muted"
             >
               <span className="hidden sm:inline">Xem tất cả</span>
               <ArrowRight className="h-4 w-4" />
@@ -333,8 +333,8 @@ export default function FlashSaleSection() {
               className="group flex items-center justify-between gap-2 rounded-xl border border-dashed border-sale/35 bg-sale/5 px-3 py-2 text-left transition hover:border-sale hover:bg-sale/10"
             >
               <span>
-                <span className="block text-[10px] font-black uppercase tracking-widest text-sale">{coupon.value}</span>
-                <span className="block text-sm font-black text-foreground">{coupon.code}</span>
+                <span className="block text-[10px] font-semibold text-sale">{coupon.value}</span>
+                <span className="block text-sm font-semibold text-foreground">{coupon.code}</span>
                 <span className="block text-[10px] font-semibold text-muted-foreground">{coupon.description}</span>
               </span>
               <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-sale text-white transition group-hover:scale-105">
@@ -355,7 +355,7 @@ export default function FlashSaleSection() {
                 key={tab.key}
                 type="button"
                 onClick={() => setActiveTab(tab.key)}
-                className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-extrabold transition ${
+                className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
                   isActive
                     ? "border-sale bg-sale text-white shadow-sm"
                     : "border-border bg-muted text-foreground hover:border-sale/40 hover:bg-sale/10"
@@ -397,11 +397,11 @@ export default function FlashSaleSection() {
             {/* Mobile scroll hint */}
             <div className="mt-2 flex items-center justify-center gap-1.5 md:hidden">
               <Zap className="h-3 w-3 text-sale" />
-              <span className="text-[10px] font-bold text-muted-foreground">Vuốt để xem thêm sản phẩm</span>
+              <span className="text-[10px] font-medium text-muted-foreground">Vuốt để xem thêm sản phẩm</span>
             </div>
           </>
         ) : (
-          <div className="rounded-xl border border-border bg-muted px-4 py-8 text-center text-sm font-bold text-muted-foreground">
+          <div className="rounded-xl border border-border bg-muted px-4 py-8 text-center text-sm font-medium text-muted-foreground">
             Nhóm này chưa có deal đang chạy. Chọn tab khác để xem các sản phẩm đang giảm giá.
           </div>
         )}

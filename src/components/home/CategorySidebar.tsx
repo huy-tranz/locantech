@@ -43,7 +43,7 @@ export default function CategorySidebar() {
     <div className="relative" onMouseLeave={() => setHoveredCat(null)}>
       <div className="overflow-hidden rounded-xl border border-border/70 bg-card shadow-card">
         <div className="bg-gradient-to-r from-primary-dark to-primary px-4 py-3">
-          <h3 className="text-sm font-extrabold text-primary-foreground">Danh mục sản phẩm</h3>
+          <h3 className="text-sm font-semibold text-primary-foreground">Danh mục sản phẩm</h3>
         </div>
 
         <ul>
@@ -62,11 +62,11 @@ export default function CategorySidebar() {
                   {Icon && (
                     <Icon className={`h-4 w-4 shrink-0 ${isActive ? "text-primary" : "text-muted-foreground"}`} />
                   )}
-                  <span className="flex-1 font-semibold">{cat.name}</span>
+                  <span className="flex-1 font-medium">{cat.name}</span>
 
                   {cat.badge && (
                     <span
-                      className={`rounded-full px-1.5 py-0.5 text-[10px] font-black ${BADGE_STYLES[cat.badge] ?? "bg-muted text-foreground"}`}
+                      className={`rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${BADGE_STYLES[cat.badge] ?? "bg-muted text-foreground"}`}
                     >
                       {cat.badge}
                     </span>
@@ -96,11 +96,11 @@ export default function CategorySidebar() {
                 {activeCategory.icon && (
                   <activeCategory.icon className="h-5 w-5 text-primary" />
                 )}
-                <p className="text-[15px] font-bold text-foreground">{activeCategory.name}</p>
+                <p className="text-[15px] font-semibold text-foreground">{activeCategory.name}</p>
               </div>
               <Link
                 to={`/${activeCategory.slug}`}
-                className="text-xs font-semibold text-primary underline-offset-2 hover:underline"
+                className="text-xs font-medium text-primary underline-offset-2 hover:underline"
               >
                 Xem tất cả →
               </Link>
@@ -112,7 +112,7 @@ export default function CategorySidebar() {
                   {/* Group heading */}
                   {hasChildren(group) ? (
                     <>
-                      <p className="mb-2 text-[13px] font-black text-sale">{group.name}</p>
+                      <p className="mb-2 text-[13px] font-semibold text-sale">{group.name}</p>
                       <div className="space-y-1.5">
                         {group.children?.map((child) => (
                           <Link
@@ -131,7 +131,7 @@ export default function CategorySidebar() {
                       to={`/${activeCategory.slug}?subcategory=${encodeURIComponent(group.slug)}`}
                       className="block leading-6 text-foreground/90 transition-colors hover:text-primary"
                     >
-                      <span className="font-bold">{group.name}</span>
+                      <span className="font-medium">{group.name}</span>
                     </Link>
                   )}
                 </div>

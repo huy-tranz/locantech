@@ -53,18 +53,18 @@ export default function BannerSection() {
               <div className="absolute inset-0 z-10 flex items-center bg-gradient-to-r from-primary-dark via-primary-dark/95 to-primary-dark/45 dark:via-primary-dark/90 dark:to-primary-dark/68">
                 <div className="max-w-[min(40rem,62vw)] px-[clamp(1.25rem,2vw,2.5rem)]">
                   <div className="mb-3 flex flex-wrap gap-2">
-                    <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-cyan-100 backdrop-blur">
+                    <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-medium text-cyan-100 backdrop-blur">
                       Lộc An Campaign
                     </span>
-                    <span className="rounded-full bg-sale px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-white shadow-sm">
+                    <span className="rounded-full bg-sale px-3 py-1 text-[11px] font-medium text-white shadow-sm">
                       Tư vấn miễn phí
                     </span>
                   </div>
-                  <h2 className="mb-2 max-w-xl text-[clamp(1.5rem,0.95rem+1.35vw,2.25rem)] font-extrabold leading-tight text-primary-foreground">
+                  <h2 className="mb-2 max-w-xl text-[clamp(1.5rem,0.95rem+1.35vw,2.25rem)] font-semibold leading-tight text-primary-foreground">
                     {banner.title}
                   </h2>
                   {banner.subtitle && (
-                    <p className="max-w-lg text-[clamp(0.8rem,0.68rem+0.3vw,1rem)] font-semibold leading-5 text-primary-foreground/80">
+                    <p className="max-w-lg text-[clamp(0.8rem,0.68rem+0.3vw,1rem)] font-medium leading-5 text-primary-foreground/80">
                       {banner.subtitle}
                     </p>
                   )}
@@ -75,7 +75,7 @@ export default function BannerSection() {
                       return (
                         <span
                           key={chip.text}
-                          className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-[11px] font-bold text-white backdrop-blur"
+                          className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-[11px] font-medium text-white backdrop-blur"
                         >
                           <Icon className="h-3.5 w-3.5 text-cyan-100" />
                           {chip.text}
@@ -88,7 +88,7 @@ export default function BannerSection() {
                     <span className="btn-cta inline-flex !px-[clamp(1rem,1.25vw,1.25rem)] !py-[clamp(0.5rem,0.65vw,0.625rem)] text-[clamp(0.75rem,0.68rem+0.2vw,0.875rem)]">
                       Xem ưu đãi →
                     </span>
-                    <span className="hidden rounded-lg bg-white/10 px-3 py-2 text-xs font-bold text-cyan-50 backdrop-blur sm:inline-flex">
+                    <span className="hidden rounded-lg bg-white/10 px-3 py-2 text-xs font-medium text-cyan-50 backdrop-blur sm:inline-flex">
                       Hotline 0989.386.219
                     </span>
                   </div>
@@ -145,11 +145,11 @@ export default function BannerSection() {
           >
             <div className="absolute inset-0 z-10 flex items-end bg-gradient-to-t from-primary-dark/98 via-primary/55 to-transparent dark:via-primary-dark/70">
               <div className="p-4">
-                <span className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-white/20 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-cyan-100 backdrop-blur">
+                <span className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-white/20 px-2.5 py-1 text-[10px] font-medium text-cyan-100 backdrop-blur">
                   <Gift className="h-3 w-3" />
                   Ưu đãi
                 </span>
-                <h3 className="text-sm font-extrabold leading-tight text-primary-foreground md:text-base">{banner.title}</h3>
+                <h3 className="text-sm font-semibold leading-tight text-primary-foreground md:text-base">{banner.title}</h3>
                 {banner.subtitle && <p className="mt-1 text-xs font-medium text-primary-foreground/80">{banner.subtitle}</p>}
               </div>
             </div>

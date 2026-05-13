@@ -14,6 +14,7 @@ export interface ApiProduct {
   images?: string[] | null;
   thumbnail?: string | null;
   brand?: string | null;
+  warranty?: string | null;
   tags?: string[] | null;
   specifications?: Record<string, string> | null;
   status?: "DRAFT" | "PUBLISHED" | "ARCHIVED" | string;
@@ -61,6 +62,10 @@ export function adaptProduct(product: ApiProduct): Product {
   const subcategorySlug = product.category?.slug || categorySlug;
   const image = product.thumbnail || product.images?.[0] || "/placeholder.svg";
   const tags = Array.isArray(product.tags) ? product.tags : [];
+  const specs = { ...(product.specifications || {}) };
+  if (product.warranty && !specs["Bảo hành"]) {
+    specs["Bảo hành"] = product.warranty;
+  }
 
   return {
     id: product.id,
@@ -82,7 +87,7 @@ export function adaptProduct(product: ApiProduct): Product {
     featured: !!product.isFeatured,
     bestSeller: !!product.isBestSeller,
     showOnHome: true,
-    specs: product.specifications || {},
+    specs,
   };
 }
 

@@ -268,7 +268,7 @@ export default function ShopByNeedSection() {
               role="tab"
               aria-selected={isActive}
               onClick={() => setActiveTab(group.key)}
-              className={`inline-flex min-h-9 shrink-0 items-center justify-center rounded-full border px-4 text-sm font-extrabold transition ${
+              className={`inline-flex min-h-9 shrink-0 items-center justify-center rounded-full border px-4 text-sm font-medium transition ${
                 isActive
                   ? "border-primary bg-primary text-primary-foreground shadow-card"
                   : "border-border bg-card text-foreground hover:border-primary/40 hover:text-primary"
@@ -282,10 +282,10 @@ export default function ShopByNeedSection() {
 
       {/* Context strip */}
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-muted/40 px-4 py-3">
-        <p className="text-sm font-semibold text-foreground">{activeGroup.tagline}</p>
+        <p className="text-sm font-medium text-foreground">{activeGroup.tagline}</p>
         <div className="flex flex-wrap gap-2">
           {activeGroup.trust.map((t) => (
-            <span key={t} className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1 text-[11px] font-bold text-foreground">
+            <span key={t} className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1 text-[11px] font-medium text-foreground">
               <Shield className="h-3 w-3 text-primary" />
               {t}
             </span>
@@ -306,14 +306,14 @@ export default function ShopByNeedSection() {
               {/* Visual top area */}
               <div className={`relative flex flex-col items-center justify-center bg-gradient-to-br ${item.cardGradient} px-4 pb-4 pt-5`}>
                 {item.badge && (
-                  <span className={`absolute right-2 top-2 rounded-full px-2 py-0.5 text-[10px] font-black ${BADGE_STYLE[item.badge] ?? "bg-muted"}`}>
+                  <span className={`absolute right-2 top-2 rounded-full px-2 py-0.5 text-[10px] font-semibold ${BADGE_STYLE[item.badge] ?? "bg-muted"}`}>
                     {item.badge}
                   </span>
                 )}
                 <span className={`flex h-14 w-14 items-center justify-center rounded-2xl border ${item.iconRing} backdrop-blur`}>
                   <Icon className="h-7 w-7 text-white" />
                 </span>
-                <h4 className="mt-3 text-center text-sm font-black leading-tight text-white md:text-[15px]">
+                <h4 className="mt-3 text-center text-sm font-semibold leading-tight text-white md:text-[15px]">
                   {item.title}
                 </h4>
               </div>
@@ -334,21 +334,21 @@ export default function ShopByNeedSection() {
                 {item.gift && (
                   <div className="mb-3 flex items-start gap-1.5 rounded-lg border border-dashed border-sale/30 bg-sale/5 px-2 py-1.5">
                     <Gift className="mt-0.5 h-3 w-3 shrink-0 text-sale" />
-                    <span className="text-[10px] font-bold leading-4 text-sale">{item.gift}</span>
+                    <span className="text-[10px] font-medium leading-4 text-sale">{item.gift}</span>
                   </div>
                 )}
 
                 {/* Price + CTA */}
                 <div className="mt-auto space-y-2">
                   <div className="flex items-baseline gap-2">
-                    <span className={`rounded-full px-2.5 py-1 text-xs font-black ${item.priceStyle}`}>
+                    <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${item.priceStyle}`}>
                       {item.price}
                     </span>
                     {item.priceNote && (
                       <span className="text-[10px] font-semibold text-muted-foreground">{item.priceNote}</span>
                     )}
                   </div>
-                  <span className={`flex w-full items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-black transition ${item.ctaStyle}`}>
+                  <span className={`flex w-full items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition ${item.ctaStyle}`}>
                     Chọn ngay
                     <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
                   </span>
@@ -371,7 +371,7 @@ export default function ShopByNeedSection() {
           <Link
             key={link.label}
             to={link.href}
-            className="inline-flex items-center gap-1 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-bold text-foreground transition hover:border-primary/40 hover:text-primary"
+            className="inline-flex items-center gap-1 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground transition hover:border-primary/40 hover:text-primary"
           >
             {link.label}
             <ArrowRight className="h-3 w-3" />

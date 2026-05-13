@@ -102,12 +102,12 @@ const Index = () => {
                           <Icon className="h-5 w-5" />
                         </div>
                         <div className="min-w-0">
-                          <span className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground">
+                          <span className="text-[10px] font-medium text-muted-foreground">
                             {item.label}
                           </span>
-                          <p className="mt-0.5 text-sm font-extrabold text-foreground">{item.title}</p>
+                          <p className="mt-0.5 text-sm font-semibold text-foreground">{item.title}</p>
                           <p className="mt-1 text-xs leading-5 text-muted-foreground">{item.desc}</p>
-                          <span className="mt-2 inline-flex text-xs font-extrabold text-primary group-hover:text-accent">
+                          <span className="mt-2 inline-flex text-xs font-medium text-primary group-hover:text-accent">
                             {item.action} →
                           </span>
                         </div>
@@ -152,7 +152,7 @@ const Index = () => {
 
         <ScrollReveal>
           <section className="brand-section mx-auto my-6 max-w-3xl px-6 py-6 text-center">
-            <h2 className="mb-3 text-xl font-extrabold text-foreground md:text-2xl">
+            <h2 className="mb-3 text-xl font-semibold text-foreground md:text-2xl">
               Lộc An - đồng hành cùng bạn trong mọi giải pháp công nghệ
             </h2>
             <p className="text-sm leading-relaxed text-muted-foreground">

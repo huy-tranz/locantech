@@ -245,7 +245,7 @@ export default function ProductCard({ product, compact = false }: ProductCardPro
 
         <div className={`relative flex flex-1 flex-col ${compact ? "p-2.5" : "p-3"}`}>
           <div className={`${compact ? "mb-1 h-4" : "mb-2 h-5"} flex items-center justify-between gap-2`}>
-            <span className="truncate text-[10px] font-extrabold uppercase tracking-wider text-primary">{product.brand}</span>
+            <span className="truncate text-[10px] font-medium text-primary">{product.brand}</span>
           </div>
 
           <Link
@@ -253,8 +253,8 @@ export default function ProductCard({ product, compact = false }: ProductCardPro
             className="rounded-sm text-left outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             <h3
-              className={`line-clamp-2 font-bold text-foreground transition-colors group-hover:text-primary ${
-                compact ? "mb-2 h-10 text-[13px] leading-5" : "mb-3 h-[42px] text-sm"
+              className={`line-clamp-2 font-medium text-foreground transition-colors group-hover:text-primary ${
+                compact ? "mb-2 h-10 text-[13px] leading-5" : "mb-3 h-[42px] text-sm leading-5"
               }`}
             >
               {product.name}
@@ -266,7 +266,7 @@ export default function ProductCard({ product, compact = false }: ProductCardPro
               {specHighlights.map((spec) => (
                 <span
                   key={spec}
-                  className="max-w-full truncate rounded-md bg-muted px-1.5 py-1 text-[10px] font-semibold leading-none text-muted-foreground"
+                  className="max-w-full truncate rounded-md bg-muted px-1.5 py-1 text-[10px] font-medium leading-none text-muted-foreground"
                   title={spec}
                 >
                   {spec}
@@ -277,14 +277,14 @@ export default function ProductCard({ product, compact = false }: ProductCardPro
 
           <div className="mt-auto">
             <div className="flex flex-wrap items-baseline gap-x-2">
-              <span className={`product-price ${compact ? "text-base" : "text-xl"}`}>{formatPrice(product.price)}</span>
+              <span className={`product-price ${compact ? "text-[17px]" : "text-xl"}`}>{formatPrice(product.price)}</span>
               {product.originalPrice && <span className="product-price-old">{formatPrice(product.originalPrice)}</span>}
             </div>
-            <p className={`mt-0.5 min-h-[16px] text-[11px] font-bold ${savings > 0 ? "text-sale" : "text-transparent"}`}>
+            <p className={`mt-0.5 min-h-[16px] text-[11px] font-medium ${savings > 0 ? "text-sale" : "text-transparent"}`}>
               {savings > 0 ? `Tiết kiệm ${formatPrice(savings)}` : "Tiết kiệm 0đ"}
             </p>
             <div className={`${compact ? "mt-1 min-h-[22px]" : "mt-1.5 min-h-[24px]"}`}>
-              <span className="inline-flex items-center gap-1 rounded-md border border-sale/20 bg-sale/10 px-2 py-1 text-[10px] font-extrabold text-sale">
+              <span className="inline-flex items-center gap-1 rounded-md border border-sale/20 bg-sale/10 px-2 py-1 text-[10px] font-medium text-sale">
                 <BadgePercent className="h-3 w-3" />
                 Trả góp 0%
               </span>

@@ -152,7 +152,7 @@ export default function Header() {
         value={searchQuery}
         onChange={(event) => setSearchQuery(event.target.value)}
         className={cn(
-          "w-full rounded-xl border border-white/70 bg-white pl-5 pr-14 text-sm font-semibold text-foreground shadow-[0_12px_28px_rgba(15,23,42,0.2)] transition-all duration-300 placeholder:text-muted-foreground/80 focus:outline-none focus:ring-2 focus:ring-accent/50 dark:border-white/15 dark:bg-card/95 dark:text-foreground",
+          "w-full rounded-xl border border-white/70 bg-white pl-5 pr-14 text-sm font-medium text-foreground shadow-[0_12px_28px_rgba(15,23,42,0.2)] transition-all duration-300 placeholder:text-muted-foreground/75 focus:outline-none focus:ring-2 focus:ring-accent/50 dark:border-white/15 dark:bg-card/95 dark:text-foreground",
           isScrolled ? "py-2.5" : "py-3.5",
         )}
       />
@@ -182,7 +182,7 @@ export default function Header() {
         aria-expanded={categoryOpen}
         onClick={() => setCategoryOpen((prev) => !prev)}
         className={cn(
-          "inline-flex min-h-12 min-w-[230px] items-center justify-center gap-2 rounded-xl border border-white/25 px-4 text-sm font-extrabold text-primary-foreground shadow-[0_14px_30px_rgba(0,0,0,0.2)] ring-1 ring-white/10 transition hover:translate-y-[-1px] hover:bg-white/24",
+          "inline-flex min-h-12 min-w-[230px] items-center justify-center gap-2 rounded-xl border border-white/25 px-4 text-sm font-semibold text-primary-foreground shadow-[0_14px_30px_rgba(0,0,0,0.2)] ring-1 ring-white/10 transition hover:translate-y-[-1px] hover:bg-white/24",
           "bg-white/16",
         )}
       >
@@ -204,7 +204,7 @@ export default function Header() {
               CATEGORY_DROPDOWN_PANEL_HEIGHT,
             )}
           >
-            <div className="shrink-0 border-b bg-gradient-to-r from-primary to-primary-light px-4 py-3 text-sm font-extrabold text-primary-foreground">
+            <div className="shrink-0 border-b bg-gradient-to-r from-primary to-primary-light px-4 py-3 text-sm font-semibold text-primary-foreground">
               Danh mục sản phẩm
             </div>
             <div className="min-h-0 flex-1 overflow-y-auto py-1">
@@ -221,7 +221,7 @@ export default function Header() {
                       setHoveredDropdownCat(null);
                     }}
                     className={cn(
-                      "flex items-center gap-3 px-4 py-3 text-sm font-semibold transition-colors",
+                      "flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors",
                       isActive ? "bg-primary/5 text-primary" : "hover:bg-primary/5 hover:text-primary",
                     )}
                   >
@@ -242,7 +242,7 @@ export default function Header() {
               )}
             >
               <div className="mb-4 border-b border-border/70 pb-3">
-                <p className="text-[15px] font-bold text-foreground">{activeCatInDropdown.name}</p>
+                <p className="text-[15px] font-semibold text-foreground">{activeCatInDropdown.name}</p>
               </div>
               <div className="grid grid-cols-3 gap-x-6 gap-y-5 text-sm">
                 {activeCatInDropdown.children.map((group) => (
@@ -250,7 +250,7 @@ export default function Header() {
                     key={group.id}
                     className={cn("min-w-0", (group.children?.length ?? 0) >= 5 ? "col-span-2" : "")}
                   >
-                    <p className="mb-2 text-[15px] font-bold text-sale">{group.name}</p>
+                    <p className="mb-2 text-[15px] font-semibold text-sale">{group.name}</p>
                     {group.children?.length ? (
                       <div className="space-y-1.5">
                         {group.children.map((child) => (
@@ -292,7 +292,7 @@ export default function Header() {
   return (
     <>
       <div className="hidden bg-primary text-white md:block">
-        <div className="section-container flex h-8 items-center justify-between gap-4 text-[12px] leading-none">
+        <div className="section-container flex h-6 items-center justify-between gap-3 text-[11px] leading-none">
           <Link to="/lien-he" className="flex items-center gap-1.5 transition-colors hover:text-accent">
             <MapPin className="h-3.5 w-3.5" />
             <span>Hệ thống cửa hàng tại Hà Nội</span>
@@ -302,7 +302,7 @@ export default function Header() {
             {promoStrip.slice(0, 3).map((item) => {
               const Icon = item.icon;
               return (
-                <span key={item.text} className="inline-flex items-center gap-1.5 font-semibold">
+                <span key={item.text} className="inline-flex items-center gap-1.5 font-medium">
                   <Icon className="h-3.5 w-3.5 text-accent" />
                   {item.text}
                 </span>
@@ -315,22 +315,6 @@ export default function Header() {
               <Truck className="h-3.5 w-3.5" />
               <span>Tra cứu đơn hàng</span>
             </Link>
-            <span className="h-3 w-px bg-white/25" aria-hidden />
-            {currentUser ? (
-              <Link
-                to="/tai-khoan"
-                className="flex items-center gap-1.5 transition-colors hover:text-accent"
-                title={currentUser.fullName}
-              >
-                <User className="h-3.5 w-3.5" />
-                <span className="max-w-[140px] truncate">{currentUser.fullName}</span>
-              </Link>
-            ) : (
-              <Link to="/dang-nhap" className="flex items-center gap-1.5 transition-colors hover:text-accent">
-                <User className="h-3.5 w-3.5" />
-                <span>Đăng nhập / Đăng ký</span>
-              </Link>
-            )}
           </div>
         </div>
       </div>
@@ -339,8 +323,8 @@ export default function Header() {
         <div className="header-bg text-primary-foreground ring-1 ring-white/10">
           <div
             className={cn(
-              "section-container flex items-center gap-3 py-3 transition-all duration-300 md:gap-4",
-              isScrolled ? "min-h-16 md:min-h-[72px]" : "min-h-[82px] md:min-h-[102px]",
+              "section-container flex items-center gap-3 py-2 transition-all duration-300 md:gap-4",
+              isScrolled ? "min-h-14 md:min-h-[60px]" : "min-h-[64px] md:min-h-[76px]",
             )}
           >
             <button
@@ -361,7 +345,10 @@ export default function Header() {
                 alt={settings.siteName}
                 className={cn(
                   "w-auto object-contain transition-all duration-300",
-                  isScrolled ? "max-h-[54px] max-w-[148px] md:max-h-[64px] md:max-w-[176px]" : "max-h-[72px] max-w-[168px] md:max-h-[90px] md:max-w-[210px]",
+                  isScrolled
+                    ? "max-h-[44px] max-w-[130px] md:max-h-[52px] md:max-w-[150px]"
+                    : "max-h-[52px] max-w-[140px] md:max-h-[64px] md:max-w-[170px]"
+
                 )}
               />
             </Link>
@@ -379,7 +366,7 @@ export default function Header() {
               </span>
               <div>
                 <div className="text-[11px] font-semibold opacity-80">Tư vấn mua hàng</div>
-                <div className="text-base font-extrabold leading-5">{hotlineDisplay}</div>
+                <div className="text-base font-semibold leading-5">{hotlineDisplay}</div>
               </div>
             </a>
 
@@ -390,7 +377,7 @@ export default function Header() {
               <Cpu className="h-5 w-5" />
               <div>
                 <div className="text-[11px] font-semibold opacity-90">Miễn phí</div>
-                <div className="text-sm font-extrabold leading-4">Build PC</div>
+                <div className="text-sm font-semibold leading-4">Build PC</div>
               </div>
             </Link>
 
@@ -444,7 +431,7 @@ export default function Header() {
                       animate={{ opacity: 1, y: -18, scale: 1.15 }}
                       exit={{ opacity: 0, y: -28, scale: 0.9 }}
                       transition={{ duration: 0.5, ease: "easeOut" }}
-                      className="pointer-events-none absolute -top-1 right-1 select-none rounded-full bg-emerald-500 px-1.5 py-0.5 text-[10px] font-black text-white shadow-md"
+                      className="pointer-events-none absolute -top-1 right-1 select-none rounded-full bg-emerald-500 px-1.5 py-0.5 text-[10px] font-semibold text-white shadow-md"
                     >
                       +1
                     </motion.span>
@@ -483,7 +470,7 @@ export default function Header() {
                   {promoStrip.map((item) => {
                     const Icon = item.icon;
                     return (
-                      <div key={item.text} className="flex items-center gap-2 rounded-lg bg-muted px-2.5 py-2 text-xs font-bold text-foreground">
+                      <div key={item.text} className="flex items-center gap-2 rounded-lg bg-muted px-2.5 py-2 text-xs font-medium text-foreground">
                         <Icon className={cn("h-4 w-4 shrink-0", item.tone)} />
                         {item.text}
                       </div>
@@ -492,7 +479,7 @@ export default function Header() {
                 </div>
 
                 <div className="border-b border-border/50 py-2">
-                  <div className="px-4 pb-2 text-xs font-extrabold uppercase tracking-widest text-muted-foreground">
+                  <div className="px-4 pb-2 text-xs font-medium text-muted-foreground">
                     Danh mục sản phẩm
                   </div>
                   {categories.map((cat) => {
@@ -555,14 +542,14 @@ export default function Header() {
 
       <nav className="hidden overflow-visible border-b border-border bg-card/95 shadow-sm backdrop-blur lg:block">
         <div className="section-container">
-          <ul className="flex min-h-14 w-full items-center justify-between gap-2 py-1.5">
+          <ul className="flex min-h-10 w-full items-center justify-between gap-2 py-1">
             {menuItems.map((item) => (
               <li key={item.path} className="flex-1 text-center">
                 <Link
                   to={item.path}
                   className={cn(
                     "nav-link inline-flex items-center justify-center gap-2 px-3",
-                    item.strong && "font-extrabold",
+                    item.strong && "font-semibold",
                   )}
                 >
                   <item.icon className={cn("h-4 w-4", item.tone)} />
@@ -571,7 +558,7 @@ export default function Header() {
               </li>
             ))}
             <li className="hidden flex-1 text-center xl:block">
-              <a href={`tel:${settings.hotline}`} className="nav-link inline-flex items-center justify-center gap-2 px-3 font-extrabold text-sale">
+              <a href={`tel:${settings.hotline}`} className="nav-link inline-flex items-center justify-center gap-2 px-3 font-semibold text-sale">
                 <Zap className="h-4 w-4" />
                 <span>Tư vấn nhanh {hotlineDisplay}</span>
               </a>

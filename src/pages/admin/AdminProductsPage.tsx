@@ -17,7 +17,7 @@ import {
   useDeleteProduct,
 } from "@/hooks/queries/product.queries";
 import { useCategoriesFlat } from "@/hooks/queries/category.queries";
-import { Plus, Search, Pencil, Trash2, Save, Upload } from "lucide-react";
+import { ArrowDown, ArrowUp, Plus, Search, Pencil, Trash2, Save, Upload } from "lucide-react";
 
 const formatPrice = (p: number) => p.toLocaleString("vi-VN") + "đ";
 
@@ -40,7 +40,7 @@ interface ProductForm {
   originalPrice?: number;
   stock: number;
   status: UiStatus;
-  image: string;
+  images: string[];
   shortDesc: string;
   tags: string[];
   featured: boolean;
@@ -63,7 +63,7 @@ const emptyProduct: ProductForm = {
   originalPrice: undefined,
   stock: 0,
   status: "in_stock",
-  image: "",
+  images: [],
   shortDesc: "",
   tags: [],
   featured: false,
@@ -93,6 +93,7 @@ export default function AdminProductsPage() {
   const [editing, setEditing] = useState<ProductForm | null>(null);
   const [specKey, setSpecKey] = useState("");
   const [specVal, setSpecVal] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
   const [isUploading, setIsUploading] = useState(false);
 
   const { data: productRes, isLoading } = useProductsQuery({ status: "all", limit: 200 });
@@ -111,7 +112,7 @@ export default function AdminProductsPage() {
   const items = useMemo<UiProduct[]>(() => {
     const products = (productRes?.products || []) as any[];
     return products.map((p) => {
-      const image = p.thumbnail || p.images?.[0] || "";
+      const images = Array.from(new Set([p.thumbnail, ...(p.images || [])].filter(Boolean))) as string[];
       return {
         id: p.id,
         name: p.name || "",
@@ -124,7 +125,7 @@ export default function AdminProductsPage() {
         originalPrice: p.comparePrice != null ? Number(p.comparePrice) : undefined,
         stock: Number(p.quantity || 0),
         status: fromApiStatus(p.status, Number(p.quantity || 0)),
-        image,
+        images,
         shortDesc: p.shortDesc || "",
         tags: Array.isArray(p.tags) ? p.tags : [],
         featured: !!p.isFeatured,
@@ -147,11 +148,13 @@ export default function AdminProductsPage() {
 
   const openCreate = () => {
     setEditing({ ...emptyProduct });
+    setImageUrl("");
     setDialogOpen(true);
   };
 
   const openEdit = (p: UiProduct) => {
     setEditing({ ...p });
+    setImageUrl("");
     setDialogOpen(true);
   };
 
@@ -167,6 +170,7 @@ export default function AdminProductsPage() {
     }
 
     const slug = editing.slug?.trim() || normalizeSlug(editing.name);
+    const images = Array.from(new Set((editing.images || []).map((img) => img.trim()).filter(Boolean)));
     const payload = {
       name: editing.name.trim(),
       slug,
@@ -181,8 +185,8 @@ export default function AdminProductsPage() {
       isFeatured: !!editing.featured,
       isBestSeller: !!editing.bestSeller,
       specifications: editing.specs || {},
-      images: editing.image ? [editing.image] : [],
-      thumbnail: editing.image || null,
+      images,
+      thumbnail: images[0] || null,
       status: toApiStatus(editing.status),
     };
 
@@ -200,15 +204,16 @@ export default function AdminProductsPage() {
   };
 
   const handleImageUpload = async (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
+    const files = Array.from(event.target.files || []);
     event.target.value = "";
-    if (!file || !editing) return;
+    if (!files.length || !editing) return;
 
     try {
       setIsUploading(true);
-      const uploaded = await uploadApi.image("products", file);
-      setEditing({ ...editing, image: uploaded.url });
-      toast({ title: "Da tai anh san pham len" });
+      const uploaded = await Promise.all(files.map((file) => uploadApi.image("products", file)));
+      const nextImages = [...editing.images, ...uploaded.map((item) => item.url)];
+      setEditing({ ...editing, images: Array.from(new Set(nextImages)) });
+      toast({ title: `Da tai ${uploaded.length} anh san pham len` });
     } catch (err: any) {
       toast({
         title: "Tai anh that bai",
@@ -218,6 +223,31 @@ export default function AdminProductsPage() {
     } finally {
       setIsUploading(false);
     }
+  };
+
+  const addImageUrl = () => {
+    if (!editing) return;
+    const urls = imageUrl
+      .split(/\r?\n|,/)
+      .map((url) => url.trim())
+      .filter(Boolean);
+    if (!urls.length) return;
+    setEditing({ ...editing, images: Array.from(new Set([...editing.images, ...urls])) });
+    setImageUrl("");
+  };
+
+  const removeImage = (index: number) => {
+    if (!editing) return;
+    setEditing({ ...editing, images: editing.images.filter((_, i) => i !== index) });
+  };
+
+  const moveImage = (index: number, direction: -1 | 1) => {
+    if (!editing) return;
+    const nextIndex = index + direction;
+    if (nextIndex < 0 || nextIndex >= editing.images.length) return;
+    const images = [...editing.images];
+    [images[index], images[nextIndex]] = [images[nextIndex], images[index]];
+    setEditing({ ...editing, images });
   };
 
   const handleDelete = async (id: string) => {
@@ -309,7 +339,7 @@ export default function AdminProductsPage() {
                 {!isLoading && filtered.map((p) => (
                   <TableRow key={p.id}>
                     <TableCell>
-                      <img src={p.image || "/placeholder.svg"} alt={p.name} className="w-12 h-12 object-contain rounded border bg-white" />
+                      <img src={p.images[0] || "/placeholder.svg"} alt={p.name} className="w-12 h-12 object-contain rounded border bg-white" />
                     </TableCell>
                     <TableCell>
                       <div>
@@ -445,18 +475,54 @@ export default function AdminProductsPage() {
               </div>
 
               <div className="space-y-2">
-                <Label>URL ảnh</Label>
-                <Input value={editing.image} onChange={(e) => setEditing({ ...editing, image: e.target.value })} placeholder="Đường dẫn ảnh" />
+                <Label>Ảnh sản phẩm</Label>
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <Input
+                    value={imageUrl}
+                    onChange={(e) => setImageUrl(e.target.value)}
+                    placeholder="Dán URL ảnh, nhiều URL cách nhau bằng dấu phẩy"
+                  />
+                  <Button type="button" variant="outline" onClick={addImageUrl} className="shrink-0">
+                    <Plus className="w-4 h-4 mr-1" />
+                    Thêm URL
+                  </Button>
+                </div>
                 <div className="flex items-center gap-2">
-                  <Input id="product-image-upload" type="file" accept="image/*" onChange={handleImageUpload} disabled={isUploading} className="hidden" />
+                  <Input id="product-image-upload" type="file" accept="image/*" multiple onChange={handleImageUpload} disabled={isUploading} className="hidden" />
                   <Button type="button" variant="outline" className="shrink-0" asChild>
                     <label htmlFor="product-image-upload" className={isUploading ? "pointer-events-none" : "cursor-pointer"}>
                       <Upload className="w-4 h-4 mr-1" />
-                      {isUploading ? "Dang tai..." : "Upload"}
+                      {isUploading ? "Dang tai..." : "Upload nhiều ảnh"}
                     </label>
                   </Button>
                 </div>
-                {editing.image && <img src={editing.image} alt="" className="w-20 h-20 object-contain rounded border bg-white mt-1" />}
+                {editing.images.length > 0 && (
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                    {editing.images.map((img, index) => (
+                      <div key={`${img}-${index}`} className="rounded border bg-white p-2">
+                        <div className="relative aspect-square">
+                          <img src={img} alt="" className="h-full w-full object-contain" />
+                          {index === 0 && (
+                            <span className="absolute left-1 top-1 rounded bg-primary px-1.5 py-0.5 text-[10px] font-bold text-primary-foreground">
+                              Ảnh chính
+                            </span>
+                          )}
+                        </div>
+                        <div className="mt-2 flex items-center justify-between gap-1">
+                          <Button type="button" variant="outline" size="icon" onClick={() => moveImage(index, -1)} disabled={index === 0}>
+                            <ArrowUp className="h-3.5 w-3.5" />
+                          </Button>
+                          <Button type="button" variant="outline" size="icon" onClick={() => moveImage(index, 1)} disabled={index === editing.images.length - 1}>
+                            <ArrowDown className="h-3.5 w-3.5" />
+                          </Button>
+                          <Button type="button" variant="outline" size="icon" onClick={() => removeImage(index)}>
+                            <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="space-y-2">
