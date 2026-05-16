@@ -312,11 +312,7 @@ function BuildPCPage() {
                       }`}
                     >
                       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                        <div className="flex min-w-0 items-start gap-3">
-                          <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl bg-muted text-xl">
-                            <span aria-hidden="true">{step.icon}</span>
-                          </div>
-
+                        <div className="flex min-w-0 items-start">
                           <div className="min-w-0">
                             <div className="flex flex-wrap items-center gap-2">
                               <h3 className="text-[15px] font-semibold leading-6 text-foreground md:text-base">{step.label}</h3>
